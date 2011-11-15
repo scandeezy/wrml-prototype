@@ -53,6 +53,12 @@
         <url>http://builds.fanclout.com</url>
     </ciManagement>
 
+    <scm>
+        <url>https://github.com/wrml/wrml-prototype</url>
+        <connection>https://github.com/wrml/wrml-prototype.git</connection>
+        <developerConnection>git@github.com:wrml/wrml-prototype.git</developerConnection>
+    </scm>
+
     <licenses>
         <license>
             <name>Apache License 2.0</name>
