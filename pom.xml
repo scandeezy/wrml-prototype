@@ -70,7 +70,7 @@
         <dependency>
             <groupId>org.cojen</groupId>
             <artifactId>cojen</artifactId>
-            <version>2.0</version>
+            <version>2.2.3</version>
         </dependency>
 
         <dependency>
@@ -80,4 +80,29 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+
+
+    
+    <!-- The following is here temporarily during initial development. -->
+    <profiles>
+        <profile>
+            <id>fanclout-repo</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <repositories>
+                <repository>
+                    <id>fanclout</id>
+                    <url>http://dev.fanclout.com/nexus/content/groups/public/</url>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>fanclout</id>
+                    <url>http://dev.fanclout.com/nexus/content/groups/public/</url>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
 </project>
