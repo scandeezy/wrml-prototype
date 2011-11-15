@@ -1,0 +1,77 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.wrml</groupId>
+    <artifactId>wrml-prototype</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>wrml-prototype</name>
+    <description>A prototype for the Web Resource Modeling Language (WRML).</description>
+    <url>http://wrml.org</url>
+    <inceptionYear>2011</inceptionYear>
+
+    <organization>
+        <name>WRML</name>
+        <url>http://wrml.org</url>
+    </organization>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
+    <developers>
+        <developer>
+            <id>marksmasse</id>
+            <name>Mark S. Masse</name>
+            <email>mark@wrml.org</email>
+            <timezone>-8</timezone>
+            <roles>
+                <role>Founder</role>
+            </roles>
+        </developer>
+
+        <developer>
+            <id>jaxzin</id>
+            <name>Brian R. Jackson</name>
+            <email>brian@jaxzin.com</email>
+            <timezone>-5</timezone>
+            <roles>
+                <role>Committer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <issueManagement>
+        <system>JIRA</system>
+        <url>http://wrmlorg.jira.com/browse/PROTO</url>
+    </issueManagement>
+
+    <ciManagement>
+        <system>TeamCity</system>
+        <url>http://builds.fanclout.com</url>
+    </ciManagement>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.cojen</groupId>
+            <artifactId>cojen</artifactId>
+            <version>2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.9</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+</project>
