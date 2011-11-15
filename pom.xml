@@ -82,6 +82,17 @@
     </dependencies>
 
 
+    <!-- This is temporarily set to use the FanClout Nexus instance until we get a Sonatype OSS Hosted Repository -->
+    <distributionManagement>
+        <repository>
+            <id>fanclout.releases</id>
+            <url>http://dev.fanclout.com/nexus/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>fanclout.snapshots</id>
+            <url>http://dev.fanclout.com/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
     
     <!-- The following is here temporarily during initial development. -->
