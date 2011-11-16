@@ -109,6 +109,8 @@
                         <email>mark@wrml.org</email>
                     </properties>
                     <excludes>
+                        <!-- .gitignore not in the default excludes yet,
+                             http://code.google.com/p/maven-license-plugin/issues/detail?id=88 -->
                         <exclude>.gitignore</exclude>
                         <exclude>LICENSE.txt</exclude>
                     </excludes>
