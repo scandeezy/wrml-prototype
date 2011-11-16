@@ -111,7 +111,7 @@
                     <excludes>
                         <exclude>.gitignore</exclude>
                         <exclude>*.md</exclude>
-                        <exclude>LICENSE-2.0.html</exclude>
+                        <exclude>LICENSE.txt</exclude>
                     </excludes>
                     <strictCheck>true</strictCheck>
                 </configuration>
