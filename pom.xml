@@ -106,6 +106,7 @@
                     <header>${basedir}/src/license/header.txt</header>
                     <properties>
                         <year>${project.inceptionYear}</year>
+                        <org>WRML.org</org>
                         <email>mark@wrml.org</email>
                     </properties>
                     <excludes>
