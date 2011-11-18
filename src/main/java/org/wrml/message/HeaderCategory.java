@@ -14,20 +14,31 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.message;
 
-/**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
- * 
- * @param <T>
- *            The field type
- */
-public interface FieldEvent<T> {
+import org.wrml.Unique;
 
-    public Field<T> getField();
+public enum HeaderCategory implements Unique<HeaderCategory>, Comparable<HeaderCategory> {
 
-    public T getNewFieldValue();
+    GENERAL("General"), REQUEST("Request"), RESPONSE("Response"), ENTITY("Entity"), EXTENSION("Extension");
 
-    public T getOldFieldValue();
+    private final String _Name;
+
+    private HeaderCategory(String name) {
+        _Name = name;
+    }
+
+    public HeaderCategory getId() {
+        return this;
+    }
+
+    public String getName() {
+        return _Name;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+
 }

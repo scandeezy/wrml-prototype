@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.message;
+
+import java.net.URI;
 
 /**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
- * 
- * @param <T>
- *            The field type
+ * <blockquote cite="message://www.w3.org/Protocols/rfc2616/rfc2616-sec5
+ * .html#sec5.1"> Request-Line = Method SP Request-URI SP HTTP-HTTPVersion CRLF
+ * </blockquote>
  */
-public interface FieldEvent<T> {
+public interface RequestLine extends StartLine {
 
-    public Field<T> getField();
+    public Method getMethod();
 
-    public T getNewFieldValue();
-
-    public T getOldFieldValue();
+    public URI getRequestURI();
 }

@@ -16,6 +16,50 @@
 
 package org.wrml;
 
-public interface Field {
+import java.util.List;
+
+/**
+ * A web resource schema's field. Conceptually a field is a typed data slot,
+ * like a field in a Java object or a field on a web form. Instances of this
+ * class group the metadata associated with a specific schema's field.
+ *  
+ */
+public interface Field<T> extends Member, Comparable<Field<?>> {
+
+    /**
+     * Returns the value of the field represented by this Field, on the
+     * specified WRML object.
+     * 
+     * @param wrmlObject
+     *            the instance
+     * @return the field value on the instance
+     */
+    public T get(WrmlObject wrmlObject);
+
+    public List<Constraint> getConstraints();
+
+    public T getDefaultValue();
+
+    public String getName();
+
+    public boolean isHidden();
+
+    public boolean isReadOnly();
+
+    public boolean isRequired();
+
+    public boolean isTransient();
+
+    /**
+     * Sets the field represented by this Field object on the specified WRML
+     * object argument to the specified new value.
+     * 
+     * @param wrmlObject
+     *            the instance whose field should be modified
+     * @param value
+     *            the new value for the field of instance being modified
+     * @return the previous value of the field of the instance being modified
+     */
+    public T set(WrmlObject wrmlObject, T value);
 
 }

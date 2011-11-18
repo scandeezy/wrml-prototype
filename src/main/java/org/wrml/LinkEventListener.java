@@ -16,6 +16,9 @@
 
 package org.wrml;
 
+/**
+ * An event listener that can watch Links to follow their availability status.
+ */
 public interface LinkEventListener {
 
     public void linkStateChanged(LinkEvent event);

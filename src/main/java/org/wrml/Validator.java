@@ -16,18 +16,10 @@
 
 package org.wrml;
 
-/**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
- * 
- * @param <T>
- *            The field type
- */
-public interface FieldEvent<T> {
+public interface Validator<T> {
 
-    public Field<T> getField();
+    public ValidationResult validate(WrmlObject wrmlObject, Field<T> field);
 
-    public T getNewFieldValue();
+    public ValidationResult validate(WrmlObject wrmlObject, Field<T> field, T value);
 
-    public T getOldFieldValue();
 }

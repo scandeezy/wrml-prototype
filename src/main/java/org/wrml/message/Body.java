@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.message;
 
-/**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
- * 
- * @param <T>
- *            The field type
- */
-public interface FieldEvent<T> {
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-    public Field<T> getField();
+public interface Body {
 
-    public T getNewFieldValue();
+    public InputStream asInputStream() throws IOException;
 
-    public T getOldFieldValue();
+    public OutputStream asOutputStream() throws IOException;
 }

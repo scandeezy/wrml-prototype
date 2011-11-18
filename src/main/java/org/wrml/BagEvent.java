@@ -17,17 +17,19 @@
 package org.wrml;
 
 /**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
+ * Fired from a Bag whenever its contents are altered.
  * 
- * @param <T>
- *            The field type
+ * @param <K>
+ *            The key type
+ * @param <V>
+ *            The value type
  */
-public interface FieldEvent<T> {
+public interface BagEvent<K, V> {
 
-    public Field<T> getField();
+    public Bag getBag();
 
-    public T getNewFieldValue();
+    public V getNewValue();
 
-    public T getOldFieldValue();
+    public V getOldValue();
+
 }

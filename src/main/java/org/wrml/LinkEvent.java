@@ -16,6 +16,9 @@
 
 package org.wrml;
 
+/**
+ * Used to communicate the change in a Link's state.
+ */
 public interface LinkEvent {
 
     public Link getLink();

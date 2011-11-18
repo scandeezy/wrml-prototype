@@ -14,20 +14,9 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.message;
 
-/**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
- * 
- * @param <T>
- *            The field type
- */
-public interface FieldEvent<T> {
+public interface StartLine {
 
-    public Field<T> getField();
-
-    public T getNewFieldValue();
-
-    public T getOldFieldValue();
+    public HTTPVersion getHTTPVersion();
 }

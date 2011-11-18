@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.message;
+
+import org.wrml.Bag;
 
 /**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
- * 
- * @param <T>
- *            The field type
+ * <blockquote cite="message://www.w3.org/Protocols/rfc2616/rfc2616-sec4
+ * .html#sec4.2 "> The order in which header fields with differing field names
+ * are received is not significant. However, it is "good practice" to send
+ * general-header fields first, followed by request-header or response- header
+ * fields, and ending with the entity-header fields. </blockquote>
  */
-public interface FieldEvent<T> {
+public interface Entity {
 
-    public Field<T> getField();
+    public Body getBody();
 
-    public T getNewFieldValue();
-
-    public T getOldFieldValue();
+    public Bag<String, Header<?>> getHeaders();
 }

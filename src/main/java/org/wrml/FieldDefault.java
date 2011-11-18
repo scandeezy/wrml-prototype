@@ -17,17 +17,18 @@
 package org.wrml;
 
 /**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
+ * The default initial values for a schema field.
+ * 
+ * Note: This is a metadata class - instances should be edited with tools and
+ * persisted for reuse.
+ * 
  * 
  * @param <T>
- *            The field type
  */
-public interface FieldEvent<T> {
+public interface FieldDefault<T> {
+
+    public T getDefaultValue();
 
     public Field<T> getField();
 
-    public T getNewFieldValue();
-
-    public T getOldFieldValue();
 }

@@ -16,25 +16,45 @@
 
 package org.wrml;
 
+/**
+ * A single "node" in a REST API's path-based Web resource model's hierarchical usage. 
+ * 
+ * Note: This is a metadata class - instances should be edited with tools and
+ * persisted for reuse.
+ */
 public interface ResourceTemplate {
 
+    public Bag<String, LinkTemplate> getDestinationLinkTemplates();
+
+    public Bag<Schema, Bag<String, FieldDefault<?>>> getFieldDefaults();
+
     public String getName();
-    
-    public String getPath();
 
     public ResourceTemplate getParent();
 
+    public String getPath();
+
     public ResourceArchetype getResourceArchetype();
+
+    public Bag<String, LinkTemplate> getSourceLinkTemplates();
 
     public UriTemplate getUriTemplate();
 
     /*
+     * public Bag<String, MediaType> getRequestMediaTypes();
      * 
+     * public Bag<String, MediaType> getResponseMediaTypes();
      * 
+     * public Bag<String, Schema> getRequestSchemas();
      * 
-     * public Set<Link> getEndingLinks(); public Set<Link> getBeginningLinks();
+     * public Bag<String, Schema> getResponseSchemas();
      * 
-     * Current Schema Past Schema (list) Link Templates per schema (list) Field
-     * Templates per schema (list)
+     * public Bag<String, Format> getRequestFormats();
+     * 
+     * public Bag<String, Format> getResponseFormats();
+     * 
+     * public Bag<String, FieldTemplate<?>> getFieldTemplates();
+     * 
+     * public Bag<String, LinkTemplate> getLinkTemplates();
      */
 }

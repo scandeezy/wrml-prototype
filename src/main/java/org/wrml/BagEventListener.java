@@ -16,6 +16,20 @@
 
 package org.wrml;
 
+/**
+ * Listener for the Bag collection's events.
+ * 
+ * @param <K>
+ *            The key type
+ * @param <V>
+ *            The value type
+ */
 public interface BagEventListener<K, V> {
+
+    public void bagCleared(BagEvent<K, V> event);
+
+    public void bagValueInserted(BagEvent<K, V> event);
+
+    public void bagValueUpdated(BagEvent<K, V> event);
 
 }

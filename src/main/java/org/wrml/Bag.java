@@ -20,6 +20,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A Map that provides List and Set views and fires events when values are
+ * inserted, updated, or cleared.
+ * 
+ * @param <K>
+ *            The key type
+ * @param <V>
+ *            The value type
+ */
 public interface Bag<K, V> extends Map<K, V> {
 
     public void addBagEventListener(BagEventListener<K, V> listener);

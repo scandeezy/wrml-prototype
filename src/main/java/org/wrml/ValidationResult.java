@@ -16,18 +16,7 @@
 
 package org.wrml;
 
-/**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
- * 
- * @param <T>
- *            The field type
- */
-public interface FieldEvent<T> {
-
-    public Field<T> getField();
-
-    public T getNewFieldValue();
-
-    public T getOldFieldValue();
+public interface ValidationResult {
+    // success/failure
+    // oldvalue new value
 }

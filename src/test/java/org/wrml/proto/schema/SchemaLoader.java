@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.proto.schema;
 
 /**
  * A class that can dynamically load a WRML Schema as a Java class.
  */
 public class SchemaLoader {
+
     public Object load(String uri) {
         // TODO: This is just enough to make the unit test pass
         return new Object() {
+
             public int getExample() {
                 return 0;
             }

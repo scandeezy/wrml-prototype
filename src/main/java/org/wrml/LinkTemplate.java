@@ -17,17 +17,25 @@
 package org.wrml;
 
 /**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
+ * A Link template exists within a specific API's design metadata. It is part of
+ * a Resource Template which is specific to a design-time linking of two REST
+ * API resource templates.
  * 
- * @param <T>
- *            The field type
+ * Note: This is a metadata class - instances should be edited with tools and
+ * persisted for reuse.
  */
-public interface FieldEvent<T> {
+public interface LinkTemplate {
 
-    public Field<T> getField();
+    public ResourceTemplate getDestination();
 
-    public T getNewFieldValue();
+    public Bag<String, Field<?>> getDestinationUriTemplateFields(Schema schema);
 
-    public T getOldFieldValue();
+    public LinkRelation getRelation();
+
+    public Bag<String, MediaType> getRequestMediaTypes();
+
+    public Bag<String, MediaType> getResponseMediaTypes();
+
+    public ResourceTemplate getSource();
+
 }

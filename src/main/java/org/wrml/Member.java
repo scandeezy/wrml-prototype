@@ -17,17 +17,16 @@
 package org.wrml;
 
 /**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
- * 
- * @param <T>
- *            The field type
+ * Base class for members of a schema/Wrml Object.
  */
-public interface FieldEvent<T> {
+public interface Member extends Unique<String> {
 
-    public Field<T> getField();
+    public Schema getDeclaredSchema();
 
-    public T getNewFieldValue();
+    public String getDescription();
 
-    public T getOldFieldValue();
+    public Schema getSchema();
+
+    public String getTitle();
+
 }

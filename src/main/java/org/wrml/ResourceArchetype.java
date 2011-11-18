@@ -16,12 +16,14 @@
 
 package org.wrml;
 
+/**
+ * Enumeration that captures the resource archetypes.
+ */
 public enum ResourceArchetype {
 
-    DOCUMENT("Document", "document"),
-    COLLECTION("Collection", "collection"),
-    STORE("Store", "store"),
-    CONTROLLER("Controller", "controller");
+    DOCUMENT("Document", "document"), COLLECTION("Collection", "collection"), STORE("Store", "store"), CONTROLLER(
+            "Controller",
+            "controller");
 
     private final String _Title;
     private final String _Keyword;

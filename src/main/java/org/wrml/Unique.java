@@ -17,17 +17,19 @@
 package org.wrml;
 
 /**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
+ * A type who's instances are unique via some identity of type I.
  * 
- * @param <T>
- *            The field type
+ * @param <I>
+ *            The identity value's type.
  */
-public interface FieldEvent<T> {
+public interface Unique<I> {
 
-    public Field<T> getField();
+    @Override
+    public boolean equals(final Object o);
 
-    public T getNewFieldValue();
+    public I getId();
 
-    public T getOldFieldValue();
+    @Override
+    public int hashCode();
+
 }

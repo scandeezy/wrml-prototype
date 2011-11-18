@@ -16,21 +16,28 @@
 
 package org.wrml;
 
-public interface Link {
+import java.net.URI;
+
+/**
+ * A WRMLObject instance's Link. This class represents a link "instance", that
+ * is a link with a fully qualified href URI value that can be used to interact.
+ * 
+ * A link is enabled if the WrmlObject's schema's associated link formula
+ * evaluates to true. Instances of this class are responsible for managing their
+ * enabled state changes by listening to events from the fields that their
+ * LinkFormula relies upon.
+ */
+public interface Link extends Member, Comparable<Link> {
 
     public void addEventListener(LinkEventListener listener);
 
-    public ResourceTemplate getDestination();
+    public URI getHref();
 
-    public LinkFormula getEnabledFormula();
+    // public Bag<String, Field<?>> getDestinationUriTemplateFields();
 
-    public LinkRelation getRelation();
+    public LinkTemplate getLinkTemplate();
 
-    public Bag<String, MediaType> getRequestMediaTypes();
-
-    public Bag<String, MediaType> getResponseMediaTypes();
-
-    public ResourceTemplate getSource();
+    public WrmlObject getOwner();
 
     public boolean isEnabled();
 

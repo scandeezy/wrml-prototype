@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wrml.proto.schema;
 
-import org.junit.Test;
+package org.wrml.proto.schema;
 
 import static org.hamcrest.Matchers.hasProperty;
 import static org.junit.Assert.assertThat;
+
+import org.junit.Test;
 
 /**
  * Tests for the behavior of SchemaLoader
@@ -27,9 +28,9 @@ public class SchemaLoaderTest {
 
     @Test
     public void shouldLoadSimpleSchema() {
-        SchemaLoader loader = new SchemaLoader();
+        final SchemaLoader loader = new SchemaLoader();
 
-        Object schema = loader.load("classpath://simple.json");
+        final Object schema = loader.load("classpath://simple.json");
 
         assertThat("schema field", schema, hasProperty("example"));
     }

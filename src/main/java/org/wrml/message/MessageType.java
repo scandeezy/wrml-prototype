@@ -14,20 +14,30 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.message;
 
-/**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
- * 
- * @param <T>
- *            The field type
- */
-public interface FieldEvent<T> {
+import org.wrml.Unique;
 
-    public Field<T> getField();
+public enum MessageType implements Unique<MessageType> {
 
-    public T getNewFieldValue();
+    REQUEST("Request"), RESPONSE("Response");
 
-    public T getOldFieldValue();
+    private final String _Name;
+
+    private MessageType(String name) {
+        _Name = name;
+    }
+
+    public MessageType getId() {
+        return this;
+    }
+
+    public String getName() {
+        return _Name;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

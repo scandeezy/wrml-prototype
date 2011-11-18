@@ -16,6 +16,21 @@
 
 package org.wrml;
 
-public interface LinkFormula {
+/**
+ * The metadata that represents a simple boolean formula that can be evaluated
+ * to determine the state of a link.
+ * 
+ * Note: This is a metadata class - instances should be edited with tools and
+ * persisted for reuse.
+ */
+public interface LinkFormula extends Member, Comparable<LinkFormula> {
+
+    public boolean execute(WrmlObject wrmlObject);
+
+    public Bag<String, Field<?>> getFieldOperands();
+
+    public LinkRelation getRelation();
+
+    public String getSourceCode();
 
 }

@@ -16,9 +16,37 @@
 
 package org.wrml;
 
-public interface Schema {
+import java.util.List;
 
-    
-    
-    
+/**
+ * Schemas are one of WRML's main ideas. Like Java's generics, schemas add
+ * parameterized type information to the representations (of various formats)
+ * that are traded back and forth between programs on the Web.
+ * 
+ * So if application/json is like Java's pre-generics collection API where type
+ * cfrom java.lang.Object to
+ * 
+ * Note: This is a metadata class - instances should be edited with tools and
+ * persisted for reuse.
+ */
+public interface Schema extends Unique<String> { // TODO: What should schema's
+
+    // key be (String or URI)?
+
+    public List<Schema> getBaseSchemas();
+
+    public String getDescription();
+
+    public Field<?> getField(String fieldName);
+
+    public Bag<String, Field<?>> getFields();
+
+    public LinkFormula getLinkFormula(String relationName);
+
+    public Bag<String, LinkFormula> getLinkFormulas();
+
+    public String getName();
+
+    public int getVersion();
+
 }

@@ -16,19 +16,20 @@
 
 package org.wrml;
 
-public interface WrmlObject {
+/**
+ * The main object that that is exposed to  clients design.   
+ */
+public interface WrmlObject extends Unique<String> {
 
     public void addEventListener(WrmlObjectEventListener listener);
+
+    public void addFieldEventListener(Field<?> field, FieldEventListener<?> listener);
 
     public Object getFieldValue(String fieldName);
 
     public Bag<String, Object> getFieldValues();
 
     public Link getLink(String relationName);
-
-    public LinkFormula getLinkFormula(String relationName);
-
-    public Bag<String, LinkFormula> getLinkFormulas();
 
     public Bag<String, Link> getLinks();
 
@@ -38,6 +39,15 @@ public interface WrmlObject {
 
     public void removeEventListener(WrmlObjectEventListener listener);
 
+    public void removeFieldEventListener(Field<?> field, FieldEventListener<?> listener);
+
     public void setFieldValue(String fieldName, Object fieldValue);
+
+    // Links may suffice on the server side (or not) but perhaps, at least a
+    // "client-side" wrapper object should make the links appear more
+    // like abstract "actions"? Meaning if the client already
+    // owns the http connection, it can pretty well implement the hypermedia
+    // engine of "clicking" links to trigger remote API calls via WRML-compliant
+    // REST.
 
 }

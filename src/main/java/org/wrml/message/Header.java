@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.message;
 
-/**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
- * 
- * @param <T>
- *            The field type
- */
-public interface FieldEvent<T> {
+public interface Header<T> extends Comparable<Header<?>> {
 
-    public Field<T> getField();
+    public HeaderCategory getCategory();
 
-    public T getNewFieldValue();
+    public String getName();
 
-    public T getOldFieldValue();
+    public T getValue();
+
+    public void setHeaderCategory(HeaderCategory headerCategory);
+
+    public T setValue(T value);
+
 }

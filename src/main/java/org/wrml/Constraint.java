@@ -16,18 +16,23 @@
 
 package org.wrml;
 
+import java.util.List;
+
 /**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
+ * A field constraint's metadata and pointers to "executable" Validators.
+ * 
+ * Note: This is a metadata class - instances should be edited with tools and
+ * persisted for reuse.
  * 
  * @param <T>
  *            The field type
  */
-public interface FieldEvent<T> {
+public interface Constraint<T> {
 
-    public Field<T> getField();
+    public String getDescription();
 
-    public T getNewFieldValue();
+    public String getName();
 
-    public T getOldFieldValue();
+    public List<Validator> getValidators();
+
 }

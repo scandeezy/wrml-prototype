@@ -16,6 +16,28 @@
 
 package org.wrml;
 
-public interface LinkRelation {
+/**
+ * Link relations are a big deal in WRML. They are a first class entity with
+ * supporting REST API to manage and deliver them. An applications use of link
+ * relations is like a "shared vocabulary" of resource relationships - the named
+ * "actions" - understood by both the client and server of an application.
+ * 
+ * Their uniqueness is used liberally in WRML Java application's as they form
+ * the key between the object model's data and metadata layers.
+ * 
+ * Note: This is a metadata class - instances should be edited with tools and
+ * persisted for reuse.
+ */
+public interface LinkRelation extends Unique<String>, Comparable<LinkFormula> {
+
+    public String getDescription();
+
+    public Schema getName();
+
+    public Bag<String, MediaType> getRequestMediaTypes();
+
+    public Bag<String, MediaType> getResponseMediaTypes();
+
+    public String getTitle();
 
 }

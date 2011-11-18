@@ -17,17 +17,13 @@
 package org.wrml;
 
 /**
- * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
+ * An event listener for events related to a WRMLObject field.
  * 
  * @param <T>
- *            The field type
  */
-public interface FieldEvent<T> {
+public interface FieldEventListener<T> {
 
-    public Field<T> getField();
+    public void fieldValueChanged(FieldEvent<T> event);
 
-    public T getNewFieldValue();
-
-    public T getOldFieldValue();
+    public void fieldValueInitialized(FieldEvent<T> event);
 }
