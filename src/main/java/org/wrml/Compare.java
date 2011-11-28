@@ -49,11 +49,11 @@ public abstract class Compare {
     }
 
     public static int twoInts(int me, int you) {
-        return Integer.compare(me, you);
+        return Integer.signum(me - you);
     }
 
     public static int twoLongs(long me, long you) {
-        return Long.compare(me, you);
+        return Long.signum(me - you);
     }
 
     public static int twoStrings(String me, String you) {
