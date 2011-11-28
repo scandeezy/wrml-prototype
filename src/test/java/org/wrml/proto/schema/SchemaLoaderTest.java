@@ -16,10 +16,11 @@
 
 package org.wrml.proto.schema;
 
-import static org.hamcrest.Matchers.hasProperty;
-import static org.junit.Assert.assertThat;
-
 import org.junit.Test;
+import org.wrml.Schema;
+
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.assertThat;
 
 /**
  * Tests for the behavior of SchemaLoader
@@ -30,8 +31,8 @@ public class SchemaLoaderTest {
     public void shouldLoadSimpleSchema() {
         final SchemaLoader loader = new SchemaLoader();
 
-        final Object schema = loader.load("classpath://simple.json");
+        final Schema schema = loader.load("classpath://simple.json");
 
-        assertThat("schema field", schema, hasProperty("example"));
+        assertThat("schema field", schema.getField("example"), is(notNullValue()));
     }
 }
