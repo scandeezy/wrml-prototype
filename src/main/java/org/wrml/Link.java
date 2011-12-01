@@ -18,6 +18,10 @@ package org.wrml;
 
 import java.net.URI;
 
+import org.wrml.api.LinkTemplate;
+import org.wrml.api.ResourceTemplate;
+import org.wrml.util.Identifiable;
+
 /**
  * A WRMLObject instance's Link. This class represents a link "instance", that
  * is a link with a fully qualified href URI value that can be used to interact.
@@ -27,19 +31,67 @@ import java.net.URI;
  * enabled state changes by listening to events from the fields that their
  * LinkFormula relies upon.
  */
-public interface Link extends Member, Comparable<Link> {
+public final class Link extends Identifiable<URI> {
 
-    public void addEventListener(LinkEventListener listener);
+    private static final long serialVersionUID = -6235652220661484935L;
 
-    public URI getHref();
+    private final WrmlObject _Owner;
+    private final URI _LinkRelationId;
+    private URI _Href;
+    private boolean _Enabled;
 
-    // public Bag<String, Field<?>> getDestinationUriTemplateFields();
+    public Link(WrmlObject owner, URI linkRelationId) {
+        _Owner = owner;
+        _LinkRelationId = linkRelationId;
+        setId(linkRelationId);
+    }
 
-    public LinkTemplate getLinkTemplate();
+    public void addEventListener(LinkEventListener listener) {
+        // TODO
+    }
 
-    public WrmlObject getOwner();
+    public void fireHrefChangedEvent() {
 
-    public boolean isEnabled();
+    }
 
-    public void removeEventListener(LinkEventListener listener);
+    public URI getHref() {
+        return _Href;
+    }
+
+    public URI getLinkRelationId() {
+        return _LinkRelationId;
+    }
+
+    public LinkTemplate getLinkTemplate() {
+        final WrmlObject owner = getOwner();
+        final ResourceTemplate resourceTemplate = getOwner().getResourceTemplate();
+        final URI linkTemplateId = resourceTemplate.getHereToThereLinkTemplateId(getLinkRelationId());
+        return owner.getContext().getLinkTemplate(linkTemplateId);
+    }
+
+    public WrmlObject getOwner() {
+        return _Owner;
+
+    }
+
+    public boolean isEnabled() {
+        return _Enabled;
+    }
+
+    public void removeEventListener(LinkEventListener listener) {
+        // TODO
+    }
+
+    /*
+     * 
+     * public void hrefFieldValueChanged(FieldEvent event) { updateHref(); }
+     * public void setHref (String href) { if (_Href !.equal href) { final _
+     * Href = href; fireHrefChangedEvent(); } }
+     * 
+     * public void updateHref() { final LinkTemplate linkTemplate =
+     * getLinkTemplate(); final ResourceTemplate destination =
+     * linkTemplate.getDestination(); final UriTemplate uriTemplate =
+     * destination.getUriTemplate(); setHref(uriTemplate.execute(this)); }
+     */
+
 }

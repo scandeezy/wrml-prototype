@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.communication;
 
-import java.util.EventListener;
+public interface Header<T> extends Comparable<Header<?>> {
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
+    public HeaderCategory getCategory();
 
-    public void enabledStateChanged(LinkEvent event);
+    public String getName();
+
+    public T getValue();
+
+    public void setHeaderCategory(HeaderCategory headerCategory);
+
+    public T setValue(T value);
 
 }

@@ -14,15 +14,31 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.util;
 
-import java.util.EventListener;
+import java.util.EventObject;
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
+public class CancelableEvent extends EventObject {
 
-    public void enabledStateChanged(LinkEvent event);
+    private static final long serialVersionUID = -8701444086930982155L;
 
+    private final boolean _Cancelable;
+    private boolean _Cancelled;
+
+    public CancelableEvent(Object source, boolean cancelable) {
+        super(source);
+        _Cancelable = cancelable;
+    }
+
+    public boolean isCancelable() {
+        return _Cancelable;
+    }
+
+    public boolean isCancelled() {
+        return _Cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        _Cancelled = cancelled;
+    }
 }

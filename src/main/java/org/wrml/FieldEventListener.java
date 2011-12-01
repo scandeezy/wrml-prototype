@@ -16,14 +16,18 @@
 
 package org.wrml;
 
+import java.util.EventListener;
+
 /**
  * An event listener for events related to a WRMLObject field.
  * 
  * @param <T>
  */
-public interface FieldEventListener<T> {
+public interface FieldEventListener<T> extends EventListener {
 
-    public void fieldValueChanged(FieldEvent<T> event);
+    public void constraintViolated(FieldEvent<T> event);
 
-    public void fieldValueInitialized(FieldEvent<T> event);
+    public void valueChanged(FieldEvent<T> event);
+
+    public void valueInitialized(FieldEvent<T> event);
 }

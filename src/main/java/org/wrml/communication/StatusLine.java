@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.communication;
 
-import java.util.EventListener;
+public interface StatusLine extends StartLine {
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
-
-    public void enabledStateChanged(LinkEvent event);
-
+    public Status getStatus();
 }

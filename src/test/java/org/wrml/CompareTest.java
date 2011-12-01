@@ -13,42 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml;
+
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Test;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.assertThat;
+import org.wrml.util.Compare;
 
 public class CompareTest {
 
     @Test
     public void shouldCompareTwoIntsAsEqual() {
-        assertThat(Compare.twoInts(0,0), is(equalTo(0)));
+        assertThat(Compare.twoInts(0, 0), is(equalTo(0)));
     }
 
     @Test
     public void shouldCompareTwoIntsAsNegative() {
-        assertThat(Compare.twoInts(0,1), is(equalTo(-1)));
+        assertThat(Compare.twoInts(0, 1), is(equalTo(-1)));
     }
 
     @Test
     public void shouldCompareTwoIntsAsPositive() {
-        assertThat(Compare.twoInts(1,0), is(equalTo(1)));
-    }
-
-    @Test
-    public void shouldCompareTwoLongsAsEqual() {
-        assertThat(Compare.twoLongs(0,0), is(equalTo(0)));
+        assertThat(Compare.twoInts(1, 0), is(equalTo(1)));
     }
 
     @Test
     public void shouldCompareTwoLongAsNegative() {
-        assertThat(Compare.twoLongs(0,1), is(equalTo(-1)));
+        assertThat(Compare.twoLongs(0, 1), is(equalTo(-1)));
+    }
+
+    @Test
+    public void shouldCompareTwoLongsAsEqual() {
+        assertThat(Compare.twoLongs(0, 0), is(equalTo(0)));
     }
 
     @Test
     public void shouldCompareTwoLongsAsPositive() {
-        assertThat(Compare.twoLongs(1,0), is(equalTo(1)));
+        assertThat(Compare.twoLongs(1, 0), is(equalTo(1)));
     }
 }

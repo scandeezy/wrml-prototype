@@ -16,6 +16,9 @@
 
 package org.wrml;
 
+import org.wrml.util.CancelableEvent;
+import org.wrml.util.MapEvent;
+
 /**
  * An event that communicates some activity associated with a specific
  * WRMLObject instance's specific field.
@@ -23,11 +26,34 @@ package org.wrml;
  * @param <T>
  *            The field type
  */
-public interface FieldEvent<T> {
+public final class FieldEvent<T> extends CancelableEvent {
 
-    public Field<T> getField();
+    private static final long serialVersionUID = -1277427529297982437L;
 
-    public T getNewFieldValue();
+    private final String _FieldName;
+    private final MapEvent<String, Object> _SourceEvent;
+    private ConstraintEvent<T> _ConstraintEvent;
 
-    public T getOldFieldValue();
+    public FieldEvent(WrmlObject source, boolean cancelable, String fieldName, MapEvent<String, Object> sourceEvent) {
+        super(source, cancelable);
+        _FieldName = fieldName;
+        _SourceEvent = sourceEvent;
+    }
+
+    public ConstraintEvent<T> getConstraintEvent() {
+        return _ConstraintEvent;
+    }
+
+    public String getFieldName() {
+        return _FieldName;
+    }
+
+    public MapEvent<String, Object> getSourceEvent() {
+        return _SourceEvent;
+    }
+
+    public void setConstraintEvent(ConstraintEvent<T> constraintEvent) {
+        _ConstraintEvent = constraintEvent;
+    }
+
 }

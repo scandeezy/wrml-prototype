@@ -16,38 +16,50 @@
 
 package org.wrml;
 
+import java.io.Serializable;
+import java.net.URI;
+
+import org.wrml.api.ResourceTemplate;
+import org.wrml.schema.Field;
+import org.wrml.schema.Schema;
+import org.wrml.util.ObservableList;
+import org.wrml.util.ObservableMap;
+
 /**
- * The main object that that is exposed to  clients design.   
+ * The base interface for all web resource schema instances.
  */
-public interface WrmlObject extends Unique<String> {
+public interface WrmlObject extends Serializable {
 
     public void addEventListener(WrmlObjectEventListener listener);
 
-    public void addFieldEventListener(Field<?> field, FieldEventListener<?> listener);
+    public void addFieldEventListener(String fieldName, FieldEventListener<?> listener);
+
+    public Context getContext();
+
+    public ObservableMap<String, Object> getFieldMap();
 
     public Object getFieldValue(String fieldName);
 
-    public Bag<String, Object> getFieldValues();
+    public Link getLink(URI linkRelationId);
 
-    public Link getLink(String relationName);
-
-    public Bag<String, Link> getLinks();
+    public ObservableMap<URI, Link> getLinkMap();
 
     public ResourceTemplate getResourceTemplate();
 
+    public URI getResourceTemplateId();
+
     public Schema getSchema();
+
+    public URI getSchemaId();
 
     public void removeEventListener(WrmlObjectEventListener listener);
 
-    public void removeFieldEventListener(Field<?> field, FieldEventListener<?> listener);
+    public void removeFieldEventListener(String fieldName, FieldEventListener<?> listener);
 
-    public void setFieldValue(String fieldName, Object fieldValue);
+    public Object setFieldValue(String fieldName, Object fieldValue);
 
-    // Links may suffice on the server side (or not) but perhaps, at least a
-    // "client-side" wrapper object should make the links appear more
-    // like abstract "actions"? Meaning if the client already
-    // owns the http connection, it can pretty well implement the hypermedia
-    // engine of "clicking" links to trigger remote API calls via WRML-compliant
-    // REST.
+    public boolean isDocroot();
+
+    public boolean isReadOnly();
 
 }

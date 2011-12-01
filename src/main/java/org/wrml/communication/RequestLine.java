@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.communication;
 
-import java.util.EventListener;
+import java.net.URI;
 
 /**
- * An event listener that can watch Links to follow their availability status.
+ * <blockquote cite="message://www.w3.org/Protocols/rfc2616/rfc2616-sec5
+ * .html#sec5.1"> Request-Line = Method SP Request-URI SP HTTP-HTTPVersion CRLF
+ * </blockquote>
  */
-public interface LinkEventListener extends EventListener {
+public interface RequestLine extends StartLine {
 
-    public void enabledStateChanged(LinkEvent event);
+    public Method getMethod();
 
+    public URI getRequestURI();
 }

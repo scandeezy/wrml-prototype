@@ -14,15 +14,30 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.communication;
 
-import java.util.EventListener;
+import org.wrml.util.Unique;
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
+public enum MessageType implements Unique<MessageType> {
 
-    public void enabledStateChanged(LinkEvent event);
+    REQUEST("Request"), RESPONSE("Response");
 
+    private final String _Name;
+
+    private MessageType(String name) {
+        _Name = name;
+    }
+
+    public MessageType getId() {
+        return this;
+    }
+
+    public String getName() {
+        return _Name;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

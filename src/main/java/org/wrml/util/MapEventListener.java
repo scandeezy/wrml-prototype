@@ -14,15 +14,34 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.util;
 
 import java.util.EventListener;
 
 /**
- * An event listener that can watch Links to follow their availability status.
+ * Listener for the ObservableMap collection's events.
+ * 
+ * @param <K>
+ *            The key type
+ * @param <V>
+ *            The value type
  */
-public interface LinkEventListener extends EventListener {
+public interface MapEventListener<K, V> extends EventListener {
 
-    public void enabledStateChanged(LinkEvent event);
+    public void cleared(MapEvent<K, V> event);
+
+    public void clearing(MapEvent<K, V> event);
+
+    public void entryInserted(MapEvent<K, V> event);
+
+    public void entryRemoved(MapEvent<K, V> event);
+
+    public void entryUpdated(MapEvent<K, V> event);
+
+    public void insertingEntry(MapEvent<K, V> event);
+
+    public void removingEntry(MapEvent<K, V> event);
+
+    public void updatingEntry(MapEvent<K, V> event);
 
 }

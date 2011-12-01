@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.communication;
 
-import java.util.EventListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
+public interface Body {
 
-    public void enabledStateChanged(LinkEvent event);
+    public InputStream asInputStream() throws IOException;
 
+    public OutputStream asOutputStream() throws IOException;
 }
