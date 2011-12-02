@@ -58,6 +58,30 @@
         </developer>
     </developers>
 
+    <mailingLists>
+        <mailingList>
+            <name>wrml-users</name>
+            <archive>http://groups.google.com/group/wrml-users</archive>
+            <post>wrml-users@googlegroups.com</post>
+            <subscribe>wrml-users-subscribe@googlegroups.com</subscribe>
+            <unsubscribe>wrml-users-unsubscribe@googlegroups.com</unsubscribe>
+        </mailingList>
+        <mailingList>
+            <name>wrml-dev</name>
+            <archive>http://groups.google.com/group/wrml-dev</archive>
+            <post>wrml-dev@googlegroups.com</post>
+            <subscribe>wrml-dev-subscribe@googlegroups.com</subscribe>
+            <unsubscribe>wrml-dev-unsubscribe@googlegroups.com</unsubscribe>
+        </mailingList>
+        <mailingList>
+            <name>wrml-announce</name>
+            <archive>http://groups.google.com/group/wrml-announce</archive>
+            <post>wrml-announce@googlegroups.com</post>
+            <subscribe>wrml-announce-subscribe@googlegroups.com</subscribe>
+            <unsubscribe>wrml-announce-unsubscribe@googlegroups.com</unsubscribe>
+        </mailingList>
+    </mailingLists>
+
     <issueManagement>
         <system>JIRA</system>
         <url>https://wrmlorg.jira.com/browse/PROTO</url>
