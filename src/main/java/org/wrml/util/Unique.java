@@ -14,15 +14,22 @@
  * limitations under the License.
  */
 
-package org.wrml;
-
-import java.util.EventListener;
+package org.wrml.util;
 
 /**
- * An event listener that can watch Links to follow their availability status.
+ * A type who's instances are unique via some identity of type I.
+ * 
+ * @param <I>
+ *            The identity value's type.
  */
-public interface LinkEventListener extends EventListener {
+public interface Unique<I> {
 
-    public void enabledStateChanged(LinkEvent event);
+    @Override
+    public boolean equals(final Object o);
+
+    public I getId();
+
+    @Override
+    public int hashCode();
 
 }

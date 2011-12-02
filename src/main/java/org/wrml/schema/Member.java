@@ -14,23 +14,33 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.schema;
 
-import org.wrml.util.CancelableEvent;
+import java.net.URI;
+
+import org.wrml.util.Identifiable;
 
 /**
- * Used to communicate the change in a Link's state.
+ * Base class for members of a schema.
  */
-public final class LinkEvent extends CancelableEvent {
+public abstract class Member<T extends Comparable<T>> extends Identifiable<T> {
 
-    private static final long serialVersionUID = -3145602918059087982L;
+    private static final long serialVersionUID = 7032315376220829674L;
 
-    public LinkEvent(Link link, boolean cancelable) {
-        super(link, cancelable);
+    private final Schema _Schema;
+    private final URI _DeclaredSchemaId;
+
+    public Member(Schema schema, URI declaredSchemaId) {
+        _Schema = schema;
+        _DeclaredSchemaId = declaredSchemaId;
     }
 
-    public Link getLink() {
-        return (Link) getSource();
+    public final URI getDeclaredSchemaId() {
+        return _DeclaredSchemaId;
+    }
+
+    public final Schema getSchema() {
+        return _Schema;
     }
 
 }

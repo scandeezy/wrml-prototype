@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package org.wrml;
-
-import java.util.EventListener;
+package org.wrml.temp;
 
 /**
- * An event listener that can watch Links to follow their availability status.
+ * An example interface that will ultimately be auto-generated from a schema.
+ * Decompile to help write the code generation code.
  */
-public interface LinkEventListener extends EventListener {
+public interface Author extends Document {
 
-    public void enabledStateChanged(LinkEvent event);
+    public String getFirstName();
+
+    public String setFirstName(String firstName);
+
+    public String getLastName();
+
+    public String setLastName(String lastName);
 
 }

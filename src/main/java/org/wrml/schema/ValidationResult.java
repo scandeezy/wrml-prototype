@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.schema;
 
-import java.util.EventListener;
-
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
-
-    public void enabledStateChanged(LinkEvent event);
-
+public interface ValidationResult {
+    // success/failure
+    // oldvalue new value
 }

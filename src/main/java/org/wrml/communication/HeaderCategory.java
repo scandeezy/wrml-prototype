@@ -14,15 +14,31 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.communication;
 
-import java.util.EventListener;
+import org.wrml.util.Unique;
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
+public enum HeaderCategory implements Unique<HeaderCategory>, Comparable<HeaderCategory> {
 
-    public void enabledStateChanged(LinkEvent event);
+    GENERAL("General"), REQUEST("Request"), RESPONSE("Response"), ENTITY("Entity"), EXTENSION("Extension");
+
+    private final String _Name;
+
+    private HeaderCategory(String name) {
+        _Name = name;
+    }
+
+    public HeaderCategory getId() {
+        return this;
+    }
+
+    public String getName() {
+        return _Name;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 
 }
