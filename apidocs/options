@@ -1,0 +1,24 @@
+-classpath
+'/Users/jacksbrr/Dropbox/Projects/wrml/wrml-prototype/target/classes:/Users/jacksbrr/.m2/repository/org/cojen/cojen/2.2.3/cojen-2.2.3.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/Users/jacksbrr/Dropbox/Projects/wrml/wrml-prototype/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2011 <a href="http://wrml.org">WRML</a>. All Rights Reserved.'
+-charset
+'UTF-8'
+-d
+'/Users/jacksbrr/Dropbox/Projects/wrml/wrml-prototype/target/site/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'wrml-prototype 1.0-SNAPSHOT API'
+-linkoffline
+'http://download.oracle.com/javase/6/docs/api' '/Users/jacksbrr/Dropbox/Projects/wrml/wrml-prototype/target/javadoc-bundle-options'
+-use
+-version
+-windowtitle
+'wrml-prototype 1.0-SNAPSHOT API'

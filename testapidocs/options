@@ -1,0 +1,26 @@
+-classpath
+'/Users/jacksbrr/Dropbox/Projects/wrml/wrml-prototype/target/classes:/Users/jacksbrr/Dropbox/Projects/wrml/wrml-prototype/target/test-classes:/Users/jacksbrr/.m2/repository/org/hamcrest/hamcrest-all/1.2/hamcrest-all-1.2.jar:/Users/jacksbrr/.m2/repository/org/objenesis/objenesis/1.0/objenesis-1.0.jar:/Users/jacksbrr/.m2/repository/org/mockito/mockito-core/1.8.5/mockito-core-1.8.5.jar:/Users/jacksbrr/.m2/repository/org/hamcrest/hamcrest-core/1.1/hamcrest-core-1.1.jar:/Users/jacksbrr/.m2/repository/org/cojen/cojen/2.2.3/cojen-2.2.3.jar:/Users/jacksbrr/.m2/repository/junit/junit/4.10/junit-4.10.jar'
+-encoding
+'UTF-8'
+-protected
+-sourcepath
+'/Users/jacksbrr/Dropbox/Projects/wrml/wrml-prototype/src/test/java'
+-author
+-bottom
+'Copyright &#169; 2011 <a href="http://wrml.org">WRML</a>. All Rights Reserved.'
+-charset
+'UTF-8'
+-d
+'/Users/jacksbrr/Dropbox/Projects/wrml/wrml-prototype/target/site/testapidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'wrml-prototype 1.0-SNAPSHOT Test API'
+-link
+'../apidocs'
+-linkoffline
+'http://download.oracle.com/javase/6/docs/api' '/Users/jacksbrr/Dropbox/Projects/wrml/wrml-prototype/target/javadoc-bundle-options'
+-use
+-version
+-windowtitle
+'wrml-prototype 1.0-SNAPSHOT Test API'
