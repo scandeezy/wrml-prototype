@@ -60,7 +60,7 @@
 
     <issueManagement>
         <system>JIRA</system>
-        <url>http://wrmlorg.jira.com/browse/PROTO</url>
+        <url>https://wrmlorg.jira.com/browse/PROTO</url>
     </issueManagement>
 
     <ciManagement>
