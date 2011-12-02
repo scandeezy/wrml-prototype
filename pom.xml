@@ -133,6 +133,25 @@
     </dependencies>
 
     <build>
+
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.scm</groupId>
+                <artifactId>maven-scm-provider-gitexe</artifactId>
+                <version>1.3</version>
+            </extension>
+            <extension>
+                <groupId>org.apache.maven.scm</groupId>
+                <artifactId>maven-scm-manager-plexus</artifactId>
+                <version>1.3</version>
+            </extension>
+            <extension>
+                <groupId>org.kathrynhuxtable.maven.wagon</groupId>
+                <artifactId>wagon-gitsite</artifactId>
+                <version>0.3.1</version>
+            </extension>
+        </extensions>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -204,8 +223,22 @@
     </build>
 
 
-    <!-- This is temporarily set to use the FanClout Nexus instance until we get a Sonatype OSS Hosted Repository -->
     <distributionManagement>
+        <!--
+            For site distribution to work, you need to add this to your settings.xml:
+            <servers>
+              <server>
+                <id>github-project-site</id>
+                <username>git</username>
+              </server>
+            </servers>
+        -->
+        <site>
+            <id>github-project-site</id>
+            <url>gitsite:git@github.com/wrml/wrml-prototype.git</url>
+        </site>
+
+        <!-- This is temporarily set to use the FanClout Nexus instance until we get a Sonatype OSS Hosted Repository -->
         <repository>
             <id>fanclout.releases</id>
             <url>http://dev.fanclout.com/nexus/content/repositories/releases/</url>
