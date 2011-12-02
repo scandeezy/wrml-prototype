@@ -104,8 +104,7 @@
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
             <version>1.8.5</version>
-            <!-- Not test scope since TDD version of SchemaLoader uses it -->
-            <!--<scope>test</scope>-->
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
