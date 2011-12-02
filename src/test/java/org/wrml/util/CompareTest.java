@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.util;
+
+import org.junit.Test;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
-
-import org.junit.Test;
-
-import org.wrml.util.Compare;
 
 public class CompareTest {
 

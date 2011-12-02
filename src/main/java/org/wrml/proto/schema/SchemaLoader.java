@@ -16,11 +16,11 @@
 
 package org.wrml.proto.schema;
 
-import org.wrml.Field;
-import org.wrml.Schema;
+import org.wrml.schema.Field;
+import org.wrml.schema.Schema;
+import org.wrml.util.ObservableMap;
 
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import java.util.HashMap;
 
 /**
  * A class that can dynamically load a WRML Schema as a Java class.
@@ -29,9 +29,11 @@ public class SchemaLoader {
 
     public Schema load(String uri) {
         // TODO: Complete this. Just enough to pass the test...for now
-        Schema schema = mock(Schema.class);
-        final Field field = mock(Field.class);
-        when(schema.getField("example")).thenReturn(field);
+        Schema schema = new Schema();
+        final Field field = new Field(schema, null);
+        final ObservableMap<String, Field<?>> fields = new ObservableMap<String, Field<?>>(new HashMap<String, Field<?>>());
+        fields.put("example", field);
+        schema.setFields(fields);
         return schema;
     }
 }
