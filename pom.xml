@@ -65,7 +65,7 @@
 
     <ciManagement>
         <system>TeamCity</system>
-        <url>http://builds.fanclout.com</url>
+        <url>http://dev.fanclout.com/teamcity/project.html?projectId=project5</url>
     </ciManagement>
 
     <scm>
