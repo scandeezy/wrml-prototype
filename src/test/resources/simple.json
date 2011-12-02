@@ -1,0 +1,13 @@
+{
+    "name": "Story",
+    "version": 1,
+    "description": "An example Story schema",
+    "fields": {
+        "example": {
+            "id": "example",
+            "type": "Text",
+            "description": "An example property.",
+            "title": "Example"
+        }
+    }
+}
