@@ -18,14 +18,14 @@ package org.wrml.temp;
 
 import java.net.URI;
 
-import org.wrml.AbstractWrmlObject;
+import org.wrml.AbstractModel;
 import org.wrml.Context;
 
 /**
  * An example class that will ultimately be auto-generated from a schema.
  * Decompile to help write the code generation code.
  */
-public class StoryImpl extends AbstractWrmlObject implements Story {
+public class StoryImpl extends AbstractModel implements Story {
 
     private static final long serialVersionUID = -3484324792379385843L;
 

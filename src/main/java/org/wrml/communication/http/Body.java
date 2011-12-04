@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.communication.http;
 
-import java.util.EventListener;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-/**
- * An event listener for events related to a Model field.
- * 
- * @param <T>
- */
-public interface FieldEventListener<T> extends EventListener {
+public interface Body {
 
-    public void constraintViolated(FieldEvent<T> event);
+    public InputStream asInputStream() throws IOException;
 
-    public void valueChanged(FieldEvent<T> event);
-
-    public void valueInitialized(FieldEvent<T> event);
+    public OutputStream asOutputStream() throws IOException;
 }

@@ -18,6 +18,8 @@ package org.wrml.communication;
 
 import java.net.URI;
 
+import org.wrml.MediaType;
+import org.wrml.communication.http.Method;
 import org.wrml.util.Identifiable;
 import org.wrml.util.ObservableList;
 
@@ -36,7 +38,7 @@ import org.wrml.util.ObservableList;
 public final class LinkRelation extends Identifiable<URI> {
 
     private static final long serialVersionUID = 2465664864460075452L;
-    
+
     private String _Name;
     private long _Version;
     private String _Description;
@@ -103,4 +105,15 @@ public final class LinkRelation extends Identifiable<URI> {
         _Version = version;
     }
 
+    /*
+     * TODO: Need to move logic elsewhere since this class is becoming a
+     * generated wrml object. Suggest move it to the Context class as utility
+     * functions available to the Model.
+     * 
+     * public boolean isGeneratableResponseSchema(URI responseModelSchemaId) {
+     * // TODO Auto-generated method stub return false; }
+     * 
+     * public boolean isSupportedRequestSchema(URI requestModelSchemaId) { //
+     * TODO Auto-generated method stub return false; }
+     */
 }

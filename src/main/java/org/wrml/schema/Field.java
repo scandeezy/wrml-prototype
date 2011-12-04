@@ -18,7 +18,7 @@ package org.wrml.schema;
 
 import java.net.URI;
 
-import org.wrml.WrmlObject;
+import org.wrml.Model;
 import org.wrml.util.ObservableList;
 
 /**
@@ -69,18 +69,18 @@ public final class Field<T> extends Member<String> {
      * Returns the value of the field represented by this Field, on the
      * specified WRML object.
      * 
-     * @param wrmlObject
+     * @param model
      *            the instance
      * @return the field value on the instance
      */
     @SuppressWarnings("unchecked")
-    public T getFieldValue(WrmlObject wrmlObject) {
+    public T getFieldValue(Model model) {
 
-        if (wrmlObject == null) {
+        if (model == null) {
             return null;
         }
 
-        return (T) wrmlObject.getFieldValue(getName());
+        return (T) model.getFieldValue(getName());
     }
 
     public String getName() {
@@ -123,15 +123,15 @@ public final class Field<T> extends Member<String> {
      * Sets the field represented by this Field object on the specified WRML
      * object argument to the specified new value.
      * 
-     * @param wrmlObject
+     * @param model
      *            the instance whose field should be modified
      * @param value
      *            the new value for the field of instance being modified
      * @return the previous value of the field of the instance being modified
      */
     @SuppressWarnings("unchecked")
-    public T setFieldValue(WrmlObject wrmlObject, T value) {
-        return (T) wrmlObject.setFieldValue(getName(), value);
+    public T setFieldValue(Model model, T value) {
+        return (T) model.setFieldValue(getName(), value);
     }
 
     public void setHidden(boolean hidden) {

@@ -21,7 +21,7 @@ import org.wrml.util.MapEvent;
 
 /**
  * An event that communicates some activity associated with a specific
- * WRMLObject instance's specific field.
+ * Model instance's specific field.
  * 
  * @param <T>
  *            The field type
@@ -34,7 +34,7 @@ public final class FieldEvent<T> extends CancelableEvent {
     private final MapEvent<String, Object> _SourceEvent;
     private ConstraintEvent<T> _ConstraintEvent;
 
-    public FieldEvent(WrmlObject source, boolean cancelable, String fieldName, MapEvent<String, Object> sourceEvent) {
+    public FieldEvent(Model source, boolean cancelable, String fieldName, MapEvent<String, Object> sourceEvent) {
         super(source, cancelable);
         _FieldName = fieldName;
         _SourceEvent = sourceEvent;

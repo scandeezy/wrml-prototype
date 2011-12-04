@@ -14,30 +14,9 @@
  * limitations under the License.
  */
 
-package org.wrml.communication;
+package org.wrml.util;
 
-import org.wrml.util.Unique;
+public interface Hierarchical<P> {
 
-public enum MessageType implements Unique<MessageType> {
-
-    REQUEST("Request"), RESPONSE("Response");
-
-    private final String _Name;
-
-    private MessageType(String name) {
-        _Name = name;
-    }
-
-    public MessageType getId() {
-        return this;
-    }
-
-    public String getName() {
-        return _Name;
-    }
-
-    @Override
-    public String toString() {
-        return getName();
-    }
+    public P getParent();
 }

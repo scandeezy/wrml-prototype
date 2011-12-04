@@ -16,15 +16,13 @@
 
 package org.wrml.temp;
 
-import org.wrml.Link;
-import org.wrml.WrmlObject;
-import org.wrml.util.ObservableList;
+import org.wrml.Model;
 
 /**
  * An example interface that will ultimately be auto-generated from a schema.
  * Decompile to help write the code generation code.
  */
-public interface Document extends WrmlObject {
+public interface Document extends Model {
 
     public String getId();
 

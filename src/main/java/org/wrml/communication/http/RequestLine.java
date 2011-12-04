@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.communication.http;
 
-import java.util.EventListener;
+import java.net.URI;
 
 /**
- * An event listener for events related to a Model field.
- * 
- * @param <T>
+ * <blockquote cite="message://www.w3.org/Protocols/rfc2616/rfc2616-sec5
+ * .html#sec5.1"> Request-Line = Method SP Request-URI SP HTTP-HttpVersion CRLF
+ * </blockquote>
  */
-public interface FieldEventListener<T> extends EventListener {
+public interface RequestLine extends StartLine {
 
-    public void constraintViolated(FieldEvent<T> event);
+    public Method getMethod();
 
-    public void valueChanged(FieldEvent<T> event);
-
-    public void valueInitialized(FieldEvent<T> event);
+    public URI getRequestURI();
 }

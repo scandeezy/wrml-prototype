@@ -14,15 +14,9 @@
  * limitations under the License.
  */
 
-package org.wrml.communication;
+package org.wrml.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+public interface Rooted<R, P extends Rooted<R, ?>> extends Hierarchical<P> {
 
-public interface Body {
-
-    public InputStream asInputStream() throws IOException;
-
-    public OutputStream asOutputStream() throws IOException;
+    public R getRoot();
 }

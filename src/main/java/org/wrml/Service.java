@@ -16,13 +16,14 @@
 
 package org.wrml;
 
-public interface WrmlObjectEventListener {
+import java.net.URI;
 
-    public void fieldConstraintViolated(FieldEvent<?> event);
+public interface Service {
 
-    public void fieldValueChanged(FieldEvent<?> event);
+    Model get(URI id, URI responseModelSchemaId);
 
-    public void fieldValueInitialized(FieldEvent<?> event);
+    Model save(URI id, Model requestModel);
 
-    public void linkEnabledStateChanged(LinkEvent event);
+    // Collection getMany(List<URI> ids, URI responseModelSchemaId);
+
 }

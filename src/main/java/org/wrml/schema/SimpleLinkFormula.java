@@ -18,7 +18,7 @@ package org.wrml.schema;
 
 import java.net.URI;
 
-import org.wrml.WrmlObject;
+import org.wrml.Model;
 import org.wrml.util.ObservableList;
 
 public class SimpleLinkFormula extends LinkFormula {
@@ -36,7 +36,7 @@ public class SimpleLinkFormula extends LinkFormula {
     }
 
     @Override
-    public boolean execute(WrmlObject wrmlObject) {
+    public boolean execute(Model model) {
         // TODO
         return false;
     }

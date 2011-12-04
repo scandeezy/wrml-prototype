@@ -18,7 +18,7 @@ package org.wrml.schema;
 
 import java.net.URI;
 
-import org.wrml.WrmlObject;
+import org.wrml.Model;
 import org.wrml.util.ObservableList;
 
 /**
@@ -44,7 +44,7 @@ public abstract class LinkFormula extends Member<URI> {
         setLinkRelationId(linkRelationId);
     }
 
-    public abstract boolean execute(WrmlObject wrmlObject);
+    public abstract boolean execute(Model model);
 
     public abstract ObservableList<String> getFieldOperands();
 

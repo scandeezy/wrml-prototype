@@ -14,9 +14,20 @@
  * limitations under the License.
  */
 
-package org.wrml.communication;
+package org.wrml.communication.http;
 
-public interface StartLine {
+import org.wrml.util.ObservableMap;
 
-    public HTTPVersion getHTTPVersion();
+/**
+ * <blockquote cite="message://www.w3.org/Protocols/rfc2616/rfc2616-sec4
+ * .html#sec4.2 "> The order in which header fields with differing field names
+ * are received is not significant. However, it is "good practice" to send
+ * general-header fields first, followed by request-header or response- header
+ * fields, and ending with the entity-header fields. </blockquote>
+ */
+public interface Entity {
+
+    public Body getBody();
+
+    public ObservableMap<String, Header<?>> getHeaders();
 }

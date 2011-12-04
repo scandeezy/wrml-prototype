@@ -18,31 +18,25 @@ package org.wrml;
 
 import java.io.Serializable;
 import java.net.URI;
+import java.util.List;
 
 import org.wrml.api.ResourceTemplate;
-import org.wrml.schema.Field;
 import org.wrml.schema.Schema;
-import org.wrml.util.ObservableList;
-import org.wrml.util.ObservableMap;
 
 /**
  * The base interface for all web resource schema instances.
  */
-public interface WrmlObject extends Serializable {
+public interface Model extends Serializable {
 
-    public void addEventListener(WrmlObjectEventListener listener);
+    public void addEventListener(ModelEventListener listener);
 
     public void addFieldEventListener(String fieldName, FieldEventListener<?> listener);
 
     public Context getContext();
 
-    public ObservableMap<String, Object> getFieldMap();
-
     public Object getFieldValue(String fieldName);
 
     public Link getLink(URI linkRelationId);
-
-    public ObservableMap<URI, Link> getLinkMap();
 
     public ResourceTemplate getResourceTemplate();
 
@@ -52,7 +46,7 @@ public interface WrmlObject extends Serializable {
 
     public URI getSchemaId();
 
-    public void removeEventListener(WrmlObjectEventListener listener);
+    public void removeEventListener(ModelEventListener listener);
 
     public void removeFieldEventListener(String fieldName, FieldEventListener<?> listener);
 
@@ -61,5 +55,7 @@ public interface WrmlObject extends Serializable {
     public boolean isDocroot();
 
     public boolean isReadOnly();
+
+    public List<URI> getEmbeddedLinkRelationIds();
 
 }

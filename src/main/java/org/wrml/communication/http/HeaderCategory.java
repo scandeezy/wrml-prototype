@@ -14,20 +14,31 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.communication.http;
 
-import java.util.EventListener;
+import org.wrml.util.Unique;
 
-/**
- * An event listener for events related to a Model field.
- * 
- * @param <T>
- */
-public interface FieldEventListener<T> extends EventListener {
+public enum HeaderCategory implements Unique<HeaderCategory>, Comparable<HeaderCategory> {
 
-    public void constraintViolated(FieldEvent<T> event);
+    GENERAL("General"), REQUEST("Request"), RESPONSE("Response"), ENTITY("Model"), EXTENSION("Extension");
 
-    public void valueChanged(FieldEvent<T> event);
+    private final String _Name;
 
-    public void valueInitialized(FieldEvent<T> event);
+    private HeaderCategory(String name) {
+        _Name = name;
+    }
+
+    public HeaderCategory getId() {
+        return this;
+    }
+
+    public String getName() {
+        return _Name;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+
 }

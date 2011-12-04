@@ -14,18 +14,9 @@
  * limitations under the License.
  */
 
-package org.wrml.communication;
+package org.wrml.communication.http;
 
-import java.net.URI;
+public interface StartLine {
 
-/**
- * <blockquote cite="message://www.w3.org/Protocols/rfc2616/rfc2616-sec5
- * .html#sec5.1"> Request-Line = Method SP Request-URI SP HTTP-HTTPVersion CRLF
- * </blockquote>
- */
-public interface RequestLine extends StartLine {
-
-    public Method getMethod();
-
-    public URI getRequestURI();
+    public HttpVersion getHTTPVersion();
 }

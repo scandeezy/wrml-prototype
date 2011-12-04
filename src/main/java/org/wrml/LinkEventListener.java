@@ -25,4 +25,8 @@ public interface LinkEventListener extends EventListener {
 
     public void enabledStateChanged(LinkEvent event);
 
+    public void clicked(LinkEvent event);
+
+    public void hrefChanged(LinkEvent event);
+
 }

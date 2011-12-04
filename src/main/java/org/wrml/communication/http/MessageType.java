@@ -14,18 +14,30 @@
  * limitations under the License.
  */
 
-package org.wrml.communication;
+package org.wrml.communication.http;
 
-public interface Header<T> extends Comparable<Header<?>> {
+import org.wrml.util.Unique;
 
-    public HeaderCategory getCategory();
+public enum MessageType implements Unique<MessageType> {
 
-    public String getName();
+    REQUEST("Request"), RESPONSE("Response");
 
-    public T getValue();
+    private final String _Name;
 
-    public void setHeaderCategory(HeaderCategory headerCategory);
+    private MessageType(String name) {
+        _Name = name;
+    }
 
-    public T setValue(T value);
+    public MessageType getId() {
+        return this;
+    }
 
+    public String getName() {
+        return _Name;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

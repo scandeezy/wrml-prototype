@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.communication;
+package org.wrml.communication.http;
 
 import org.wrml.util.Unique;
 
@@ -72,7 +72,7 @@ public enum Status implements Unique<Status> {
     GONE(410, "Gone"),
     LENGTH_REQUIRED(411, "Length Required"),
     PRECONDITION_FAILED(412, "Precondition Failed"),
-    REQUEST_ENTITY_TOO_LARGE(413, "Request Entity Too Large"),
+    REQUEST_ENTITY_TOO_LARGE(413, "Request Model Too Large"),
     REQUEST_URI_TOO_LONG(414, "Request-URI Too Long"),
     UNSUPPORTED_MEDIA_TYPE(415, "Unsupported Media Type"),
     REQUESTED_RANGE_NOT_SATISFIABLE(416, "Requested Range Not Satisfiable"),

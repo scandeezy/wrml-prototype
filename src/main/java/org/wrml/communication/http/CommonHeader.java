@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.communication;
+package org.wrml.communication.http;
 
 import java.util.HashMap;
 import java.util.Map;

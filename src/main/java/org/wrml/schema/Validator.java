@@ -16,12 +16,14 @@
 
 package org.wrml.schema;
 
-import org.wrml.WrmlObject;
+import org.wrml.Model;
 
 public interface Validator<T> {
 
-    public ValidationResult validate(WrmlObject wrmlObject, Field<T> field);
+    public Constraint<T> getConstraint();
+    
+    public ValidationResult validate(Model model, Field<T> field);
 
-    public ValidationResult validate(WrmlObject wrmlObject, Field<T> field, T value);
+    public ValidationResult validate(Model model, Field<T> field, T value);
 
 }

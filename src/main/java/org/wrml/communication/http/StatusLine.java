@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.communication;
+package org.wrml.communication.http;
 
 public interface StatusLine extends StartLine {
 

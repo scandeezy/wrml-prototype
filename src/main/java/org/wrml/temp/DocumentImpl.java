@@ -18,7 +18,7 @@ package org.wrml.temp;
 
 import java.net.URI;
 
-import org.wrml.AbstractWrmlObject;
+import org.wrml.AbstractModel;
 import org.wrml.Context;
 
 /**
@@ -26,9 +26,9 @@ import org.wrml.Context;
  * Decompile to help write the code generation code.
  * 
  * Note that unlike all other schemas, Document is the base schema and its core
- * fields are implemented as "common fields" in the AbstractWrmlObject.
+ * fields are implemented as "common fields" in the AbstractModel.
  */
-public class DocumentImpl extends AbstractWrmlObject implements Document {
+public class DocumentImpl extends AbstractModel implements Document {
 
     private static final long serialVersionUID = 1626828688776764191L;
 

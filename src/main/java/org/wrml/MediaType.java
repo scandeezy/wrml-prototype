@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-package org.wrml.communication;
+package org.wrml;
 
+import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -39,6 +41,14 @@ public final class MediaType extends Identifiable<String> {
             + "([a-zA-Z0-9!#$%^&\\*_\\-\\+{}\\|'.`~]+)( +" + "([a-zA-Z0-9!#$%^&\\*_\\-\\+{}\\|'.`~]+)=\"([^\"]*)\";)*$";
 
     private static final Pattern MEDIA_TYPE_REGEX_PATTERN = Pattern.compile(MEDIA_TYPE_REGEX_STRING);
+
+    private static final String WRML_TYPE = "application";
+
+    private static final String WRML_SUBTYPE = "wrml";
+
+    private static final String WRML_PARAMETER_SCHEMA = "schema";
+
+    private static final String WRML_PARAMETER_FORMAT = "format";
 
     public static final MediaType create(String mediaTypeId) {
 
@@ -67,13 +77,22 @@ public final class MediaType extends Identifiable<String> {
         return output;
     }
 
+    private static final Map<String, String> createWrmlParameters(URI schemaId, URI formatId) {
+        final HashMap<String, String> params = new HashMap<String, String>();
+        params.put(WRML_PARAMETER_SCHEMA, String.valueOf(schemaId));
+        params.put(WRML_PARAMETER_FORMAT, String.valueOf(formatId));
+        return params;
+    }
+
     private final String _Name;
     private final String _Type;
     private final String _Subtype;
     private final SortedMap<String, String> _Parameters;
 
-    public MediaType(final String type, final String subtype) {
+    private URI _SchemaId;
+    private URI _FormatId;
 
+    public MediaType(final String type, final String subtype) {
         this(type, subtype, null);
     }
 
@@ -93,12 +112,28 @@ public final class MediaType extends Identifiable<String> {
         setId(_Name);
     }
 
+    public MediaType(URI schemaId, URI formatId) {
+        this(WRML_TYPE, WRML_SUBTYPE, createWrmlParameters(schemaId, formatId));
+        _SchemaId = schemaId;
+        _FormatId = formatId;
+    }
+
+    public URI getFormatId() {
+        // TODO: If null lazily initialize (if application/wrml)                
+        return _FormatId;
+    }
+
     public final String getName() {
         return _Name;
     }
 
     public final SortedMap<String, String> getParameters() {
         return _Parameters;
+    }
+
+    public URI getSchemaId() {
+        // TODO: If null lazily initialize (if application/wrml)
+        return _SchemaId;
     }
 
     public final String getSubtype() {

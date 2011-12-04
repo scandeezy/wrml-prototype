@@ -14,21 +14,24 @@
  * limitations under the License.
  */
 
-package org.wrml.api;
+package org.wrml;
 
 import java.net.URI;
 import java.util.List;
 
-import org.wrml.Link;
-import org.wrml.WrmlObject;
+import org.wrml.api.LinkTemplate;
 import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
+
+/*
+ * TODO: Figure out how/where UriTemplate fits in. Is it a schema type or a core wrml type?
+ */
 
 public class UriTemplate {
 
     public URI execute(final Link link) {
 
-        final WrmlObject obj = link.getOwner();
+        final Model obj = link.getOwner();
         final LinkTemplate linkTemplate = link.getLinkTemplate();
         final ObservableMap<URI, ObservableList<String>> destinationUriTemplateFields = linkTemplate
                 .getDestinationUriTemplateFields();
@@ -38,7 +41,7 @@ public class UriTemplate {
         return execute(obj, fieldNames);
     }
 
-    public URI execute(final WrmlObject obj, final List<String> fieldNames) {
+    public URI execute(final Model obj, final List<String> fieldNames) {
         // TODO Auto-generated method stub
         return null;
     }

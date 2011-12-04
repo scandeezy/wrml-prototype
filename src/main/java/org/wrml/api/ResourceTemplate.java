@@ -22,6 +22,7 @@ import java.util.List;
 import org.wrml.util.Identifiable;
 import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
+import org.wrml.util.Rooted;
 
 /**
  * A single "node" in a REST API's path-based Web resource model's hierarchical
@@ -30,11 +31,11 @@ import org.wrml.util.ObservableMap;
  * Note: This is a metadata class - instances should be edited with tools and
  * persisted for reuse.
  */
-public final class ResourceTemplate extends Identifiable<URI> {
+public final class ResourceTemplate extends Identifiable<URI> implements Rooted<RestApiTemplate, ResourceTemplate> {
 
     private static final long serialVersionUID = -5567896015312023454L;
 
-    private final URI _ApiTemplateId;
+    private final URI _RestApiTemplateId;
 
     private ResourceArchetype _ResourceArchetype;
 
@@ -51,11 +52,7 @@ public final class ResourceTemplate extends Identifiable<URI> {
     private ObservableList<URI /* linkTemplateIds */> _ThereToHereLinkTemplateIds;
 
     public ResourceTemplate(URI apiTemplateId) {
-        _ApiTemplateId = apiTemplateId;
-    }
-
-    public URI getApiTemplateId() {
-        return _ApiTemplateId;
+        _RestApiTemplateId = apiTemplateId;
     }
 
     public ObservableList<URI> getChildResourceTemplateIds() {
@@ -74,6 +71,24 @@ public final class ResourceTemplate extends Identifiable<URI> {
         return _HereToThereLinkRelationIdToLinkTemplateIdMap.get(hereToThereLinkRelationId);
     }
 
+    public ResourceTemplate getParent() {
+        return getParentResourceTemplate();
+    }
+
+    public ResourceTemplate getParentResourceTemplate() {
+
+        URI parentResourceTemplateId = getParentResourceTemplateId();
+
+        /*
+         * TODO: Need access to the Context from here. Two options as I see
+         * them: Make the Context globally available in some way (see comments
+         * in Context) or turn this class into a Model descendant, which it
+         * needs to be anyway in order to bootstrap WRML.
+         */
+
+        return null;
+    }
+
     public URI getParentResourceTemplateId() {
         return _ParentResourceTemplateId;
     }
@@ -84,6 +99,28 @@ public final class ResourceTemplate extends Identifiable<URI> {
 
     public ResourceArchetype getResourceArchetype() {
         return _ResourceArchetype;
+    }
+
+    public RestApiTemplate getRestApiTemplate() {
+
+        URI restApiTemplateId = getRestApiTemplateId();
+
+        /*
+         * TODO: Need access to the Context from here. Two options as I see
+         * them: Make the Context globally available in some way (see comments
+         * in Context) or turn this class into a Model descendant, which it
+         * needs to be anyway in order to bootstrap WRML.
+         */
+
+        return null;
+    }
+
+    public URI getRestApiTemplateId() {
+        return _RestApiTemplateId;
+    }
+
+    public RestApiTemplate getRoot() {
+        return getRestApiTemplate();
     }
 
     public ObservableMap<URI, ObservableMap<String, FieldDefault<?>>> getSchemaFieldDefaultsMap() {

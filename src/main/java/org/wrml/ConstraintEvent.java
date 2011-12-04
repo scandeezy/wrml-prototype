@@ -28,7 +28,7 @@ public class ConstraintEvent<T> extends EventObject {
     private final Validator<T> _Validator;
     private final ValidationResult _ValidationResult;
 
-    public ConstraintEvent(WrmlObject source, Validator<T> validator, ValidationResult validationResult) {
+    public ConstraintEvent(Model source, Validator<T> validator, ValidationResult validationResult) {
         super(source);
         _Validator = validator;
         _ValidationResult = validationResult;

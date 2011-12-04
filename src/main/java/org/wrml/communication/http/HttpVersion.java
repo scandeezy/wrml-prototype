@@ -14,18 +14,18 @@
  * limitations under the License.
  */
 
-package org.wrml.communication;
+package org.wrml.communication.http;
 
 import org.wrml.util.Unique;
 
 /**
  * http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.1
  */
-public enum HTTPVersion implements Unique<HTTPVersion> {
+public enum HttpVersion implements Unique<HttpVersion> {
 
     HTTP_1_0(1, 0), HTTP_1_1(1, 1);
 
-    public final static HTTPVersion fromString(String httpVersionString) {
+    public final static HttpVersion fromString(String httpVersionString) {
 
         // MSMTODO: Implement with regex parsing
         // MSMTODO: If 1.0 return the HTTP_1_0 const
@@ -38,13 +38,13 @@ public enum HTTPVersion implements Unique<HTTPVersion> {
     private final long _MajorNumber;
     private final long _MinorNumber;
 
-    private HTTPVersion(final long majorNumber, final long minorNumber) {
+    private HttpVersion(final long majorNumber, final long minorNumber) {
 
         _MajorNumber = majorNumber;
         _MinorNumber = minorNumber;
     }
 
-    public final HTTPVersion getId() {
+    public final HttpVersion getId() {
         return this;
     }
 

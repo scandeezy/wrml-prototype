@@ -18,7 +18,7 @@ package org.wrml.api;
 
 import java.net.URI;
 
-import org.wrml.communication.MediaType;
+import org.wrml.MediaType;
 import org.wrml.util.Identifiable;
 import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;

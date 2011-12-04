@@ -20,8 +20,9 @@ import java.net.URI;
 
 import org.wrml.util.Identifiable;
 import org.wrml.util.ObservableList;
+import org.wrml.util.Rooted;
 
-public class ApiTemplate extends Identifiable<URI> {
+public class RestApiTemplate extends Identifiable<URI> implements Rooted<RestApiTemplate, ResourceTemplate> {
 
     private static final long serialVersionUID = 468618916602653649L;
 
@@ -31,14 +32,14 @@ public class ApiTemplate extends Identifiable<URI> {
     private String _Title;
     private ObservableList<URI> _RootResourceTemplateIds;
 
-    public ApiTemplate() {
+    public RestApiTemplate() {
     }
 
-    public ApiTemplate(String name) {
+    public RestApiTemplate(String name) {
         this(name, null);
     }
 
-    public ApiTemplate(String name, String description) {
+    public RestApiTemplate(String name, String description) {
         setName(name);
         setTitle(name);
         setDescription(description);
@@ -82,6 +83,14 @@ public class ApiTemplate extends Identifiable<URI> {
 
     public void setVersion(long version) {
         _Version = version;
+    }
+
+    public ResourceTemplate getParent() {
+        return null;
+    }
+
+    public RestApiTemplate getRoot() {
+        return this;
     }
 
 }
