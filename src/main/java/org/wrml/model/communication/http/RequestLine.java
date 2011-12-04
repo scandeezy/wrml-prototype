@@ -13,28 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.wrml.model.communication.http;
 
-package org.wrml.temp;
+import java.net.URI;
 
 /**
- * An example interface that will ultimately be auto-generated from a schema.
- * Decompile to help write the code generation code.
+ * <blockquote cite="message://www.w3.org/Protocols/rfc2616/rfc2616-sec5
+ * .html#sec5.1"> Request-Line = Method SP Request-URI SP HTTP-HttpVersion CRLF
+ * </blockquote>
  */
-public interface Story {
+// Generated from a Web Resource Schema
+public interface RequestLine extends StartLine {
 
-    public String getHeadline();
+    public Method getMethod();
 
-    public String setHeadline(String headline);
-
-    // Boolean Field example
-
-    public boolean isPremium();
-
-    public boolean setPremium(boolean premium);
-
-    // Schema Field example
-
-    public Author getAuthor();
-
-    public Author setAuthor(Author author);
+    public URI getRequestURI();
 }

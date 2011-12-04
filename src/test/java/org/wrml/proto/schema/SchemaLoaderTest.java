@@ -18,7 +18,8 @@ package org.wrml.proto.schema;
 
 import org.junit.Ignore;
 import org.junit.Test;
-import org.wrml.schema.Schema;
+
+import org.wrml.model.schema.Schema;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;

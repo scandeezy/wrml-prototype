@@ -13,28 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.wrml.temp;
+package org.wrml.model;
 
 /**
- * An example interface that will ultimately be auto-generated from a schema.
- * Decompile to help write the code generation code.
+ * Enumeration that captures the resource archetypes.
  */
-public interface Story {
+//Generated from a Web Resource Schema
+public enum ResourceArchetype {
 
-    public String getHeadline();
+    DOCUMENT("Document"), COLLECTION("Collection"), STORE("Store"), ACTION("Action");
 
-    public String setHeadline(String headline);
+    private final String _Title;
 
-    // Boolean Field example
+    private ResourceArchetype(String title) {
+        _Title = title;
+    }
 
-    public boolean isPremium();
+    public final String getTitle() {
+        return _Title;
+    }
 
-    public boolean setPremium(boolean premium);
-
-    // Schema Field example
-
-    public Author getAuthor();
-
-    public Author setAuthor(Author author);
+    @Override
+    public String toString() {
+        return getTitle();
+    }
 }

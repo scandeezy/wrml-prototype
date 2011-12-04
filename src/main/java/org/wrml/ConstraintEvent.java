@@ -18,8 +18,8 @@ package org.wrml;
 
 import java.util.EventObject;
 
-import org.wrml.schema.ValidationResult;
-import org.wrml.schema.Validator;
+import org.wrml.model.schema.ValidationResult;
+import org.wrml.util.Validator;
 
 public class ConstraintEvent<T> extends EventObject {
 

@@ -14,27 +14,22 @@
  * limitations under the License.
  */
 
-package org.wrml.temp;
+package org.wrml.model;
+
+import org.wrml.Model;
 
 /**
- * An example interface that will ultimately be auto-generated from a schema.
- * Decompile to help write the code generation code.
+ * A simple named document.
  */
-public interface Story {
+// Generated from a Web Resource Schema
+public interface Named extends Model {
 
-    public String getHeadline();
+    // Generated from Field
+    //     Name: name 
+    //     Value: Text 
+    //     Flags: Required
+    //     Constraints: TextLength - 200 characters
+    public String getName();
 
-    public String setHeadline(String headline);
-
-    // Boolean Field example
-
-    public boolean isPremium();
-
-    public boolean setPremium(boolean premium);
-
-    // Schema Field example
-
-    public Author getAuthor();
-
-    public Author setAuthor(Author author);
+    public String setName(String name);
 }

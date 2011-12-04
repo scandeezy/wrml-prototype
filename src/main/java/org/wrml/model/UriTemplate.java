@@ -13,28 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.wrml.model;
 
-package org.wrml.temp;
+import org.wrml.Model;
 
-/**
- * An example interface that will ultimately be auto-generated from a schema.
- * Decompile to help write the code generation code.
+/*
+ * TODO: Figure out how/where UriTemplate fits in. Is it a schema type or a core
+ * wrml type?
  */
-public interface Story {
+// Generated from a Web Resource Schema
+public interface UriTemplate extends Model {
 
-    public String getHeadline();
-
-    public String setHeadline(String headline);
-
-    // Boolean Field example
-
-    public boolean isPremium();
-
-    public boolean setPremium(boolean premium);
-
-    // Schema Field example
-
-    public Author getAuthor();
-
-    public Author setAuthor(Author author);
 }

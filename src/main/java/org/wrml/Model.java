@@ -20,8 +20,8 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
 
-import org.wrml.api.ResourceTemplate;
-import org.wrml.schema.Schema;
+import org.wrml.model.restapi.ResourceTemplate;
+import org.wrml.model.schema.Schema;
 
 /**
  * The base interface for all web resource schema instances.

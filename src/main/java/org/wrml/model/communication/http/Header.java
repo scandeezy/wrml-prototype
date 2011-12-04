@@ -13,28 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.wrml.model.communication.http;
 
-package org.wrml.temp;
+import org.wrml.Model;
 
-/**
- * An example interface that will ultimately be auto-generated from a schema.
- * Decompile to help write the code generation code.
- */
-public interface Story {
+// Generated from a Web Resource Schema
+public interface Header<T> extends Comparable<Header<?>>, Model {
 
-    public String getHeadline();
+    public HeaderCategory getCategory();
 
-    public String setHeadline(String headline);
+    public String getName();
 
-    // Boolean Field example
+    public T getValue();
 
-    public boolean isPremium();
+    public void setHeaderCategory(HeaderCategory headerCategory);
 
-    public boolean setPremium(boolean premium);
+    public T setValue(T value);
 
-    // Schema Field example
-
-    public Author getAuthor();
-
-    public Author setAuthor(Author author);
 }

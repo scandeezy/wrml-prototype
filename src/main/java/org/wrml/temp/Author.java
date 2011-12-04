@@ -20,7 +20,7 @@ package org.wrml.temp;
  * An example interface that will ultimately be auto-generated from a schema.
  * Decompile to help write the code generation code.
  */
-public interface Author extends Document {
+public interface Author {
 
     public String getFirstName();
 

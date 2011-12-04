@@ -13,28 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.wrml.model.schema;
 
-package org.wrml.temp;
+import java.net.URI;
+
+import org.wrml.model.relation.LinkRelation;
 
 /**
- * An example interface that will ultimately be auto-generated from a schema.
- * Decompile to help write the code generation code.
+ * The metadata that represents a simple boolean formula that can be evaluated
+ * to determine the state of a link.
+ * 
+ * Note: This is a metadata class - instances should be edited with tools and
+ * persisted for reuse.
  */
-public interface Story {
+// Generated from a Web Resource Schema
+public interface LinkFormula extends Member {
 
-    public String getHeadline();
+    public URI getLinkRelationId();
 
-    public String setHeadline(String headline);
-
-    // Boolean Field example
-
-    public boolean isPremium();
-
-    public boolean setPremium(boolean premium);
-
-    // Schema Field example
-
-    public Author getAuthor();
-
-    public Author setAuthor(Author author);
+    public LinkRelation getLinkRelation();
 }

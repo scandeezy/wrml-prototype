@@ -13,28 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.wrml.model.communication.http;
 
-package org.wrml.temp;
+// Generated from a Web Resource Schema
+public enum MessageType {
 
-/**
- * An example interface that will ultimately be auto-generated from a schema.
- * Decompile to help write the code generation code.
- */
-public interface Story {
+    REQUEST("Request"), RESPONSE("Response");
 
-    public String getHeadline();
+    private final String _Name;
 
-    public String setHeadline(String headline);
+    private MessageType(String name) {
+        _Name = name;
+    }
 
-    // Boolean Field example
+    public String getName() {
+        return _Name;
+    }
 
-    public boolean isPremium();
-
-    public boolean setPremium(boolean premium);
-
-    // Schema Field example
-
-    public Author getAuthor();
-
-    public Author setAuthor(Author author);
+    @Override
+    public String toString() {
+        return getName();
+    }
 }

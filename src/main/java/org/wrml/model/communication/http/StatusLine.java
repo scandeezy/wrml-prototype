@@ -14,27 +14,9 @@
  * limitations under the License.
  */
 
-package org.wrml.temp;
+package org.wrml.model.communication.http;
 
-/**
- * An example interface that will ultimately be auto-generated from a schema.
- * Decompile to help write the code generation code.
- */
-public interface Story {
+public interface StatusLine extends StartLine {
 
-    public String getHeadline();
-
-    public String setHeadline(String headline);
-
-    // Boolean Field example
-
-    public boolean isPremium();
-
-    public boolean setPremium(boolean premium);
-
-    // Schema Field example
-
-    public Author getAuthor();
-
-    public Author setAuthor(Author author);
+    public Status getStatus();
 }

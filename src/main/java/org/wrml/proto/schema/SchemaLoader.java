@@ -16,8 +16,8 @@
 
 package org.wrml.proto.schema;
 
-import org.wrml.schema.Field;
-import org.wrml.schema.Schema;
+import org.wrml.model.schema.Field;
+import org.wrml.model.schema.Schema;
 import org.wrml.util.ObservableMap;
 
 import java.util.HashMap;
@@ -28,6 +28,12 @@ import java.util.HashMap;
 public class SchemaLoader {
 
     public Schema load(String uri) {
+        
+        // TODO: Commented out for now
+        return null;
+        
+        /*
+        
         // TODO: Complete this. Just enough to pass the test...for now
         Schema schema = new Schema();
         final Field field = new Field(schema, null);
@@ -35,5 +41,7 @@ public class SchemaLoader {
         fields.put("example", field);
         schema.setFields(fields);
         return schema;
+        
+        */
     }
 }

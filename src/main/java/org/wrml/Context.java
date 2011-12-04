@@ -17,13 +17,17 @@
 package org.wrml;
 
 import java.net.URI;
+import java.util.List;
 
-import org.wrml.api.LinkTemplate;
-import org.wrml.api.ResourceTemplate;
-import org.wrml.api.RestApiTemplate;
-import org.wrml.communication.LinkRelation;
-import org.wrml.schema.Constraint;
-import org.wrml.schema.Schema;
+import org.wrml.model.UriTemplateParameter;
+import org.wrml.model.relation.LinkRelation;
+import org.wrml.model.restapi.LinkTemplate;
+import org.wrml.model.restapi.ResourceTemplate;
+import org.wrml.model.restapi.RestApiTemplate;
+import org.wrml.model.schema.Constraint;
+import org.wrml.model.schema.Schema;
+import org.wrml.util.ObservableList;
+import org.wrml.util.ObservableMap;
 
 /**
  * A stateful class that exposes wrml object-based services to wrml objects and
@@ -160,4 +164,25 @@ public abstract class Context {
 
     public abstract URI getSchemaIdForClassName(String className);
 
+    
+    // TODO: Moved from UriTemplate class. Refactor to make sense.
+    public URI execute(final Link link) {
+
+        final Model obj = link.getOwner();
+        final LinkTemplate linkTemplate = link.getLinkTemplate();
+        
+        final ObservableMap<URI, ObservableList<UriTemplateParameter>> destinationUriTemplateParameters = linkTemplate.getDestinationUriTemplateParameters();
+                
+        final List<UriTemplateParameter> uriTemplateParameters = destinationUriTemplateParameters.get(obj.getSchemaId());
+
+        return execute(obj, uriTemplateParameters);
+    }
+
+    public URI execute(final Model obj, final List<UriTemplateParameter> uriTemplateParameters) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    
+    
 }

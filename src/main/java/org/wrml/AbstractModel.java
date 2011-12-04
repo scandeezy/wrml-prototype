@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wrml;
 
 import java.net.URI;
@@ -22,13 +21,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.wrml.api.FieldDefault;
-import org.wrml.api.ResourceTemplate;
-import org.wrml.schema.Field;
-import org.wrml.schema.Schema;
+import org.wrml.model.restapi.ResourceTemplate;
+import org.wrml.model.schema.Field;
+import org.wrml.model.schema.FieldDefault;
+import org.wrml.model.schema.Schema;
 import org.wrml.util.Identifiable;
 import org.wrml.util.MapEvent;
 import org.wrml.util.MapEventListener;
+import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
 
 /**
@@ -199,8 +199,8 @@ import org.wrml.util.ObservableMap;
  * <h2>Summary</h2>
  * 
  * <p>
- * The Model Java API will automagically manage the boolean enabled state
- * and the href value of Links, which together represent the object’s available,
+ * The Model Java API will automagically manage the boolean enabled state and
+ * the href value of Links, which together represent the object’s available,
  * Field-sensitive interaction options.
  * </p>
  * 
@@ -354,18 +354,28 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
         // default value setting by looking at the ResourceTemplate and
         // then up the schema tree.
 
+        /*
+         TODO: Move this default value code to an init() method step? 
+         
+        
         final ResourceTemplate resourceTemplate = getResourceTemplate();
 
         final URI schemaId = getSchemaId();
 
-        final ObservableMap<String, FieldDefault<?>> fieldDefaults = resourceTemplate.getFieldDefaults(schemaId);
+        final ObservableMap<URI, ObservableList<FieldDefault<?>>> fieldDefaultsMap = resourceTemplate
+                .getSchemaFieldDefaultsMap();
 
-        if (fieldDefaults.containsKey(fieldName)) {
+        
+        if (fieldDefaultsMap != null && fieldDefaultsMap.containsKey(schemaId)) {
+
+            ObservableList<FieldDefault<?>> schemaFieldDefaults = fieldDefaultsMap.get(schemaId);
             return fieldDefaults.get(fieldName).getDefaultValue();
         }
 
         // TODO: Traverse up the rest of resource template tree to find a
         // default specified in the resource hierarchy
+
+        */
 
         final Schema schema = getSchema();
         final Field<?> field = schema.getFields().get(fieldName);
@@ -376,6 +386,7 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
 
         final Schema fieldDeclaredSchema = getContext().getSchema(field.getDeclaredSchemaId());
         final Schema baseSchema = getContext().getSchema(field.getDeclaredSchemaId());
+
 
         // TODO: Traverse up the base schemas from this object's schema through
         // the list of schemas between it and the field's declared schema.

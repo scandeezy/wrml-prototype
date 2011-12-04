@@ -13,28 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.wrml.model;
 
-package org.wrml.temp;
+import java.net.URI;
 
-/**
- * An example interface that will ultimately be auto-generated from a schema.
- * Decompile to help write the code generation code.
- */
-public interface Story {
+import org.wrml.Model;
 
-    public String getHeadline();
+// Generated from a Web Resource Schema
+public interface Choice extends Model {
 
-    public String setHeadline(String headline);
+    public String getValue();
 
-    // Boolean Field example
+    public URI getMenuId();
 
-    public boolean isPremium();
-
-    public boolean setPremium(boolean premium);
-
-    // Schema Field example
-
-    public Author getAuthor();
-
-    public Author setAuthor(Author author);
+    public ChoiceMenu getMenu();
 }

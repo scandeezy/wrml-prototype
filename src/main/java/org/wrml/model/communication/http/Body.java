@@ -13,28 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.wrml.model.communication.http;
 
-package org.wrml.temp;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-/**
- * An example interface that will ultimately be auto-generated from a schema.
- * Decompile to help write the code generation code.
- */
-public interface Story {
+import org.wrml.Model;
 
-    public String getHeadline();
+// Generated from a Web Resource Schema
+public interface Body extends Model {
 
-    public String setHeadline(String headline);
+    // TODO: It might be useful to have "marker" schemas for InputStream and OutputStream
+    // these raw Streams will be critical for all non-Wrml media type data throughput.
 
-    // Boolean Field example
+    public InputStream asInputStream() throws IOException;
 
-    public boolean isPremium();
-
-    public boolean setPremium(boolean premium);
-
-    // Schema Field example
-
-    public Author getAuthor();
-
-    public Author setAuthor(Author author);
+    public OutputStream asOutputStream() throws IOException;
 }

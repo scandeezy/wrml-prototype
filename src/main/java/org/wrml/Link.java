@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wrml;
 
 import java.net.URI;
 import java.util.List;
 
-import org.wrml.api.LinkTemplate;
-import org.wrml.api.ResourceTemplate;
-import org.wrml.communication.LinkRelation;
-import org.wrml.communication.http.Method;
+import org.wrml.model.communication.http.Method;
+import org.wrml.model.relation.LinkRelation;
+import org.wrml.model.restapi.LinkTemplate;
+import org.wrml.model.restapi.ResourceTemplate;
 import org.wrml.util.Identifiable;
+import org.wrml.util.ObservableMap;
 
 /**
  * A Model instance's Link. This class represents a link "instance", that is a
@@ -72,7 +72,12 @@ public final class Link extends Identifiable<URI> {
     public LinkTemplate getLinkTemplate() {
         final Model owner = getOwner();
         final ResourceTemplate resourceTemplate = owner.getResourceTemplate();
-        final URI linkTemplateId = resourceTemplate.getHereToThereLinkTemplateId(getLinkRelationId());
+
+        final ObservableMap<URI, URI> hereToThereLinkRelationIdToLinkTemplateIdMap = resourceTemplate
+                .getHereToThereLinkRelationIdToLinkTemplateIdMap();
+
+        final URI linkTemplateId = hereToThereLinkRelationIdToLinkTemplateIdMap.get(getLinkRelationId());
+
         return owner.getContext().getLinkTemplate(linkTemplateId);
     }
 
@@ -215,23 +220,25 @@ public final class Link extends Identifiable<URI> {
 
         // TODO
         /*
-        if (responseModelSchemaId != null && !linkRelation.isGeneratableResponseSchema(responseModelSchemaId)) {
-            // TODO: Preemptively throw "406 Not Acceptable" exception
-            return null;
-        }
+         * if (responseModelSchemaId != null &&
+         * !linkRelation.isGeneratableResponseSchema(responseModelSchemaId)) {
+         * // TODO: Preemptively throw "406 Not Acceptable" exception
+         * return null;
+         * }
+         * 
+         * URI requestModelSchemaId = null;
+         * if (requestModel != null) {
+         * requestModelSchemaId = requestModel.getSchemaId();
+         * 
+         * if (requestModelSchemaId != null &&
+         * !linkRelation.isSupportedRequestSchema(requestModelSchemaId)) {
+         * // TODO: Preemptively throw "415 Unsupported Media Type"
+         * // exception
+         * return null;
+         * }
+         * }
+         */
 
-        URI requestModelSchemaId = null;
-        if (requestModel != null) {
-            requestModelSchemaId = requestModel.getSchemaId();
-
-            if (requestModelSchemaId != null && !linkRelation.isSupportedRequestSchema(requestModelSchemaId)) {
-                // TODO: Preemptively throw "415 Unsupported Media Type"
-                // exception
-                return null;
-            }
-        }
-        */
-        
         Model owner = getOwner();
 
         // TODO: The last minute hrefParams is a possibly half-baked way to fill
@@ -252,29 +259,32 @@ public final class Link extends Identifiable<URI> {
 
         // TODO
         /*
-        switch (method) {
+         * switch (method) {
+         * 
+         * case GET:
+         * Service responseModelService = owner.getContext().getService(owner,
+         * responseModelSchemaId);
+         * responseModel = responseModelService.get(href,
+         * responseModelSchemaId);
+         * break;
+         * 
+         * case PUT:
+         * Service requestModelService = owner.getContext().getService(owner,
+         * requestModelSchemaId);
+         * responseModel = requestModelService.save(href, requestModel);
+         * break;
+         * 
+         * default:
+         * // TODO: Preemptively throw "405 Method Not Allowed"
+         * 
+         * // OPTIONS("OPTIONS", false, true), GET("GET", true, true),
+         * // HEAD("HEAD", true, true), POST("POST", false, false), PUT( "PUT",
+         * // false, true), DELETE("DELETE", false, true), TRACE("TRACE",
+         * // false, true), CONNECT("CONNECT", false, false);
+         * 
+         * }
+         */
 
-        case GET:
-            Service responseModelService = owner.getContext().getService(owner, responseModelSchemaId);
-            responseModel = responseModelService.get(href, responseModelSchemaId);
-            break;
-
-        case PUT:
-            Service requestModelService = owner.getContext().getService(owner, requestModelSchemaId);
-            responseModel = requestModelService.save(href, requestModel);
-            break;
-
-        default:
-            // TODO: Preemptively throw "405 Method Not Allowed"
-
-            // OPTIONS("OPTIONS", false, true), GET("GET", true, true),
-            // HEAD("HEAD", true, true), POST("POST", false, false), PUT( "PUT",
-            // false, true), DELETE("DELETE", false, true), TRACE("TRACE",
-            // false, true), CONNECT("CONNECT", false, false);
-
-        }
-        */
-        
         // TODO
 
         return responseModel;

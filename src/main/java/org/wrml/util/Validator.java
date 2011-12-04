@@ -14,27 +14,19 @@
  * limitations under the License.
  */
 
-package org.wrml.temp;
+package org.wrml.util;
 
-/**
- * An example interface that will ultimately be auto-generated from a schema.
- * Decompile to help write the code generation code.
- */
-public interface Story {
+import org.wrml.Model;
+import org.wrml.model.schema.Constraint;
+import org.wrml.model.schema.Field;
+import org.wrml.model.schema.ValidationResult;
 
-    public String getHeadline();
+public interface Validator<T> {
 
-    public String setHeadline(String headline);
+    public Constraint<T> getConstraint();
+    
+    public ValidationResult validate(Model model, Field<T> field);
 
-    // Boolean Field example
+    public ValidationResult validate(Model model, Field<T> field, T value);
 
-    public boolean isPremium();
-
-    public boolean setPremium(boolean premium);
-
-    // Schema Field example
-
-    public Author getAuthor();
-
-    public Author setAuthor(Author author);
 }

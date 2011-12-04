@@ -14,27 +14,24 @@
  * limitations under the License.
  */
 
-package org.wrml.temp;
+package org.wrml.model;
 
-/**
- * An example interface that will ultimately be auto-generated from a schema.
- * Decompile to help write the code generation code.
- */
-public interface Story {
+import org.wrml.util.ObservableList;
 
-    public String getHeadline();
+// Generated from a Web Resource Schema
+public interface Container<T extends Document> extends Document {
 
-    public String setHeadline(String headline);
+    public ObservableList<T> getElements();
 
-    // Boolean Field example
+    public Integer getPageSize();
 
-    public boolean isPremium();
+    public Integer getPageStartIndex();
 
-    public boolean setPremium(boolean premium);
+    public int getSize();
 
-    // Schema Field example
+    public Container<T> getNext();
 
-    public Author getAuthor();
+    public Container<T> getPrevious();
 
-    public Author setAuthor(Author author);
+    //public T getElement(ObservableList<UriTemplateParameter> params);
 }
