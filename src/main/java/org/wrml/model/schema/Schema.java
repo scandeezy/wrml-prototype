@@ -16,8 +16,8 @@
 package org.wrml.model.schema;
 
 import java.net.URI;
-import java.util.Collection;
 
+import org.wrml.model.Collection;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Document;
 import org.wrml.model.Named;

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wrml;
 
 import java.net.URI;
@@ -26,6 +25,7 @@ import org.wrml.model.restapi.ResourceTemplate;
 import org.wrml.model.restapi.RestApiTemplate;
 import org.wrml.model.schema.Constraint;
 import org.wrml.model.schema.Schema;
+import org.wrml.service.SchemaService;
 import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
 
@@ -52,7 +52,7 @@ public abstract class Context {
      * implementations, meaning that the thread local scope may be different but
      * "parented" by the global context.
      * 
-     * Reference Dimension (Designtime Composition)
+     * Reference Dimension (Design-time Composition)
      * 
      * Parenting means making contexts hierarchical using object references,
      * meaning that a context could have a parent and children. On the server
@@ -66,7 +66,7 @@ public abstract class Context {
      * data and associated actions (e.g. plug-ins). In these situations the
      * thread local may not be an effective slot to achieve context locality.
      * 
-     * Polymorphism Dimension (Designtime Inheritance)
+     * Polymorphism Dimension (Design-time Inheritance)
      * 
      * Context subclasses can alter the default behavior and values by
      * overriding certain methods (and obviously by implementing the absract
@@ -114,66 +114,17 @@ public abstract class Context {
      * to autogenerate impl classes via our own code generation.
      */
 
-    public LinkRelation getLinkRelation(URI id) {
-
-        // String className = LinkRelation.class.getCanonicalName();
-        // URI schemaId = getSchemaIdForClassName(className);
-        // Service service = getService();
-        // return service.get(id, schemaId);
-
-        // TODO
-        return null;
-    }
-
-    public Schema getSchema(URI id) {
-        // TODO
-        return null;
-    }
-
-    public MediaType getMediaType(String mediaType) {
-        // TODO
-        return null;
-    }
-
-    public ResourceTemplate getResourceTemplate(URI id) {
-        // TODO
-        return null;
-    }
-
-    public RestApiTemplate getApiTemplate(URI id) {
-        // TODO
-        return null;
-    }
-
-    public LinkTemplate getLinkTemplate(URI id) {
-        // TODO
-        return null;
-    }
-
-    public Constraint<?> getConstraint(URI id) {
-        // TODO
-        return null;
-    }
-
-    public Service getServiceForClassName(String className) {
-        // TODO
-        return null;
-    }
-
-    public abstract Service getService(URI schemaId);
-
-    public abstract URI getSchemaIdForClassName(String className);
-
-    
     // TODO: Moved from UriTemplate class. Refactor to make sense.
     public URI execute(final Link link) {
 
         final Model obj = link.getOwner();
         final LinkTemplate linkTemplate = link.getLinkTemplate();
-        
-        final ObservableMap<URI, ObservableList<UriTemplateParameter>> destinationUriTemplateParameters = linkTemplate.getDestinationUriTemplateParameters();
-                
-        final List<UriTemplateParameter> uriTemplateParameters = destinationUriTemplateParameters.get(obj.getSchemaId());
+
+        final ObservableMap<URI, ObservableList<UriTemplateParameter>> destinationUriTemplateParameters = linkTemplate
+                .getDestinationUriTemplateParameters();
+
+        final List<UriTemplateParameter> uriTemplateParameters = destinationUriTemplateParameters
+                .get(obj.getSchemaId());
 
         return execute(obj, uriTemplateParameters);
     }
@@ -183,6 +134,51 @@ public abstract class Context {
         return null;
     }
 
-    
-    
+    public RestApiTemplate getApiTemplate(URI id) {
+        return (RestApiTemplate) getModel(id, RestApiTemplate.class);
+    }
+
+    public Constraint<?> getConstraint(URI id) {
+        return (Constraint<?>) getModel(id, Constraint.class);
+    }
+
+    public LinkRelation getLinkRelation(URI id) {
+        return (LinkRelation) getModel(id, LinkRelation.class);
+    }
+
+    public LinkTemplate getLinkTemplate(URI id) {
+        return (LinkTemplate) getModel(id, LinkTemplate.class);
+    }
+
+    public MediaType getMediaType(String mediaType) {
+        // TODO
+        return null;
+    }
+
+    public ResourceTemplate getResourceTemplate(URI id) {
+        return (ResourceTemplate) getModel(id, ResourceTemplate.class);
+    }
+
+    public Schema getSchema(URI id) {
+        return getSchemaService().get(id);
+    }
+
+    public abstract URI getSchemaIdForClassName(String className);
+
+    public abstract Service<?> getService(URI schemaId);
+
+    public abstract SchemaService getSchemaService();
+
+    public Service<?> getServiceForClassName(Class<?> clazz) {
+        return getService(getSchemaIdForClassName(clazz.getCanonicalName()));
+    }
+
+    public Model getModel(URI id, Class<?> clazz) {
+
+        String className = clazz.getCanonicalName();
+        URI schemaId = getSchemaIdForClassName(className);
+        Service<?> service = getService(schemaId);
+        return service.get(id);
+    }
+
 }

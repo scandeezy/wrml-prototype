@@ -18,7 +18,7 @@ package org.wrml.model.relation;
 import org.wrml.MediaType;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Document;
-import org.wrml.model.Entitled;
+import org.wrml.model.Titled;
 import org.wrml.model.Named;
 import org.wrml.model.Versioned;
 import org.wrml.model.communication.http.Method;
@@ -37,7 +37,7 @@ import org.wrml.util.ObservableList;
  * persisted for reuse.
  */
 //Generated from a Web Resource Schema
-public interface LinkRelation extends Named, Entitled, Versioned, Descriptive, Document {
+public interface LinkRelation extends Named, Titled, Versioned, Descriptive, Document {
 
     // Added to Field
     //     Name: name 

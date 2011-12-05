@@ -20,12 +20,12 @@ import java.net.URI;
 import org.wrml.model.Collection;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Document;
-import org.wrml.model.Entitled;
+import org.wrml.model.Titled;
 import org.wrml.model.Named;
 import org.wrml.model.Versioned;
 
 // Generated from a Web Resource Schema
-public interface RestApiTemplate extends Named, Entitled, Versioned, Descriptive, Document {
+public interface RestApiTemplate extends Named, Titled, Versioned, Descriptive, Document {
 
     // Added to Field
     //     Name: name 

@@ -22,7 +22,6 @@ import org.wrml.model.communication.http.Method;
 import org.wrml.model.relation.LinkRelation;
 import org.wrml.model.restapi.LinkTemplate;
 import org.wrml.model.restapi.ResourceTemplate;
-import org.wrml.util.Identifiable;
 import org.wrml.util.ObservableMap;
 
 /**
@@ -34,7 +33,7 @@ import org.wrml.util.ObservableMap;
  * state changes by listening to events from the fields that their LinkFormula
  * relies upon.
  */
-public final class Link extends Identifiable<URI> {
+public final class Link {
 
     private static final long serialVersionUID = -6235652220661484935L;
 
@@ -46,7 +45,6 @@ public final class Link extends Identifiable<URI> {
     public Link(Model owner, URI linkRelationId) {
         _Owner = owner;
         _LinkRelationId = linkRelationId;
-        setId(linkRelationId);
     }
 
     public void addEventListener(LinkEventListener listener) {

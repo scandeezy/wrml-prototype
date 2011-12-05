@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wrml.util;
 
 import java.io.Serializable;
 import java.util.Comparator;
 
-public class Identifiable<T extends Comparable<T>> implements Unique<T>, Comparable<Identifiable<T>>, Serializable {
+public abstract class Identifiable<I extends Comparable<I>> implements Unique<I>, Comparable<Identifiable<I>>,
+        Serializable {
 
     private static final long serialVersionUID = 6794910140369730199L;
 
@@ -36,17 +36,15 @@ public class Identifiable<T extends Comparable<T>> implements Unique<T>, Compara
 
     };
 
-    private T _Id;
-
     public Identifiable() {
 
     }
 
-    public Identifiable(T id) {
+    public Identifiable(I id) {
         setId(id);
     }
 
-    public int compareTo(Identifiable<T> other) {
+    public int compareTo(Identifiable<I> other) {
 
         if (other == null) {
             return 1;
@@ -67,35 +65,36 @@ public class Identifiable<T extends Comparable<T>> implements Unique<T>, Compara
             return false;
         }
         final Identifiable<?> other = (Identifiable<?>) obj;
-        if (_Id == null) {
-            if (other._Id != null) {
+
+        I id = getId();
+        if (id == null) {
+            if (other.getId() != null) {
                 return false;
             }
-        } else if (!_Id.equals(other._Id)) {
-            return false;
         }
+        else
+            if (!id.equals(other.getId())) {
+                return false;
+            }
         return true;
     }
 
-    public final T getId() {
-        return _Id;
-    }
+    public abstract I getId();
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = (prime * result) + ((_Id == null) ? 0 : _Id.hashCode());
+        I id = getId();
+        result = (prime * result) + ((id == null) ? 0 : id.hashCode());
         return result;
     }
 
-    public final void setId(T id) {
-        _Id = id;
-    }
+    public abstract I setId(I id);
 
     @Override
     public String toString() {
-        return getClass().getName() + " [id=" + _Id + "]";
+        return getClass().getName() + " [id=" + getId() + "]";
     }
 
 }

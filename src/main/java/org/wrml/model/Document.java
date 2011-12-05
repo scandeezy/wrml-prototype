@@ -25,10 +25,6 @@ import org.wrml.Model;
 // Generated from a Web Resource Schema
 public interface Document extends Model {
 
-    public URI setId(URI id);
-
-    public URI getId();
-
     // Generated from Field
     //     Name: parentId 
     //     Flags: ReadOnly
@@ -37,6 +33,10 @@ public interface Document extends Model {
     public Long getSecondsToLive();
 
     public Long setSecondsToLive(Long secondsToLive);
+
+    public String getEtag();
+
+    public String setEtag(String etag);
 
     // Generated from Field
     //     Name: docroot 

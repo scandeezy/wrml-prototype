@@ -17,18 +17,18 @@ package org.wrml;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.wrml.model.restapi.ResourceTemplate;
-import org.wrml.model.schema.Field;
 import org.wrml.model.schema.FieldDefault;
 import org.wrml.model.schema.Schema;
 import org.wrml.util.Identifiable;
 import org.wrml.util.MapEvent;
 import org.wrml.util.MapEventListener;
-import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
 
 /**
@@ -280,7 +280,7 @@ import org.wrml.util.ObservableMap;
  * 
  * 
  */
-public/* abstract */class AbstractModel extends Identifiable<String> implements Model {
+public/* abstract */class AbstractModel extends Identifiable<URI> implements Model {
 
     /*
      * TODO: Uncomment the abstract keyword once the Model interface design
@@ -289,14 +289,18 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
 
     private static final long serialVersionUID = -7696720779481780624L;
 
-    private final URI _ResourceTemplateId;
+    // TODO: Make this an enum?
+    public static final String ID_FIELD_NAME = "id";
+    public static final String READ_ONLY_FIELD_NAME = "readOnly";
 
     private final URI _SchemaId;
+    private final URI _ResourceTemplateId;
+    private final List<URI> _EmbeddedLinkRelationIds;
+
     private transient Context _Context;
+
     private ObservableMap<String, Object> _FieldMap;
     private ObservableMap<URI, Link> _LinkMap;
-    private final List<URI> _EmbeddedLinkRelationIds;
-    private boolean _ReadOnly;
 
     private transient List<ModelEventListener> _EventListeners;
     private transient Map<String, List<FieldEventListener<?>>> _FieldEventListeners;
@@ -312,6 +316,8 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
         _ResourceTemplateId = resourceTemplateId;
         _Context = context;
         _EmbeddedLinkRelationIds = embeddedLinkRelationIds;
+
+        init();
     }
 
     public void addEventListener(ModelEventListener listener) {
@@ -336,6 +342,15 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
         fieldEventListenerList.add(listener);
     }
 
+    @Override
+    public final boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    public LinkedHashMap<URI, Schema> getAllBaseSchema() {
+        return getContext().getSchemaService().getAllBaseSchemas(getSchemaId());
+    }
+
     public Context getContext() {
         return _Context;
     }
@@ -345,68 +360,12 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
     }
 
     public Object getFieldValue(String fieldName) {
+        return isFieldValueSet(fieldName) ? _FieldMap.get(fieldName) : null;
+    }
 
-        if ((_FieldMap != null) && _FieldMap.containsKey(fieldName)) {
-            return _FieldMap.get(fieldName);
-        }
-
-        // TODO: No value for the field was set locally. Locate "nearest"
-        // default value setting by looking at the ResourceTemplate and
-        // then up the schema tree.
-
-        /*
-         TODO: Move this default value code to an init() method step? 
-         
-        
-        final ResourceTemplate resourceTemplate = getResourceTemplate();
-
-        final URI schemaId = getSchemaId();
-
-        final ObservableMap<URI, ObservableList<FieldDefault<?>>> fieldDefaultsMap = resourceTemplate
-                .getSchemaFieldDefaultsMap();
-
-        
-        if (fieldDefaultsMap != null && fieldDefaultsMap.containsKey(schemaId)) {
-
-            ObservableList<FieldDefault<?>> schemaFieldDefaults = fieldDefaultsMap.get(schemaId);
-            return fieldDefaults.get(fieldName).getDefaultValue();
-        }
-
-        // TODO: Traverse up the rest of resource template tree to find a
-        // default specified in the resource hierarchy
-
-        */
-
-        final Schema schema = getSchema();
-        final Field<?> field = schema.getFields().get(fieldName);
-        final Object defaultValue = field.getDefaultValue();
-        if (defaultValue != null) {
-            return defaultValue;
-        }
-
-        final Schema fieldDeclaredSchema = getContext().getSchema(field.getDeclaredSchemaId());
-        final Schema baseSchema = getContext().getSchema(field.getDeclaredSchemaId());
-
-
-        // TODO: Traverse up the base schemas from this object's schema through
-        // the list of schemas between it and the field's declared schema.
-        // This is not the same as going over all of the base schemas. Nor is it
-        // necessary to go over all base schemas and their ancestors. Again, the
-        // schemas that need to be checked range from this object's schema to
-        // the fields delcared schema (only).
-
-        /*
-         * List<URI> baseSchemaIds = schema.getBaseSchemaIds(); if
-         * (baseSchemaIds != null && !baseSchemaIds.isEmpty()) { for (URI
-         * baseSchemaId : baseSchemaIds) {
-         * 
-         * baseSchema = getContext().getSchema();
-         * 
-         * }
-         * 
-         * }
-         */
-        return defaultValue;
+    @Override
+    public URI getId() {
+        return (URI) getFieldValue(ID_FIELD_NAME);
     }
 
     public Link getLink(URI linkRelationId) {
@@ -414,7 +373,7 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
         Link link;
 
         if (_LinkMap == null) {
-            initLinks();
+            initLinkMap();
         }
         else {
             link = _LinkMap.get(linkRelationId);
@@ -430,7 +389,8 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
     }
 
     public ResourceTemplate getResourceTemplate() {
-        return getContext().getResourceTemplate(getResourceTemplateId());
+        URI resourceTemplateId = getResourceTemplateId();
+        return (resourceTemplateId != null) ? getContext().getResourceTemplate(resourceTemplateId) : null;
     }
 
     public URI getResourceTemplateId() {
@@ -445,13 +405,22 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
         return _SchemaId;
     }
 
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
+    }
+
     public boolean isDocroot() {
         final ResourceTemplate resourceTemplate = getResourceTemplate();
         return ((resourceTemplate != null) && (resourceTemplate.getParentResourceTemplateId() == null));
     }
 
+    public boolean isFieldValueSet(String fieldName) {
+        return (_FieldMap != null) && _FieldMap.containsKey(fieldName);
+    }
+
     public boolean isReadOnly() {
-        return _ReadOnly;
+        return ((Boolean) getFieldValue(READ_ONLY_FIELD_NAME)).booleanValue();
     }
 
     public void removeEventListener(ModelEventListener listener) {
@@ -460,7 +429,7 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
         }
 
         _EventListeners.remove(listener);
-    };
+    }
 
     public void removeFieldEventListener(String fieldName, FieldEventListener<?> listener) {
         if (_FieldEventListeners == null) {
@@ -475,17 +444,14 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
         fieldEventListenerList.remove(listener);
     }
 
-    public Object setFieldValue(String fieldName, Object fieldValue) {
-
-        if (_FieldMap == null) {
-            initFields();
+    public void setAllFieldsToDefaultValue() {
+        final Map<String, FieldDefault<?>> fieldDefaults = getFieldDefaults();
+        if (fieldDefaults != null) {
+            Set<String> fieldNames = fieldDefaults.keySet();
+            for (String fieldName : fieldNames) {
+                setFieldToDefaultValue(fieldName);
+            }
         }
-
-        return _FieldMap.put(fieldName, fieldValue);
-    }
-
-    public void setReadOnly(boolean readOnly) {
-        _ReadOnly = readOnly;
     }
 
     // TODO: Add public clickLink methods to the Model interface
@@ -519,6 +485,31 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
      * protected Object clickLink(Link link, Object requestModel, MediaType
      * requestMediaType) { return link.click(requestModel, requestMediaType); }
      */
+
+    public void setFieldToDefaultValue(String fieldName) {
+        final Map<String, FieldDefault<?>> fieldDefaults = getFieldDefaults();
+        if (fieldDefaults != null && fieldDefaults.containsKey(fieldName)) {
+            setFieldValue(fieldName, fieldDefaults.get(fieldName).getDefaultValue());
+        }
+    }
+
+    public Object setFieldValue(String fieldName, Object fieldValue) {
+
+        if (_FieldMap == null) {
+            initFieldMap();
+        }
+
+        return _FieldMap.put(fieldName, fieldValue);
+    }
+
+    @Override
+    public URI setId(URI id) {
+        return (URI) setFieldValue(ID_FIELD_NAME, id);
+    }
+
+    protected Map<String, FieldDefault<?>> getFieldDefaults() {
+        return getContext().getSchemaService().getFieldDefaults(getSchemaId());
+    }
 
     protected ObservableMap<String, Object> getFieldMap() {
         return _FieldMap;
@@ -565,13 +556,20 @@ public/* abstract */class AbstractModel extends Identifiable<String> implements 
         }
     }
 
-    private void initFields() {
+    /**
+     * Called to initialize the Model.
+     */
+    private void init() {
+        setAllFieldsToDefaultValue();
+    }
+
+    private void initFieldMap() {
         _FieldMap = new ObservableMap<String, Object>(new HashMap<String, Object>());
         _FieldMapEventListener = new FieldMapEventListener();
         _FieldMap.addEventListener(_FieldMapEventListener);
     }
 
-    private void initLinks() {
+    private void initLinkMap() {
         _LinkMap = new ObservableMap<URI, Link>(new HashMap<URI, Link>());
     }
 

@@ -144,4 +144,16 @@ public final class MediaType extends Identifiable<String> {
         return _Type;
     }
 
+    @Override
+    public String getId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String setId(String id) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

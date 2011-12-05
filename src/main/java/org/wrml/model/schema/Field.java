@@ -19,7 +19,7 @@ import java.net.URI;
 
 import org.wrml.model.Collection;
 import org.wrml.model.Descriptive;
-import org.wrml.model.Entitled;
+import org.wrml.model.Titled;
 import org.wrml.model.Named;
 
 /**
@@ -29,7 +29,7 @@ import org.wrml.model.Named;
  * 
  */
 // Generated from a Web Resource Schema
-public interface Field<T> extends Named, Entitled, Descriptive, Member {
+public interface Field<T> extends Named, Titled, Descriptive, Member {
 
     // Added to Field
     //     Name: name 

@@ -17,7 +17,7 @@ package org.wrml.model.schema;
 
 import org.wrml.model.Descriptive;
 import org.wrml.model.Document;
-import org.wrml.model.Entitled;
+import org.wrml.model.Titled;
 import org.wrml.model.Named;
 import org.wrml.model.Versioned;
 import org.wrml.util.ObservableList;
@@ -33,7 +33,7 @@ import org.wrml.util.Validator;
  *            The field type
  */
 // Generated from a Web Resource Schema
-public interface Constraint<T> extends Named, Entitled, Versioned, Descriptive, Document {
+public interface Constraint<T> extends Named, Titled, Versioned, Descriptive, Document {
 
     // Added to Field
     //     Name: name 

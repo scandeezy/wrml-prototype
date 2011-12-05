@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.wrml;
 
 import java.net.URI;
 
-public interface Service {
+public interface Service<T extends Model> {
 
-    Model get(URI id, URI responseModelSchemaId);
+    T get(URI id);
 
-    Model save(URI id, Model requestModel);
+    T save(URI id, T model);
 
     // Collection getMany(List<URI> ids, URI responseModelSchemaId);
 
