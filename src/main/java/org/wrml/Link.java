@@ -13,11 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml;
 
 import java.net.URI;
 import java.util.List;
 
+import org.wrml.model.Document;
 import org.wrml.model.communication.http.Method;
 import org.wrml.model.relation.LinkRelation;
 import org.wrml.model.restapi.LinkTemplate;
@@ -51,36 +53,123 @@ public final class Link {
         // TODO
     }
 
+    public Model click() {
+        return click(null);
+    }
+
+    public Model click(URI responseModelSchemaId) {
+        return click(responseModelSchemaId, null);
+    }
+
+    public Model click(URI responseModelSchemaId, Model requestModel) {
+
+        /*
+         * TODO // Check to see if this link is currently enabled before
+         * proceeding if (!isEnabled()) { // TODO: Throw an exception of some
+         * sort return null; }
+         * 
+         * MediaType requestMediaType = null;
+         * 
+         * if (requestModel != null) { // TODO: // Determine default media type
+         * by looking at the link template and // then the link relation. // Go
+         * through each list comparing the requestModel's schema URI to // the
+         * wrml media type's schema parameter, or if a non wrml media // type is
+         * used then look up a Format using the "raw" media type // (e.g.
+         * application/json maps to the json Format) }
+         */
+
+        return click(responseModelSchemaId, requestModel, null);
+    }
+
+    public Model click(URI responseModelSchemaId, Model requestModel, List<String> hrefParams) {
+
+        // Check to see if this link is currently enabled before proceeding
+        if (!isEnabled()) {
+            // TODO: Throw an exception of some sort
+            return null;
+        }
+
+        final LinkRelation linkRelation = getLinkRelation();
+
+        // TODO
+        /*
+         * if (responseModelSchemaId != null &&
+         * !linkRelation.isGeneratableResponseSchema(responseModelSchemaId)) {
+         * // TODO: Preemptively throw "406 Not Acceptable" exception
+         * return null;
+         * }
+         * 
+         * URI requestModelSchemaId = null;
+         * if (requestModel != null) {
+         * requestModelSchemaId = requestModel.getSchemaId();
+         * 
+         * if (requestModelSchemaId != null &&
+         * !linkRelation.isSupportedRequestSchema(requestModelSchemaId)) {
+         * // TODO: Preemptively throw "415 Unsupported Media Type"
+         * // exception
+         * return null;
+         * }
+         * }
+         */
+
+        final Model owner = getOwner();
+
+        // TODO: The last minute hrefParams is a possibly half-baked way to fill
+        // in any remaining URI Template params, such as the client-assigned
+        // "name" of a first time stored (PUT) resource.
+        final URI href = getHref(hrefParams);
+        final Method method = linkRelation.getMethod();
+
+        final Model responseModel = null;
+
+        // TODO: Is it weird to be doing this in this class? Should this logic
+        // be more pluggable in some way? In some ways it is nice for this magic
+        // to take place inside the Link since metaphorically that's not far
+        // off. Also, it codifies these semantic method mapping rules
+        // permanently, which may be a good thing.
+        //
+        // Bottom line, consider refactoring.
+
+        // TODO
+        /*
+         * switch (method) {
+         * 
+         * case GET:
+         * Service responseModelService = owner.getContext().getService(owner,
+         * responseModelSchemaId);
+         * responseModel = responseModelService.get(href,
+         * responseModelSchemaId);
+         * break;
+         * 
+         * case PUT:
+         * Service requestModelService = owner.getContext().getService(owner,
+         * requestModelSchemaId);
+         * responseModel = requestModelService.save(href, requestModel);
+         * break;
+         * 
+         * default:
+         * // TODO: Preemptively throw "405 Method Not Allowed"
+         * 
+         * // OPTIONS("OPTIONS", false, true), GET("GET", true, true),
+         * // HEAD("HEAD", true, true), POST("POST", false, false), PUT( "PUT",
+         * // false, true), DELETE("DELETE", false, true), TRACE("TRACE",
+         * // false, true), CONNECT("CONNECT", false, false);
+         * 
+         * }
+         */
+
+        // TODO
+
+        return responseModel;
+
+    }
+
     public void fireHrefChangedEvent() {
 
     }
 
     public URI getHref() {
         return _Href;
-    }
-
-    public URI getLinkRelationId() {
-        return _LinkRelationId;
-    }
-
-    public LinkRelation getLinkRelation() {
-        return getOwner().getContext().getLinkRelation(getLinkRelationId());
-    }
-
-    public LinkTemplate getLinkTemplate() {
-        final Model owner = getOwner();
-        final ResourceTemplate resourceTemplate = owner.getResourceTemplate();
-
-        final ObservableMap<URI, URI> hereToThereLinkRelationIdToLinkTemplateIdMap = resourceTemplate
-                .getHereToThereLinkRelationIdToLinkTemplateIdMap();
-
-        final URI linkTemplateId = hereToThereLinkRelationIdToLinkTemplateIdMap.get(getLinkRelationId());
-
-        return owner.getContext().getLinkTemplate(linkTemplateId);
-    }
-
-    public Model getOwner() {
-        return _Owner;
     }
 
     /*
@@ -169,8 +258,9 @@ public final class Link {
      * connection). Its WRML's equivalent of the Web's uniform interface.
      */
 
-    public Model click() {
-        return click(null);
+    public LinkRelation getLinkRelation() {
+        final Model owner = getOwner();
+        return (LinkRelation) owner.getContext().getModel(LinkRelation.class, getLinkRelationId(), owner);
     }
 
     /*
@@ -182,111 +272,38 @@ public final class Link {
      * Consider refactoring to be more generic.
      */
 
-    public Model click(URI responseModelSchemaId) {
-        return click(responseModelSchemaId, null);
+    public URI getLinkRelationId() {
+        return _LinkRelationId;
     }
 
-    public Model click(URI responseModelSchemaId, Model requestModel) {
+    public LinkTemplate getLinkTemplate() {
+        final Model owner = getOwner();
 
-        /*
-         * TODO // Check to see if this link is currently enabled before
-         * proceeding if (!isEnabled()) { // TODO: Throw an exception of some
-         * sort return null; }
-         * 
-         * MediaType requestMediaType = null;
-         * 
-         * if (requestModel != null) { // TODO: // Determine default media type
-         * by looking at the link template and // then the link relation. // Go
-         * through each list comparing the requestModel's schema URI to // the
-         * wrml media type's schema parameter, or if a non wrml media // type is
-         * used then look up a Format using the "raw" media type // (e.g.
-         * application/json maps to the json Format) }
-         */
-
-        return click(responseModelSchemaId, requestModel, null);
-    }
-
-    public Model click(URI responseModelSchemaId, Model requestModel, List<String> hrefParams) {
-
-        // Check to see if this link is currently enabled before proceeding
-        if (!isEnabled()) {
-            // TODO: Throw an exception of some sort
+        if (!(owner instanceof Document)) {
             return null;
         }
 
-        LinkRelation linkRelation = getLinkRelation();
+        final Document document = (Document) owner;
+        final ResourceTemplate resourceTemplate = document.getResourceTemplate();
 
+        final ObservableMap<URI, URI> hereToThereLinkRelationIdToLinkTemplateIdMap = resourceTemplate
+                .getHereToThereLinkRelationIdToLinkTemplateIdMap();
+
+        final URI linkTemplateId = hereToThereLinkRelationIdToLinkTemplateIdMap.get(getLinkRelationId());
+
+        return (LinkTemplate) document.getContext().getModel(LinkTemplate.class, linkTemplateId, document);
+    }
+
+    public Model getOwner() {
+        return _Owner;
+    }
+
+    public boolean isEnabled() {
+        return _Enabled;
+    }
+
+    public void removeEventListener(LinkEventListener listener) {
         // TODO
-        /*
-         * if (responseModelSchemaId != null &&
-         * !linkRelation.isGeneratableResponseSchema(responseModelSchemaId)) {
-         * // TODO: Preemptively throw "406 Not Acceptable" exception
-         * return null;
-         * }
-         * 
-         * URI requestModelSchemaId = null;
-         * if (requestModel != null) {
-         * requestModelSchemaId = requestModel.getSchemaId();
-         * 
-         * if (requestModelSchemaId != null &&
-         * !linkRelation.isSupportedRequestSchema(requestModelSchemaId)) {
-         * // TODO: Preemptively throw "415 Unsupported Media Type"
-         * // exception
-         * return null;
-         * }
-         * }
-         */
-
-        Model owner = getOwner();
-
-        // TODO: The last minute hrefParams is a possibly half-baked way to fill
-        // in any remaining URI Template params, such as the client-assigned
-        // "name" of a first time stored (PUT) resource.
-        URI href = getHref(hrefParams);
-        Method method = linkRelation.getMethod();
-
-        Model responseModel = null;
-
-        // TODO: Is it weird to be doing this in this class? Should this logic
-        // be more pluggable in some way? In some ways it is nice for this magic
-        // to take place inside the Link since metaphorically that's not far
-        // off. Also, it codifies these semantic method mapping rules
-        // permanently, which may be a good thing.
-        //
-        // Bottom line, consider refactoring.
-
-        // TODO
-        /*
-         * switch (method) {
-         * 
-         * case GET:
-         * Service responseModelService = owner.getContext().getService(owner,
-         * responseModelSchemaId);
-         * responseModel = responseModelService.get(href,
-         * responseModelSchemaId);
-         * break;
-         * 
-         * case PUT:
-         * Service requestModelService = owner.getContext().getService(owner,
-         * requestModelSchemaId);
-         * responseModel = requestModelService.save(href, requestModel);
-         * break;
-         * 
-         * default:
-         * // TODO: Preemptively throw "405 Method Not Allowed"
-         * 
-         * // OPTIONS("OPTIONS", false, true), GET("GET", true, true),
-         * // HEAD("HEAD", true, true), POST("POST", false, false), PUT( "PUT",
-         * // false, true), DELETE("DELETE", false, true), TRACE("TRACE",
-         * // false, true), CONNECT("CONNECT", false, false);
-         * 
-         * }
-         */
-
-        // TODO
-
-        return responseModel;
-
     }
 
     /**
@@ -300,14 +317,6 @@ public final class Link {
     private URI getHref(List<String> hrefParams) {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public boolean isEnabled() {
-        return _Enabled;
-    }
-
-    public void removeEventListener(LinkEventListener listener) {
-        // TODO
     }
 
     /*

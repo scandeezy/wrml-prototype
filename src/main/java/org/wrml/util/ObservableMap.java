@@ -33,12 +33,14 @@ import java.util.Set;
 public class ObservableMap<K, V> implements Map<K, V>, Serializable {
 
     private static final long serialVersionUID = -4210504376374050501L;
-    
+
     private final Map<K, V> _Delegate;
 
     // TODO: Make sure any listeners are marked as transient
-    
-    
+
+    // Perhaps use constraints to determine what kind of delegate should be used.
+    // E.G. A schema constraint like "sorted" would use a tree map
+    // E.G. A schema constraint like "ordered" would use a linked has map
     public ObservableMap(final Map<K, V> delegate) {
         _Delegate = delegate;
     }

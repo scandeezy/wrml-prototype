@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.model.restapi;
 
 import java.net.URI;
@@ -37,10 +38,32 @@ import org.wrml.util.ObservableMap;
 public interface LinkTemplate extends Versioned, Document {
 
     // Generated from Field
-    //     Name: restApiTemplateId 
-    //     Value: Text[URI] 
-    //     Flags: Required, ReadOnly
-    public URI getRestApiTemplateId();
+    //     Name: defaultDestinationUriTemplateParameters 
+    //     Value: List[Schema[UriTemplateParameter]]
+    public ObservableList<UriTemplateParameter> getDefaultDestinationUriTemplateParameters();
+
+    public ResourceTemplate getDestinationResourceTemplate();
+
+    public URI getDestinationResourceTemplateId();
+
+    // Generated from Field
+    //     Name: destinationUriTemplateParameters 
+    //     Value: Map[ Key=Text[URI], Value=List[Schema[UriTemplateParameter]] ]
+    public ObservableMap<URI, ObservableList<UriTemplateParameter>> getDestinationUriTemplateParameters();
+
+    public LinkRelation getLinkRelation();
+
+    public URI getLinkRelationId();
+
+    // Generated from Field
+    //     Name: requestTypes 
+    //     Value: List[Text[MediaType]]
+    public ObservableList<MediaType> getRequestTypes();
+
+    // Generated from Field
+    //     Name: responseTypes 
+    //     Value: List[Text[MediaType]]    
+    public ObservableList<MediaType> getResponseTypes();
 
     // Generated from Link
     //     Relation: restApiTemplate
@@ -53,11 +76,10 @@ public interface LinkTemplate extends Versioned, Document {
     public RestApiTemplate getRestApiTemplate();
 
     // Generated from Field
-    //     Name: sourceResourceTemplateId 
+    //     Name: restApiTemplateId 
     //     Value: Text[URI] 
-    public URI getSourceResourceTemplateId();
-
-    public URI setSourceResourceTemplateId(URI sourceResourceTemplateId);
+    //     Flags: Required, ReadOnly
+    public URI getRestApiTemplateId();
 
     // Generated from Link
     //     Relation: sourceResourceTemplate
@@ -69,36 +91,15 @@ public interface LinkTemplate extends Versioned, Document {
     //     Href: <sourceResourceTemplateId>
     public ResourceTemplate getSourceResourceTemplate();
 
-    public URI getDestinationResourceTemplateId();
+    // Generated from Field
+    //     Name: sourceResourceTemplateId 
+    //     Value: Text[URI] 
+    public URI getSourceResourceTemplateId();
 
     public URI setDestinationResourceTemplateId(URI destinationResourceTemplateId);
 
-    public ResourceTemplate getDestinationResourceTemplate();
-
-    public URI getLinkRelationId();
-
     public URI setLinkRelationId(URI linkRelationId);
 
-    public LinkRelation getLinkRelation();
-
-    // Generated from Field
-    //     Name: requestTypes 
-    //     Value: List[Text[MediaType]]
-    public ObservableList<MediaType> getRequestTypes();
-
-    // Generated from Field
-    //     Name: responseTypes 
-    //     Value: List[Text[MediaType]]    
-    public ObservableList<MediaType> getResponseTypes();
-
-    // Generated from Field
-    //     Name: defaultDestinationUriTemplateParameters 
-    //     Value: List[Schema[UriTemplateParameter]]
-    public ObservableList<UriTemplateParameter> getDefaultDestinationUriTemplateParameters();
-
-    // Generated from Field
-    //     Name: destinationUriTemplateParameters 
-    //     Value: Map[ Key=Text[URI], Value=List[Schema[UriTemplateParameter]] ]
-    public ObservableMap<URI, ObservableList<UriTemplateParameter>> getDestinationUriTemplateParameters();
+    public URI setSourceResourceTemplateId(URI sourceResourceTemplateId);
 
 }

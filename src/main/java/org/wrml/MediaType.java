@@ -123,6 +123,12 @@ public final class MediaType extends Identifiable<String> {
         return _FormatId;
     }
 
+    @Override
+    public String getId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     public final String getName() {
         return _Name;
     }
@@ -142,12 +148,6 @@ public final class MediaType extends Identifiable<String> {
 
     public final String getType() {
         return _Type;
-    }
-
-    @Override
-    public String getId() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

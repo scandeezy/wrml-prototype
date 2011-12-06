@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.model.relation;
 
 import org.wrml.MediaType;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Document;
-import org.wrml.model.Titled;
 import org.wrml.model.Named;
+import org.wrml.model.Titled;
 import org.wrml.model.Versioned;
 import org.wrml.model.communication.http.Method;
 import org.wrml.util.ObservableList;
@@ -43,11 +44,11 @@ public interface LinkRelation extends Named, Titled, Versioned, Descriptive, Doc
     //     Name: name 
     //     Constraints: TextSyntax - Mixed-Lower Case
 
+    public Method getMethod();
+
     public ObservableList<MediaType> getRequestMediaTypes();
 
     public ObservableList<MediaType> getResponseMediaTypes();
-
-    public Method getMethod();
 
     public Method setMethod(Method method);
 

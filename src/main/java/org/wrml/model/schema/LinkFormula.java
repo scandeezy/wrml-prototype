@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.model.schema;
 
 import java.net.URI;
@@ -29,7 +30,7 @@ import org.wrml.model.relation.LinkRelation;
 // Generated from a Web Resource Schema
 public interface LinkFormula extends Member {
 
-    public URI getLinkRelationId();
-
     public LinkRelation getLinkRelation();
+
+    public URI getLinkRelationId();
 }

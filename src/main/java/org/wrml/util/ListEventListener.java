@@ -29,7 +29,7 @@ import java.util.EventListener;
 public interface ListEventListener<T> extends EventListener {
 
     // TODO: Design API to match the List operations (pre and post)
-    
+
     public void cleared(ListEvent<T> event);
 
     public void clearing(ListEvent<T> event);

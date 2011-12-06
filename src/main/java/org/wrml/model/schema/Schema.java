@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.model.schema;
 
 import java.net.URI;
@@ -39,13 +40,6 @@ public interface Schema extends Named, Versioned, Descriptive, Document {
     //     Name: name 
     //     Constraints: TextSyntax - Mixed-Upper Case
 
-    // Generated from Field
-    //     Name: baseSchemasId
-    //     Value: Text[URI]
-    //     Constraints: TextSyntax - URI
-    //     Flags: ReadOnly
-    public URI getBaseSchemasId();
-
     // Generated from Link
     //     Relation: baseSchemas
     //         Methods: GET 
@@ -55,6 +49,13 @@ public interface Schema extends Named, Versioned, Descriptive, Document {
     //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["baseSchemasId"]]
     //     Href: <baseSchemasId>
     public Collection<Schema> getBaseSchemas();
+
+    // Generated from Field
+    //     Name: baseSchemasId
+    //     Value: Text[URI]
+    //     Constraints: TextSyntax - URI
+    //     Flags: ReadOnly
+    public URI getBaseSchemasId();
 
     // Generated from Field
     //     Name: fields 

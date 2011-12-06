@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.util;
 
 import java.io.Serializable;
@@ -66,7 +67,7 @@ public abstract class Identifiable<I extends Comparable<I>> implements Unique<I>
         }
         final Identifiable<?> other = (Identifiable<?>) obj;
 
-        I id = getId();
+        final I id = getId();
         if (id == null) {
             if (other.getId() != null) {
                 return false;
@@ -85,7 +86,7 @@ public abstract class Identifiable<I extends Comparable<I>> implements Unique<I>
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        I id = getId();
+        final I id = getId();
         result = (prime * result) + ((id == null) ? 0 : id.hashCode());
         return result;
     }

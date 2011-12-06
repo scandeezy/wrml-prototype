@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.model.restapi;
 
 import java.net.URI;
@@ -22,7 +23,7 @@ import org.wrml.model.Descriptive;
 import org.wrml.model.Document;
 import org.wrml.model.ResourceArchetype;
 import org.wrml.model.Versioned;
-import org.wrml.model.schema.FieldDefault;
+import org.wrml.model.schema.PrototypeField;
 import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
 
@@ -36,33 +37,6 @@ import org.wrml.util.ObservableMap;
 // Generated from a Web Resource Schema
 public interface ResourceTemplate extends Versioned, Descriptive, Document {
 
-    // Generated from Field
-    //     Name: restApiTemplateId 
-    //     Value: Text[URI] 
-    //     Flags: Required, ReadOnly
-    public URI getRestApiTemplateId();
-
-    public ResourceArchetype getResourceArchetype();
-
-    public ResourceArchetype setResourceArchetype(ResourceArchetype resourceArchetype);
-
-    public String getPathSegment();
-
-    public String setPathSegment(String pathSegment);
-
-    public URI getParentResourceTemplateId();
-
-    public URI setParentResourceTemplateId(URI parentResourceTemplateId);
-
-    public ResourceTemplate getParentResourceTemplate();
-
-    // Generated from Field
-    //     Name: childResourceTemplatesId
-    //     Value: Text[URI]
-    //     Constraints: TextSyntax - URI
-    //     Flags: ReadOnly
-    public URI getChildResourceTemplatesId();
-
     // Generated from Link
     //     Relation: childResourceTemplates
     //         Methods: GET 
@@ -73,9 +47,36 @@ public interface ResourceTemplate extends Versioned, Descriptive, Document {
     //     Href: <childResourceTemplatesId>
     public Collection<ResourceTemplate> getChildResourceTemplates();
 
-    public ObservableMap<URI, ObservableList<FieldDefault<?>>> getSchemaFieldDefaultsMap();
+    // Generated from Field
+    //     Name: childResourceTemplatesId
+    //     Value: Text[URI]
+    //     Constraints: TextSyntax - URI
+    //     Flags: ReadOnly
+    public URI getChildResourceTemplatesId();
 
     public ObservableMap<URI, URI> getHereToThereLinkRelationIdToLinkTemplateIdMap();
 
+    public ResourceTemplate getParentResourceTemplate();
+
+    public URI getParentResourceTemplateId();
+
+    public String getPathSegment();
+
+    public ResourceArchetype getResourceArchetype();
+
+    // Generated from Field
+    //     Name: restApiTemplateId 
+    //     Value: Text[URI] 
+    //     Flags: Required, ReadOnly
+    public URI getRestApiTemplateId();
+
+    public ObservableMap<URI, ObservableList<PrototypeField<?>>> getSchemaFieldDefaultsMap();
+
     public ObservableList<URI> getThereToHereLinkTemplateIds();
+
+    public URI setParentResourceTemplateId(URI parentResourceTemplateId);
+
+    public String setPathSegment(String pathSegment);
+
+    public ResourceArchetype setResourceArchetype(ResourceArchetype resourceArchetype);
 }

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.model.schema;
 
 import java.net.URI;
@@ -29,23 +30,23 @@ import org.wrml.Model;
  * @param <T>
  */
 // Generated from a Web Resource Schema
-public interface FieldDefault<T> extends Model {
+public interface PrototypeField<T> extends Model {
 
-    public URI getSchemaId();
-
-    // Generated from Link
-    //     Relation: schema
-    //         Methods: GET 
-    //         ResponseSchema: Schema[?]
-    //     EnabledFormula: schemaId != null
-    //     DestinationUriTemplate: {schemaId} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["schemaId"]]
-    //     Href: <schemaId>
-    public Schema getSchema();
+    public T getDefaultValue();
 
     public String getFieldName();
 
-    public T getDefaultValue();
+    // Generated from Link
+    //     Relation: ownerSchema
+    //         Methods: GET 
+    //         ResponseSchema: Schema[?]
+    //     EnabledFormula: ownerSchemaId != null
+    //     DestinationUriTemplate: {ownerSchemaId} 
+    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["ownerSchemaId"]]
+    //     Href: <ownerSchemaId>
+    public Schema getOwnerSchema();
+
+    public URI getOwnerSchemaId();
 
     public T setDefaultValue(T defaultValue);
 }

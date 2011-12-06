@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.model.schema;
 
-import java.util.EventListener;
+import java.net.URI;
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
+import org.wrml.Model;
+import org.wrml.util.ObservableMap;
 
-    public void clicked(LinkEvent event);
+//Generated from a Web Resource Schema
+public interface Prototype extends Model {
 
-    public void enabledStateChanged(LinkEvent event);
+    public ObservableMap<URI, Schema> getAllBaseSchemas();
 
-    public void hrefChanged(LinkEvent event);
+    public ObservableMap<String, PrototypeField<?>> getPrototypeFields();
 
 }

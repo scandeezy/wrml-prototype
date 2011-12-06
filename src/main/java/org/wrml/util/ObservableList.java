@@ -27,21 +27,21 @@ public class ObservableList<T> implements List<T>, Serializable {
     private static final long serialVersionUID = 3845570551813234715L;
 
     // TODO: Make sure any listeners are marked as transient
-    
+
     private final List<T> _Delegate;
 
     public ObservableList(List<T> delegate) {
         _Delegate = delegate;
     }
 
-    public boolean add(T e) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
     public void add(int index, T element) {
         // TODO Auto-generated method stub
 
+    }
+
+    public boolean add(T e) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     public boolean addAll(Collection<? extends T> c) {
@@ -104,14 +104,14 @@ public class ObservableList<T> implements List<T>, Serializable {
         return null;
     }
 
-    public boolean remove(Object o) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
     public T remove(int index) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public boolean remove(Object o) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
     public boolean removeAll(Collection<?> c) {
@@ -143,7 +143,7 @@ public class ObservableList<T> implements List<T>, Serializable {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     public <T> T[] toArray(T[] a) {
         // TODO Auto-generated method stub
         return null;

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.model.schema;
 
 import java.net.URI;
@@ -25,20 +26,6 @@ import org.wrml.Model;
 // Generated from a Web Resource Schema
 public interface Member extends Model {
 
-    public URI getSchemaId();
-
-    // Generated from Link
-    //     Relation: schema
-    //         Methods: GET 
-    //         ResponseSchema: Schema[?]
-    //     EnabledFormula: schemaId != null
-    //     DestinationUriTemplate: {schemaId} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["schemaId"]]
-    //     Href: <schemaId>
-    public Schema getSchema();
-
-    public URI getDeclaredSchemaId();
-
     // Generated from Link
     //     Relation: declaredSchema
     //         Methods: GET 
@@ -48,4 +35,18 @@ public interface Member extends Model {
     //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["declaredSchemaId"]]
     //     Href: <declaredSchemaId>
     public Schema getDeclaredSchema();
+
+    public URI getDeclaredSchemaId();
+
+    // Generated from Link
+    //     Relation: ownerSchema
+    //         Methods: GET 
+    //         ResponseSchema: Schema[?]
+    //     EnabledFormula: ownerSchemaId != null
+    //     DestinationUriTemplate: {ownerSchemaId} 
+    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["ownerSchemaId"]]
+    //     Href: <ownerSchemaId>
+    public Schema getOwnerSchema();
+
+    public URI getOwnerSchemaId();
 }

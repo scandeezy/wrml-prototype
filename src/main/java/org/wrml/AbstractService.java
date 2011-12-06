@@ -16,17 +16,16 @@
 
 package org.wrml;
 
-import java.util.EventListener;
+import java.net.URI;
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
+public abstract class AbstractService<T extends Model> implements Service<T> {
 
-    public void clicked(LinkEvent event);
+    public T get(URI id) {
+        return get(id, null);
+    }
 
-    public void enabledStateChanged(LinkEvent event);
-
-    public void hrefChanged(LinkEvent event);
+    public T save(URI id, T modelToSave) {
+        return save(id, modelToSave, null);
+    }
 
 }

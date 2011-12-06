@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.model;
 
 import org.wrml.util.ObservableList;
@@ -24,9 +25,9 @@ public interface ChoiceMenu extends Named, Versioned, Descriptive, Document {
     //     Name: name 
     //     Constraints: TextSyntax - Mixed-Upper Case
 
-    public ObservableList<String> getItems();
-
     public String getDefaultValue();
+
+    public ObservableList<String> getItems();
 
     public String setDefaultValue(String defaultValue);
 }

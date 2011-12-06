@@ -13,15 +13,75 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml;
 
 import java.net.URI;
 
+/**
+ * This is still-evolving core "backend connection" CRUD interface that is
+ * intended to "recursively" and "uniformly" satisfy the communication needs on
+ * both the client and server-side of the WRML framework.
+ * 
+ * @param <T>
+ */
 public interface Service<T extends Model> {
 
+    // For models clients
+
+    /**
+     * Gets a Model of type T based on the specified model ID. The optional
+     * requestor may be used to influence the outcome.
+     * 
+     * @param id
+     *            The ID of the model to request.
+     * 
+     * @return The identified model or null if the request could not be
+     *         resolved.
+     */
     T get(URI id);
 
-    T save(URI id, T model);
+    /**
+     * Gets a Model of type T based on the specified model ID. The optional
+     * requestor may be used to influence the outcome.
+     * 
+     * @param id
+     *            The ID of the model to request.
+     * @param requestor
+     *            The (optional) model requesting this service to get the other
+     *            model.
+     * 
+     * @return The identified model or null if the request could not be
+     *         resolved.
+     */
+    T get(URI id, Model requestor);
+
+    /**
+     * Saves a Model of type T based on the specified model ID. The optional
+     * requestor may be used to influence the outcome.
+     * 
+     * @param id
+     *            The ID of the model to save.
+     * 
+     * @return The identified model or null if the request could not be
+     *         resolved.
+     */
+    T save(URI id, T modelToSave);
+
+    /**
+     * Saves a Model of type T based on the specified model ID. The optional
+     * requestor may be used to influence the outcome.
+     * 
+     * @param id
+     *            The ID of the model to save.
+     * @param requestor
+     *            The (optional) model requesting this service to save the other
+     *            model.
+     * 
+     * @return The identified model or null if the request could not be
+     *         resolved.
+     */
+    T save(URI id, T modelToSave, Model requestor);
 
     // Collection getMany(List<URI> ids, URI responseModelSchemaId);
 

@@ -13,39 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.model.restapi;
 
-import java.net.URI;
-
-import org.wrml.model.Collection;
-import org.wrml.model.Descriptive;
-import org.wrml.model.Document;
-import org.wrml.model.Titled;
 import org.wrml.model.Named;
-import org.wrml.model.Versioned;
+import org.wrml.model.Titled;
 
 // Generated from a Web Resource Schema
-public interface RestApiTemplate extends Named, Titled, Versioned, Descriptive, Document {
+public interface RestApiTemplate extends Named, Titled, ResourceTemplate {
 
     // Added to Field
     //     Name: name 
     //     Constraints: TextSyntax - Mixed-Upper Case
-
-    // Generated from Field
-    //     Name: rootResourceTemplatesId
-    //     Value: Text[URI]
-    //     Constraints: TextSyntax - URI
-    //     Flags: ReadOnly
-    public URI getRootResourceTemplatesId();
-
-    // Generated from Link
-    //     Relation: rootResourceTemplates
-    //         Methods: GET 
-    //         ResponseSchema: Collection[ResourceTemplate]
-    //     EnabledFormula: rootResourceTemplatesId != null
-    //     DestinationUriTemplate: {rootResourceTemplatesId} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["rootResourceTemplatesId"]]
-    //     Href: <rootResourceTemplatesId>
-    public Collection<ResourceTemplate> getRootResourceTemplates();
 
 }

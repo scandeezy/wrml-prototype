@@ -24,7 +24,7 @@ import org.wrml.model.schema.ValidationResult;
 public interface Validator<T> {
 
     public Constraint<T> getConstraint();
-    
+
     public ValidationResult validate(Model model, Field<T> field);
 
     public ValidationResult validate(Model model, Field<T> field, T value);

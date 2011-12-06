@@ -13,18 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml;
 
 import java.net.URI;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.wrml.model.restapi.ResourceTemplate;
-import org.wrml.model.schema.FieldDefault;
+import org.wrml.model.schema.Prototype;
+import org.wrml.model.schema.PrototypeField;
 import org.wrml.model.schema.Schema;
 import org.wrml.util.Identifiable;
 import org.wrml.util.MapEvent;
@@ -35,9 +35,9 @@ import org.wrml.util.ObservableMap;
  * <h1>Greetings Program!</h1>
  * 
  * <p>
- * The abstract base class for all web resource schema instances. It provides a
- * set of features intended to attract developers wanting to work with an
- * easy-to-use REST-based application framework.
+ * The base class for all web resource schema instances. It provides a set of
+ * features intended to attract developers wanting to work with an easy-to-use
+ * REST-based application framework.
  * </p>
  * 
  * <h1>Feature 1</h1>
@@ -280,12 +280,7 @@ import org.wrml.util.ObservableMap;
  * 
  * 
  */
-public/* abstract */class AbstractModel extends Identifiable<URI> implements Model {
-
-    /*
-     * TODO: Uncomment the abstract keyword once the Model interface design
-     * settles. Keeping it concrete for now to catch interface/impl mismatches.
-     */
+public class RuntimeModel extends Identifiable<URI> implements Model {
 
     private static final long serialVersionUID = -7696720779481780624L;
 
@@ -294,7 +289,6 @@ public/* abstract */class AbstractModel extends Identifiable<URI> implements Mod
     public static final String READ_ONLY_FIELD_NAME = "readOnly";
 
     private final URI _SchemaId;
-    private final URI _ResourceTemplateId;
     private final List<URI> _EmbeddedLinkRelationIds;
 
     private transient Context _Context;
@@ -307,13 +301,12 @@ public/* abstract */class AbstractModel extends Identifiable<URI> implements Mod
 
     private transient FieldMapEventListener _FieldMapEventListener;
 
-    public AbstractModel(URI schemaId, URI resourceTemplateId, Context context) {
-        this(schemaId, resourceTemplateId, context, null);
+    public RuntimeModel(URI schemaId, Context context) {
+        this(schemaId, context, null);
     }
 
-    public AbstractModel(URI schemaId, URI resourceTemplateId, Context context, List<URI> embeddedLinkRelationIds) {
+    public RuntimeModel(URI schemaId, Context context, List<URI> embeddedLinkRelationIds) {
         _SchemaId = schemaId;
-        _ResourceTemplateId = resourceTemplateId;
         _Context = context;
         _EmbeddedLinkRelationIds = embeddedLinkRelationIds;
 
@@ -345,10 +338,6 @@ public/* abstract */class AbstractModel extends Identifiable<URI> implements Mod
     @Override
     public final boolean equals(Object obj) {
         return super.equals(obj);
-    }
-
-    public LinkedHashMap<URI, Schema> getAllBaseSchema() {
-        return getContext().getSchemaService().getAllBaseSchemas(getSchemaId());
     }
 
     public Context getContext() {
@@ -388,17 +377,12 @@ public/* abstract */class AbstractModel extends Identifiable<URI> implements Mod
         return link;
     }
 
-    public ResourceTemplate getResourceTemplate() {
-        URI resourceTemplateId = getResourceTemplateId();
-        return (resourceTemplateId != null) ? getContext().getResourceTemplate(resourceTemplateId) : null;
-    }
-
-    public URI getResourceTemplateId() {
-        return _ResourceTemplateId;
+    public Prototype getPrototype() {
+        return getContext().getPrototype(getSchemaId(), this);
     }
 
     public Schema getSchema() {
-        return getContext().getSchema(getSchemaId());
+        return getContext().getSchema(getSchemaId(), this);
     }
 
     public URI getSchemaId() {
@@ -408,11 +392,6 @@ public/* abstract */class AbstractModel extends Identifiable<URI> implements Mod
     @Override
     public final int hashCode() {
         return super.hashCode();
-    }
-
-    public boolean isDocroot() {
-        final ResourceTemplate resourceTemplate = getResourceTemplate();
-        return ((resourceTemplate != null) && (resourceTemplate.getParentResourceTemplateId() == null));
     }
 
     public boolean isFieldValueSet(String fieldName) {
@@ -445,10 +424,12 @@ public/* abstract */class AbstractModel extends Identifiable<URI> implements Mod
     }
 
     public void setAllFieldsToDefaultValue() {
-        final Map<String, FieldDefault<?>> fieldDefaults = getFieldDefaults();
-        if (fieldDefaults != null) {
-            Set<String> fieldNames = fieldDefaults.keySet();
-            for (String fieldName : fieldNames) {
+
+        final Prototype prototype = getPrototype();
+        final Map<String, PrototypeField<?>> prototypeFields = prototype.getPrototypeFields();
+        if (prototypeFields != null) {
+            final Set<String> fieldNames = prototypeFields.keySet();
+            for (final String fieldName : fieldNames) {
                 setFieldToDefaultValue(fieldName);
             }
         }
@@ -487,9 +468,12 @@ public/* abstract */class AbstractModel extends Identifiable<URI> implements Mod
      */
 
     public void setFieldToDefaultValue(String fieldName) {
-        final Map<String, FieldDefault<?>> fieldDefaults = getFieldDefaults();
-        if (fieldDefaults != null && fieldDefaults.containsKey(fieldName)) {
-            setFieldValue(fieldName, fieldDefaults.get(fieldName).getDefaultValue());
+
+        final Prototype prototype = getPrototype();
+        final Map<String, PrototypeField<?>> prototypeFields = prototype.getPrototypeFields();
+
+        if ((prototypeFields != null) && prototypeFields.containsKey(fieldName)) {
+            setFieldValue(fieldName, prototypeFields.get(fieldName).getDefaultValue());
         }
     }
 
@@ -505,10 +489,6 @@ public/* abstract */class AbstractModel extends Identifiable<URI> implements Mod
     @Override
     public URI setId(URI id) {
         return (URI) setFieldValue(ID_FIELD_NAME, id);
-    }
-
-    protected Map<String, FieldDefault<?>> getFieldDefaults() {
-        return getContext().getSchemaService().getFieldDefaults(getSchemaId());
     }
 
     protected ObservableMap<String, Object> getFieldMap() {

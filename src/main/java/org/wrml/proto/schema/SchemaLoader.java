@@ -16,11 +16,7 @@
 
 package org.wrml.proto.schema;
 
-import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Schema;
-import org.wrml.util.ObservableMap;
-
-import java.util.HashMap;
 
 /**
  * A class that can dynamically load a WRML Schema as a Java class.
@@ -28,20 +24,20 @@ import java.util.HashMap;
 public class SchemaLoader {
 
     public Schema load(String uri) {
-        
+
         // TODO: Commented out for now
         return null;
-        
+
         /*
-        
-        // TODO: Complete this. Just enough to pass the test...for now
-        Schema schema = new Schema();
-        final Field field = new Field(schema, null);
-        final ObservableMap<String, Field<?>> fields = new ObservableMap<String, Field<?>>(new HashMap<String, Field<?>>());
-        fields.put("example", field);
-        schema.setFields(fields);
-        return schema;
-        
-        */
+         * 
+         * // TODO: Complete this. Just enough to pass the test...for now
+         * Schema schema = new Schema();
+         * final Field field = new Field(schema, null);
+         * final ObservableMap<String, Field<?>> fields = new
+         * ObservableMap<String, Field<?>>(new HashMap<String, Field<?>>());
+         * fields.put("example", field);
+         * schema.setFields(fields);
+         * return schema;
+         */
     }
 }

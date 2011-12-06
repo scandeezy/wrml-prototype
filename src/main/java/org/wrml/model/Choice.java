@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.model;
 
 import java.net.URI;
@@ -22,9 +23,9 @@ import org.wrml.Model;
 // Generated from a Web Resource Schema
 public interface Choice extends Model {
 
-    public String getValue();
+    public ChoiceMenu getMenu();
 
     public URI getMenuId();
 
-    public ChoiceMenu getMenu();
+    public String getValue();
 }

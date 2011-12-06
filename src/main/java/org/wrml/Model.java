@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.wrml.model.restapi.ResourceTemplate;
+import org.wrml.model.schema.Prototype;
 import org.wrml.model.schema.Schema;
 import org.wrml.util.Unique;
 
@@ -41,17 +41,11 @@ public interface Model extends Unique<URI>, Serializable {
 
     public Link getLink(URI linkRelationId);
 
-    public ResourceTemplate getResourceTemplate();
-
-    public URI getResourceTemplateId();
+    public Prototype getPrototype();
 
     public Schema getSchema();
 
-    public LinkedHashMap<URI, Schema> getAllBaseSchema();
-
     public URI getSchemaId();
-
-    public boolean isDocroot();
 
     public boolean isReadOnly();
 

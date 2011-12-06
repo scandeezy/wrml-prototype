@@ -19,8 +19,6 @@ package org.wrml.model.communication.http;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.wrml.util.Unique;
-
 // Generated from a Web Resource Schema
 public enum CommonHeader {
 

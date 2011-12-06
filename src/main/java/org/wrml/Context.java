@@ -13,19 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml;
 
 import java.net.URI;
 import java.util.List;
 
 import org.wrml.model.UriTemplateParameter;
-import org.wrml.model.relation.LinkRelation;
 import org.wrml.model.restapi.LinkTemplate;
-import org.wrml.model.restapi.ResourceTemplate;
-import org.wrml.model.restapi.RestApiTemplate;
-import org.wrml.model.schema.Constraint;
+import org.wrml.model.schema.Prototype;
 import org.wrml.model.schema.Schema;
-import org.wrml.service.SchemaService;
 import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
 
@@ -134,51 +131,28 @@ public abstract class Context {
         return null;
     }
 
-    public RestApiTemplate getApiTemplate(URI id) {
-        return (RestApiTemplate) getModel(id, RestApiTemplate.class);
+    public Model getModel(Class<?> clazz, URI modelId, Model requestor) {
+        return getServiceForClass(clazz).get(modelId, requestor);
     }
 
-    public Constraint<?> getConstraint(URI id) {
-        return (Constraint<?>) getModel(id, Constraint.class);
+    public Prototype getPrototype(URI prototypeId, Model requestor) {
+        return (Prototype) getModel(Prototype.class, prototypeId, requestor);
     }
 
-    public LinkRelation getLinkRelation(URI id) {
-        return (LinkRelation) getModel(id, LinkRelation.class);
+    public Schema getSchema(URI schemaId, Model requestor) {
+        return (Schema) getModel(Schema.class, schemaId, requestor);
     }
 
-    public LinkTemplate getLinkTemplate(URI id) {
-        return (LinkTemplate) getModel(id, LinkTemplate.class);
-    }
-
-    public MediaType getMediaType(String mediaType) {
-        // TODO
-        return null;
-    }
-
-    public ResourceTemplate getResourceTemplate(URI id) {
-        return (ResourceTemplate) getModel(id, ResourceTemplate.class);
-    }
-
-    public Schema getSchema(URI id) {
-        return getSchemaService().get(id);
+    public URI getSchemaIdForClass(Class<?> clazz) {
+        return getSchemaIdForClassName(clazz.getCanonicalName());
     }
 
     public abstract URI getSchemaIdForClassName(String className);
 
     public abstract Service<?> getService(URI schemaId);
 
-    public abstract SchemaService getSchemaService();
-
-    public Service<?> getServiceForClassName(Class<?> clazz) {
-        return getService(getSchemaIdForClassName(clazz.getCanonicalName()));
-    }
-
-    public Model getModel(URI id, Class<?> clazz) {
-
-        String className = clazz.getCanonicalName();
-        URI schemaId = getSchemaIdForClassName(className);
-        Service<?> service = getService(schemaId);
-        return service.get(id);
+    public Service<?> getServiceForClass(Class<?> clazz) {
+        return getService(getSchemaIdForClass(clazz));
     }
 
 }

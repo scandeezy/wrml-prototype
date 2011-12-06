@@ -16,21 +16,16 @@
 
 package org.wrml.model.communication.http;
 
-
 /**
  * message://www.w3.org/Protocols/rfc2616/rfc2616-sec9.html
  */
 // Generated from a Web Resource Schema
 public enum Method {
-    
-    GET("GET", true, true), 
-    HEAD("HEAD", true, true), 
-    POST("POST", false, false), 
-    PUT("PUT", false, true), 
-    DELETE("DELETE", false, true), 
-    OPTIONS("OPTIONS", false, true), 
-    TRACE("TRACE", false, true), 
-    CONNECT("CONNECT", false, false);
+
+    GET("GET", true, true), HEAD("HEAD", true, true), POST("POST", false, false), PUT("PUT", false, true), DELETE(
+            "DELETE",
+            false,
+            true), OPTIONS("OPTIONS", false, true), TRACE("TRACE", false, true), CONNECT("CONNECT", false, false);
 
     private final String _Name;
     private final boolean _Safe;

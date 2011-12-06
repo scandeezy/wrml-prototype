@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.model.schema;
 
 import org.wrml.Model;
 
 // Generated from a Web Resource Schema
 public interface ValidationResult extends Model {
-    
+
     // TODO: Define interface
     // success/failure
     // oldvalue new value
