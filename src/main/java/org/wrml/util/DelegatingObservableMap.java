@@ -49,11 +49,15 @@ public class DelegatingObservableMap<K,V> extends AbstractObservableMap<K, V> {
 
     public V remove(Object key) {
 
-        fireRemovingEntryEvent(new MapEvent<K, V>(this, true, (K) key));
+        final MapEvent<K, V> removingEvent = new MapEvent<K, V>(this, true, (K) key);
+        fireRemovingEntryEvent(removingEvent);
+
+        if(removingEvent.isCancelled()) {
+            return null;
+        }
+
         final V removed = delegate.remove(key);
-
         fireEntryRemovedEvent(new MapEvent<K, V>(this, false, (K) key, null, removed));
-
         return removed;
     }
 
@@ -62,9 +66,13 @@ public class DelegatingObservableMap<K,V> extends AbstractObservableMap<K, V> {
     }
 
     public void clear() {
-        fireClearingEvent(new MapEvent<K, V>(this, true));
-        delegate.clear();
-        fireClearedEvent(new MapEvent<K, V>(this, true));
+        final MapEvent<K, V> clearingEvent = new MapEvent<K, V>(this, true);
+        fireClearingEvent(clearingEvent);
+
+        if(!clearingEvent.isCancelled()) {
+            delegate.clear();
+            fireClearedEvent(new MapEvent<K, V>(this, false));
+        }
     }
 
     public Set<K> keySet() {
