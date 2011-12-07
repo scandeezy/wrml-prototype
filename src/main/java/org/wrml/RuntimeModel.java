@@ -290,8 +290,8 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
 
     private transient Context _Context;
 
-    private AbstractObservableMap<String, Object> _FieldMap;
-    private AbstractObservableMap<URI, Link> _LinkMap;
+    private ObservableMap<String, Object> _FieldMap;
+    private ObservableMap<URI, Link> _LinkMap;
 
     private transient List<ModelEventListener> _EventListeners;
     private transient Map<String, List<FieldEventListener<?>>> _FieldEventListeners;
@@ -541,13 +541,13 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
     }
 
     private void initFieldMap() {
-        _FieldMap = new DelegatingObservableMap<String, Object>(new HashMap<String, Object>());
+        _FieldMap = Observables.observableMap(new HashMap<String, Object>());
         _FieldMapEventListener = new FieldMapEventListener();
         _FieldMap.addEventListener(_FieldMapEventListener);
     }
 
     private void initLinkMap() {
-        _LinkMap = new DelegatingObservableMap<URI, Link>(new HashMap<URI, Link>());
+        _LinkMap = Observables.observableMap(new HashMap<URI, Link>());
     }
 
     private class FieldMapEventListener implements MapEventListener<String, Object> {

@@ -21,8 +21,8 @@ import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Prototype;
 import org.wrml.model.schema.PrototypeField;
 import org.wrml.model.schema.Schema;
-import org.wrml.util.DelegatingObservableMap;
 import org.wrml.util.ObservableMap;
+import org.wrml.util.Observables;
 
 import java.net.URI;
 import java.util.*;
@@ -80,7 +80,7 @@ public class RuntimePrototype extends RuntimeModel implements Prototype {
             baseSchema = queue.poll();
         }
 
-        allBaseSchemas = new DelegatingObservableMap<URI, Schema>(allYourBase);
+        allBaseSchemas = Observables.observableMap(allYourBase);
         return (ObservableMap<URI, Schema>) setFieldValue(ALL_BASE_SCHEMAS_FIELD_NAME, allBaseSchemas);
     }
 
@@ -108,7 +108,7 @@ public class RuntimePrototype extends RuntimeModel implements Prototype {
 
             putSchemaFields(getId(), allYourFields);
 
-            prototypeFields = new DelegatingObservableMap<String, PrototypeField<?>>(allYourFields);
+            prototypeFields = Observables.observableMap(allYourFields);
             // Cache the schema's field prototypes for use by model instances
             return (ObservableMap<String, PrototypeField<?>>) setFieldValue(PROTOTYPE_FIELDS_FIELD_NAME,
                     prototypeFields);
@@ -130,7 +130,7 @@ public class RuntimePrototype extends RuntimeModel implements Prototype {
         // final locality
         putSchemaFields(getId(), allYourFields);
 
-        prototypeFields = new DelegatingObservableMap<String, PrototypeField<?>>(allYourFields);
+        prototypeFields = Observables.observableMap(allYourFields);
         // Cache the schema's field prototypes for use by model instances
         return (ObservableMap<String, PrototypeField<?>>) setFieldValue(PROTOTYPE_FIELDS_FIELD_NAME, prototypeFields);
     }

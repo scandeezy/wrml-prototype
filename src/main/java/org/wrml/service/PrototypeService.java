@@ -21,8 +21,8 @@ import org.wrml.Context;
 import org.wrml.Model;
 import org.wrml.RuntimePrototype;
 import org.wrml.model.schema.Prototype;
-import org.wrml.util.AbstractObservableMap;
-import org.wrml.util.DelegatingObservableMap;
+import org.wrml.util.ObservableMap;
+import org.wrml.util.Observables;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -32,7 +32,7 @@ import java.util.HashMap;
  */
 public class PrototypeService extends AbstractService<Prototype> {
 
-    private AbstractObservableMap<URI, Prototype> _PrototypeMap;
+    private ObservableMap<URI, Prototype> _PrototypeMap;
 
     public Prototype get(URI id, Model requestor) {
 
@@ -61,7 +61,7 @@ public class PrototypeService extends AbstractService<Prototype> {
         }
 
         if (_PrototypeMap == null) {
-            _PrototypeMap = new DelegatingObservableMap<URI, Prototype>(new HashMap<URI, Prototype>());
+            _PrototypeMap = Observables.observableMap(new HashMap<URI, Prototype>());
         }
 
         _PrototypeMap.put(id, prototype);
