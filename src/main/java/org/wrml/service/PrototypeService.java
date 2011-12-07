@@ -16,22 +16,23 @@
 
 package org.wrml.service;
 
-import java.net.URI;
-import java.util.HashMap;
-
 import org.wrml.AbstractService;
 import org.wrml.Context;
 import org.wrml.Model;
 import org.wrml.RuntimePrototype;
 import org.wrml.model.schema.Prototype;
-import org.wrml.util.ObservableMap;
+import org.wrml.util.AbstractObservableMap;
+import org.wrml.util.DelegatingObservableMap;
+
+import java.net.URI;
+import java.util.HashMap;
 
 /**
  * TODO: Refactor this into a more useful proxy/cache base service.
  */
 public class PrototypeService extends AbstractService<Prototype> {
 
-    private ObservableMap<URI, Prototype> _PrototypeMap;
+    private AbstractObservableMap<URI, Prototype> _PrototypeMap;
 
     public Prototype get(URI id, Model requestor) {
 
@@ -60,7 +61,7 @@ public class PrototypeService extends AbstractService<Prototype> {
         }
 
         if (_PrototypeMap == null) {
-            _PrototypeMap = new ObservableMap<URI, Prototype>(new HashMap<URI, Prototype>());
+            _PrototypeMap = new DelegatingObservableMap<URI, Prototype>(new HashMap<URI, Prototype>());
         }
 
         _PrototypeMap.put(id, prototype);

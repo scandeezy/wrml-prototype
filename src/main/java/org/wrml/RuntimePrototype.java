@@ -16,24 +16,16 @@
 
 package org.wrml;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.SortedMap;
-import java.util.TreeMap;
-
 import org.wrml.model.Collection;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Prototype;
 import org.wrml.model.schema.PrototypeField;
 import org.wrml.model.schema.Schema;
+import org.wrml.util.DelegatingObservableMap;
 import org.wrml.util.ObservableMap;
+
+import java.net.URI;
+import java.util.*;
 
 public class RuntimePrototype extends RuntimeModel implements Prototype {
 
@@ -88,7 +80,7 @@ public class RuntimePrototype extends RuntimeModel implements Prototype {
             baseSchema = queue.poll();
         }
 
-        allBaseSchemas = new ObservableMap<URI, Schema>(allYourBase);
+        allBaseSchemas = new DelegatingObservableMap<URI, Schema>(allYourBase);
         return (ObservableMap<URI, Schema>) setFieldValue(ALL_BASE_SCHEMAS_FIELD_NAME, allBaseSchemas);
     }
 
@@ -116,7 +108,7 @@ public class RuntimePrototype extends RuntimeModel implements Prototype {
 
             putSchemaFields(getId(), allYourFields);
 
-            prototypeFields = new ObservableMap<String, PrototypeField<?>>(allYourFields);
+            prototypeFields = new DelegatingObservableMap<String, PrototypeField<?>>(allYourFields);
             // Cache the schema's field prototypes for use by model instances
             return (ObservableMap<String, PrototypeField<?>>) setFieldValue(PROTOTYPE_FIELDS_FIELD_NAME,
                     prototypeFields);
@@ -138,7 +130,7 @@ public class RuntimePrototype extends RuntimeModel implements Prototype {
         // final locality
         putSchemaFields(getId(), allYourFields);
 
-        prototypeFields = new ObservableMap<String, PrototypeField<?>>(allYourFields);
+        prototypeFields = new DelegatingObservableMap<String, PrototypeField<?>>(allYourFields);
         // Cache the schema's field prototypes for use by model instances
         return (ObservableMap<String, PrototypeField<?>>) setFieldValue(PROTOTYPE_FIELDS_FIELD_NAME, prototypeFields);
     }

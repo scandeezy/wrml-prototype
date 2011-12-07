@@ -16,20 +16,17 @@
 
 package org.wrml;
 
+import org.wrml.model.schema.Prototype;
+import org.wrml.model.schema.PrototypeField;
+import org.wrml.model.schema.Schema;
+import org.wrml.util.*;
+
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import org.wrml.model.schema.Prototype;
-import org.wrml.model.schema.PrototypeField;
-import org.wrml.model.schema.Schema;
-import org.wrml.util.Identifiable;
-import org.wrml.util.MapEvent;
-import org.wrml.util.MapEventListener;
-import org.wrml.util.ObservableMap;
 
 /**
  * <h1>Greetings Program!</h1>
@@ -293,8 +290,8 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
 
     private transient Context _Context;
 
-    private ObservableMap<String, Object> _FieldMap;
-    private ObservableMap<URI, Link> _LinkMap;
+    private AbstractObservableMap<String, Object> _FieldMap;
+    private AbstractObservableMap<URI, Link> _LinkMap;
 
     private transient List<ModelEventListener> _EventListeners;
     private transient Map<String, List<FieldEventListener<?>>> _FieldEventListeners;
@@ -544,13 +541,13 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
     }
 
     private void initFieldMap() {
-        _FieldMap = new ObservableMap<String, Object>(new HashMap<String, Object>());
+        _FieldMap = new DelegatingObservableMap<String, Object>(new HashMap<String, Object>());
         _FieldMapEventListener = new FieldMapEventListener();
         _FieldMap.addEventListener(_FieldMapEventListener);
     }
 
     private void initLinkMap() {
-        _LinkMap = new ObservableMap<URI, Link>(new HashMap<URI, Link>());
+        _LinkMap = new DelegatingObservableMap<URI, Link>(new HashMap<URI, Link>());
     }
 
     private class FieldMapEventListener implements MapEventListener<String, Object> {
