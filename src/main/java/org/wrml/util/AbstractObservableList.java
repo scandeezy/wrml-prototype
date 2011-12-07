@@ -16,142 +16,92 @@
 
 package org.wrml.util;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
-public class AbstractObservableList<T> implements Serializable, ObservableList<T> {
+public abstract class AbstractObservableList<E> implements ObservableList<E> {
 
-    private static final long serialVersionUID = 3845570551813234715L;
+    private List<ListEventListener<E>> listeners = new LinkedList<ListEventListener<E>>();
 
-    // TODO: Make sure any listeners are marked as transient
-
-    private final List<T> _Delegate;
-
-    public AbstractObservableList(List<T> delegate) {
-        _Delegate = delegate;
+    public void addListEventListener(ListEventListener<E> listener) {
+        listeners.add(listener);
     }
 
-    public void add(int index, T element) {
-        // TODO Auto-generated method stub
-
+    public void removeListEventListener(ListEventListener<E> listener) {
+        listeners.remove(listener);
     }
 
-    public boolean add(T e) {
-        // TODO Auto-generated method stub
-        return false;
+    protected final void fireClearedEvent(ListEvent<E> event) {
+        fireEvent(event, new ListEventHandler<E>() {
+            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
+                listener.cleared(event);
+            }
+        });
     }
 
-    public boolean addAll(Collection<? extends T> c) {
-        // TODO Auto-generated method stub
-        return false;
+    protected final void fireClearingEvent(ListEvent<E> event) {
+        fireEvent(event, new ListEventHandler<E>() {
+            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
+                listener.clearing(event);
+            }
+        });
     }
 
-    public boolean addAll(int index, Collection<? extends T> c) {
-        // TODO Auto-generated method stub
-        return false;
+    protected final void fireElementInsertedEvent(ListEvent<E> event) {
+        fireEvent(event, new ListEventHandler<E>() {
+            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
+                listener.elementInserted(event);
+            }
+        });
     }
 
-    public void clear() {
-        // TODO Auto-generated method stub
-
+    protected final void fireElementRemovedEvent(ListEvent<E> event) {
+        fireEvent(event, new ListEventHandler<E>() {
+            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
+                listener.elementRemoved(event);
+            }
+        });
     }
 
-    public boolean contains(Object o) {
-        // TODO Auto-generated method stub
-        return false;
+    protected final void fireElementUpdatedEvent(ListEvent<E> event) {
+        fireEvent(event, new ListEventHandler<E>() {
+            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
+                listener.elementUpdated(event);
+            }
+        });
     }
 
-    public boolean containsAll(Collection<?> c) {
-        // TODO Auto-generated method stub
-        return false;
+    protected final void fireInsertingElementEvent(ListEvent<E> event) {
+        fireEvent(event, new ListEventHandler<E>() {
+            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
+                listener.insertingElement(event);
+            }
+        });
     }
 
-    public T get(int index) {
-        // TODO Auto-generated method stub
-        return null;
+    protected final void fireRemovingElementEvent(ListEvent<E> event) {
+        fireEvent(event, new ListEventHandler<E>() {
+            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
+                listener.removingElement(event);
+            }
+        });
     }
 
-    public int indexOf(Object o) {
-        // TODO Auto-generated method stub
-        return 0;
+    protected final void fireUpdatingElementEvent(ListEvent<E> event) {
+        fireEvent(event, new ListEventHandler<E>() {
+            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
+                listener.updatingElement(event);
+            }
+        });
     }
 
-    public boolean isEmpty() {
-        // TODO Auto-generated method stub
-        return false;
+    protected void fireEvent(ListEvent<E> event, ListEventHandler handler) {
+        for (ListEventListener<E> listener : listeners) {
+            handler.handleEvent(event, listener);
+        }
     }
 
-    public Iterator<T> iterator() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public int lastIndexOf(Object o) {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public ListIterator<T> listIterator() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public ListIterator<T> listIterator(int index) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public T remove(int index) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public boolean remove(Object o) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public boolean removeAll(Collection<?> c) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public boolean retainAll(Collection<?> c) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    public T set(int index, T element) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public int size() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public List<T> subList(int fromIndex, int toIndex) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Object[] toArray() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public <T> T[] toArray(T[] a) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void addListEventListener(ListEventListener<T> listEventListener) {
-    }
-
-    public void removeListEventListener(ListEventListener<T> listEventListener) {
+    private interface ListEventHandler<E> {
+        void handleEvent(ListEvent<E> event, ListEventListener<E> listener);
     }
 }
