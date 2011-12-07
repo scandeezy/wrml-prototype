@@ -1,5 +1,6 @@
 package org.wrml.util;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,5 +20,15 @@ public final class Observables {
      */
     public static <K, V> ObservableMap<K, V> observableMap(Map<K, V> map) {
         return new DelegatingObservableMap<K, V>(map);
+    }
+
+    /**
+     * Convenience utility method for decorating a List as an ObservableList.
+     * @param list The List to decorate
+     * @param <E> The element type
+     * @return An ObservableList backed by the given List
+     */
+    public static <E> ObservableList<E> observableList(List<E> list) {
+        return new DelegatingObservableList<E>(list);
     }
 }
