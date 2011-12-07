@@ -36,6 +36,10 @@ public final class MapEvent<K, V> extends CancelableEvent {
         this(map, cancelable, null, null, null);
     }
 
+    public MapEvent(ObservableMap<K, V> map, boolean cancelable, K _Key) {
+        this(map, cancelable, _Key, null, null);
+    }
+
     public MapEvent(ObservableMap<K, V> map, boolean cancelable, K key, V newValue, V oldValue) {
         super(map, cancelable);
         _Key = key;

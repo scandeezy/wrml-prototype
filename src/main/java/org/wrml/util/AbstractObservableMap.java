@@ -16,10 +16,8 @@
 
 package org.wrml.util;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * A Map that fires events when entries are inserted, updated, removed, or
@@ -30,91 +28,89 @@ import java.util.Set;
  * @param <V>
  *            The value type
  */
-public class AbstractObservableMap<K, V> implements Serializable, ObservableMap<V,K,V> {
+public abstract class AbstractObservableMap<K, V> implements ObservableMap<K,V> {
 
-    private static final long serialVersionUID = -4210504376374050501L;
+    private List<MapEventListener<K,V>> mapEventListeners = new LinkedList<MapEventListener<K, V>>();
 
-    private final Map<K, V> _Delegate;
-
-    // TODO: Make sure any listeners are marked as transient
-
-    // Perhaps use constraints to determine what kind of delegate should be used.
-    // E.G. A schema constraint like "sorted" would use a tree map
-    // E.G. A schema constraint like "ordered" would use a linked has map
-    public AbstractObservableMap(final Map<K, V> delegate) {
-        _Delegate = delegate;
+    public void addEventListener(MapEventListener<K, V> mapEventListener) {
+        mapEventListeners.add(mapEventListener);
     }
 
-    public void addEventListener(MapEventListener<K, V> listener) {
-        // TODO
+    public void removeEventListener(MapEventListener<K, V> mapEventListener) {
+        mapEventListeners.remove(mapEventListener);
     }
 
-    public void clear() {
-        // TODO Auto-generated method stub
-
+    protected final void fireClearedEvent(MapEvent<K, V> mapEvent) {
+        fireEvent(mapEvent, new MapEventHandler<K, V>() {
+            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
+                mapEventListener.cleared(mapEvent);
+            }
+        });
     }
 
-    public boolean containsKey(Object key) {
-        // TODO Auto-generated method stub
-        return false;
+    protected final void fireClearingEvent(MapEvent<K, V> mapEvent) {
+        fireEvent(mapEvent, new MapEventHandler<K, V>() {
+            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
+                mapEventListener.clearing(mapEvent);
+            }
+        });
     }
 
-    public boolean containsValue(Object value) {
-        // TODO Auto-generated method stub
-        return false;
+    protected final void fireEntryInsertedEvent(MapEvent<K, V> mapEvent) {
+        fireEvent(mapEvent, new MapEventHandler<K, V>() {
+            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
+                mapEventListener.entryInserted(mapEvent);
+            }
+        });
     }
 
-    public Set<java.util.Map.Entry<K, V>> entrySet() {
-        // TODO Auto-generated method stub
-        return null;
+    protected final void fireEntryRemovedEvent(MapEvent<K, V> mapEvent) {
+        fireEvent(mapEvent, new MapEventHandler<K, V>() {
+            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
+                mapEventListener.entryRemoved(mapEvent);
+            }
+        });
     }
 
-    public V get(Object key) {
-        // TODO Auto-generated method stub
-        return null;
+    protected final void fireEntryUpdatedEvent(MapEvent<K, V> mapEvent) {
+        fireEvent(mapEvent, new MapEventHandler<K, V>() {
+            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
+                mapEventListener.entryUpdated(mapEvent);
+            }
+        });
     }
 
-    public Map<K, V> getDelegate() {
-        return _Delegate;
+    protected final void fireInsertingEntryEvent(MapEvent<K, V> mapEvent) {
+        fireEvent(mapEvent, new MapEventHandler<K, V>() {
+            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
+                mapEventListener.insertingEntry(mapEvent);
+            }
+        });
     }
 
-    public boolean isEmpty() {
-        // TODO Auto-generated method stub
-        return false;
+    protected final void fireRemovingEntryEvent(MapEvent<K, V> mapEvent) {
+        fireEvent(mapEvent, new MapEventHandler<K, V>() {
+            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
+                mapEventListener.removingEntry(mapEvent);
+            }
+        });
     }
 
-    public Set<K> keySet() {
-        // TODO Auto-generated method stub
-        return null;
+    protected final void fireUpdatingEntryEvent(MapEvent<K, V> mapEvent) {
+        fireEvent(mapEvent, new MapEventHandler<K, V>() {
+            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
+                mapEventListener.updatingEntry(mapEvent);
+            }
+        });
     }
 
-    public V put(K key, V value) {
-        // TODO Auto-generated method stub
-        return null;
+    protected void fireEvent(MapEvent<K,V> mapEvent, MapEventHandler handler) {
+        for (MapEventListener<K, V> mapEventListener : mapEventListeners) {
+            handler.handleEvent(mapEvent, mapEventListener);
+        }
     }
 
-    public void putAll(Map<? extends K, ? extends V> map) {
-        // TODO Auto-generated method stub
-
+    private interface MapEventHandler<K, V> {
+        void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener);
     }
-
-    public V remove(Object key) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public void removeEventListener(MapEventListener<K, V> listener) {
-        // TODO
-    }
-
-    public int size() {
-        // TODO Auto-generated method stub
-        return 0;
-    }
-
-    public Collection<V> values() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }
