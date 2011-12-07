@@ -25,9 +25,10 @@ public class DelegatingObservableMapTest {
         verifyNoMoreInteractions(listener);
     }
 
+    @Test
     public void shouldCancelPut() {
-        final Map mockMap = mock(Map.class);
-        ObservableMap<String, Integer> observableMap = new DelegatingObservableMap<String, Integer>(mockMap);
+        final Map backingMap = mock(Map.class);
+        ObservableMap<String, Integer> observableMap = new DelegatingObservableMap<String, Integer>(backingMap);
         MapEventListener<String, Integer> listener = mock(MapEventListener.class);
 
         // Cancel the event during a call to listener.updatingEntry(...)
@@ -46,8 +47,7 @@ public class DelegatingObservableMapTest {
         verify(listener).updatingEntry(Matchers.<MapEvent<String, Integer>>any());
         verifyNoMoreInteractions(listener);
 
-        verifyZeroInteractions(mockMap);
-
-
+        verify(backingMap, times(0)).put(any(), any());
     }
+
 }
