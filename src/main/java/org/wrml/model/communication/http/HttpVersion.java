@@ -25,14 +25,24 @@ public enum HttpVersion {
 
     HTTP_1_0(1, 0), HTTP_1_1(1, 1);
 
-    public final static HttpVersion fromString(String httpVersionString) {
+    public static HttpVersion fromString(String httpVersionString) {
 
-        // MSMTODO: Implement with regex parsing
-        // MSMTODO: If 1.0 return the HTTP_1_0 const
-        // MSMTODO: Else If 1.1 return the HTTP_1_1 const
-        // MSMTODO: Else throw an unsupported version exception or something
+        // Quick, dirty but simple. No regex needed.
+        if(httpVersionString == null ||
+                httpVersionString.length() != 8 ||
+                !httpVersionString.startsWith("HTTP/1.")) {
+            throw new IllegalArgumentException("Invalid HTTP version.");
+        }
 
-        return null;
+        if(httpVersionString.endsWith("0")) {
+            return HTTP_1_0;
+        }
+
+        if(httpVersionString.endsWith("1")) {
+            return HTTP_1_1;
+        } else {
+            throw new IllegalArgumentException("Unsupported HTTP version.");
+        }
     }
 
     private final long _MajorNumber;
