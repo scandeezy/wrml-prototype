@@ -32,11 +32,11 @@ public abstract class AbstractObservableMap<K, V> implements ObservableMap<K,V> 
 
     private List<MapEventListener<K,V>> mapEventListeners = new LinkedList<MapEventListener<K, V>>();
 
-    public void addEventListener(MapEventListener<K, V> mapEventListener) {
+    public void addMapEventListener(MapEventListener<K, V> mapEventListener) {
         mapEventListeners.add(mapEventListener);
     }
 
-    public void removeEventListener(MapEventListener<K, V> mapEventListener) {
+    public void removeMapEventListener(MapEventListener<K, V> mapEventListener) {
         mapEventListeners.remove(mapEventListener);
     }
 

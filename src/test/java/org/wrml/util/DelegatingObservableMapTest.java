@@ -32,7 +32,7 @@ public class DelegatingObservableMapTest {
         ObservableMap<String, Integer> observableMap = new DelegatingObservableMap<String, Integer>(backingMap);
         MapEventListener<String, Integer> listener = mock(MapEventListener.class);
 
-        observableMap.addEventListener(listener);
+        observableMap.addMapEventListener(listener);
 
         observableMap.clear();
 
@@ -58,7 +58,7 @@ public class DelegatingObservableMapTest {
             }
         }).when(listener).clearing(Matchers.<MapEvent<String, Integer>>any());
 
-        observableMap.addEventListener(listener);
+        observableMap.addMapEventListener(listener);
 
         observableMap.clear();
 
@@ -74,7 +74,7 @@ public class DelegatingObservableMapTest {
         ObservableMap<String, Integer> observableMap = new DelegatingObservableMap<String, Integer>(backingMap);
         MapEventListener<String, Integer> listener = mock(MapEventListener.class);
 
-        observableMap.addEventListener(listener);
+        observableMap.addMapEventListener(listener);
 
         observableMap.put("test", 123);
 
@@ -100,7 +100,7 @@ public class DelegatingObservableMapTest {
             }
         }).when(listener).updatingEntry(Matchers.<MapEvent<String, Integer>>any());
 
-        observableMap.addEventListener(listener);
+        observableMap.addMapEventListener(listener);
 
         observableMap.put("test", 123);
 
@@ -116,7 +116,7 @@ public class DelegatingObservableMapTest {
         ObservableMap<String, Integer> observableMap = new DelegatingObservableMap<String, Integer>(backingMap);
         MapEventListener<String, Integer> listener = mock(MapEventListener.class);
 
-        observableMap.addEventListener(listener);
+        observableMap.addMapEventListener(listener);
 
         observableMap.remove("test");
 
@@ -142,7 +142,7 @@ public class DelegatingObservableMapTest {
             }
         }).when(listener).removingEntry(Matchers.<MapEvent<String, Integer>>any());
 
-        observableMap.addEventListener(listener);
+        observableMap.addMapEventListener(listener);
 
         observableMap.remove("test");
 

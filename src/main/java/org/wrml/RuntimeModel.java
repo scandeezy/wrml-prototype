@@ -543,7 +543,7 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
     private void initFieldMap() {
         _FieldMap = Observables.observableMap(new HashMap<String, Object>());
         _FieldMapEventListener = new FieldMapEventListener();
-        _FieldMap.addEventListener(_FieldMapEventListener);
+        _FieldMap.addMapEventListener(_FieldMapEventListener);
     }
 
     private void initLinkMap() {
