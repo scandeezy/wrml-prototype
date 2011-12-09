@@ -19,7 +19,6 @@ package org.wrml.model.restapi;
 import java.net.URI;
 
 import org.wrml.MediaType;
-import org.wrml.model.Document;
 import org.wrml.model.UriTemplateParameter;
 import org.wrml.model.Versioned;
 import org.wrml.model.relation.LinkRelation;
@@ -37,19 +36,19 @@ import org.wrml.util.ObservableMap;
 // Generated from a Web Resource Schema
 public interface LinkTemplate extends Versioned, Document {
 
+    public ResourceTemplate getEndPoint();
+
+    public URI getEndPointId();
+
     // Generated from Field
-    //     Name: defaultDestinationUriTemplateParameters 
+    //     Name: endPointParamDefaults 
     //     Value: List[Schema[UriTemplateParameter]]
-    public ObservableList<UriTemplateParameter> getDefaultDestinationUriTemplateParameters();
-
-    public ResourceTemplate getDestinationResourceTemplate();
-
-    public URI getDestinationResourceTemplateId();
+    public ObservableList<UriTemplateParameter> getEndPointParamDefaults();
 
     // Generated from Field
-    //     Name: destinationUriTemplateParameters 
+    //     Name: endPointParams 
     //     Value: Map[ Key=Text[URI], Value=List[Schema[UriTemplateParameter]] ]
-    public ObservableMap<URI, ObservableList<UriTemplateParameter>> getDestinationUriTemplateParameters();
+    public ObservableMap<URI, ObservableList<UriTemplateParameter>> getEndPointParams();
 
     public LinkRelation getLinkRelation();
 
@@ -82,24 +81,24 @@ public interface LinkTemplate extends Versioned, Document {
     public URI getRestApiTemplateId();
 
     // Generated from Link
-    //     Relation: sourceResourceTemplate
+    //     Relation: startingPoint
     //         Method: GET 
     //         ResponseSchema: ResourceTemplate
-    //     EnabledFormula: sourceResourceTemplateId != null
-    //     DestinationUriTemplate: {sourceResourceTemplateId} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["sourceResourceTemplateId"]]
-    //     Href: <sourceResourceTemplateId>
-    public ResourceTemplate getSourceResourceTemplate();
+    //     EnabledFormula: startingPointId != null
+    //     DestinationUriTemplate: {startingPointId} 
+    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["startingPointId"]]
+    //     Href: <startingPointId>
+    public ResourceTemplate getStartingPoint();
 
     // Generated from Field
-    //     Name: sourceResourceTemplateId 
+    //     Name: startingPointId 
     //     Value: Text[URI] 
-    public URI getSourceResourceTemplateId();
+    public URI getStartingPointId();
 
-    public URI setDestinationResourceTemplateId(URI destinationResourceTemplateId);
+    public URI setEndPointId(URI endPointId);
 
     public URI setLinkRelationId(URI linkRelationId);
 
-    public URI setSourceResourceTemplateId(URI sourceResourceTemplateId);
+    public URI setStartingPointId(URI startingPointId);
 
 }

@@ -118,7 +118,7 @@ public abstract class Context {
         final LinkTemplate linkTemplate = link.getLinkTemplate();
 
         final ObservableMap<URI, ObservableList<UriTemplateParameter>> destinationUriTemplateParameters = linkTemplate
-                .getDestinationUriTemplateParameters();
+                .getEndPointParams();
 
         final List<UriTemplateParameter> uriTemplateParameters = destinationUriTemplateParameters
                 .get(obj.getSchemaId());

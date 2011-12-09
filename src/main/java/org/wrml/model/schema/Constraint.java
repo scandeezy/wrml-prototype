@@ -17,10 +17,10 @@
 package org.wrml.model.schema;
 
 import org.wrml.model.Descriptive;
-import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
 import org.wrml.model.Versioned;
+import org.wrml.model.restapi.Document;
 import org.wrml.util.ObservableList;
 import org.wrml.util.Validator;
 

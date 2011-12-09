@@ -18,10 +18,10 @@ package org.wrml.model.schema;
 
 import java.net.URI;
 
-import org.wrml.model.Collection;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
+import org.wrml.model.restapi.Collection;
 
 /**
  * A web resource schema's field. Conceptually a field is a typed data slot,

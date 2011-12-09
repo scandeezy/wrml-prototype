@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-package org.wrml.model;
+package org.wrml.model.schema;
 
+import org.wrml.model.Descriptive;
+import org.wrml.model.Named;
+import org.wrml.model.Versioned;
+import org.wrml.model.restapi.Document;
 import org.wrml.util.ObservableList;
 
 // Generated from a Web Resource Schema

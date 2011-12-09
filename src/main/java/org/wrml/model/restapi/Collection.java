@@ -14,28 +14,19 @@
  * limitations under the License.
  */
 
-package org.wrml.model;
+package org.wrml.model.restapi;
 
-/**
- * Enumeration that captures the resource archetypes.
- */
-//Generated from a Web Resource Schema
-public enum ResourceArchetype {
+// Generated from a Web Resource Schema
+public interface Collection<T extends Document> extends Container<T> {
 
-    DOCUMENT("Document"), COLLECTION("Collection"), STORE("Store"), ACTION("Action");
-
-    private final String _Title;
-
-    private ResourceArchetype(String title) {
-        _Title = title;
-    }
-
-    public final String getTitle() {
-        return _Title;
-    }
-
-    @Override
-    public String toString() {
-        return getTitle();
-    }
+    // Generated from Link
+    //     Relation: create
+    //         Methods: POST 
+    //         RequestSchema: T
+    //         ResponseSchema: T
+    //     EnabledFormula: id != null && !isReadOnly
+    //     DestinationUriTemplate: {id} 
+    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
+    //     Href: <id>
+    public T create(T model);
 }

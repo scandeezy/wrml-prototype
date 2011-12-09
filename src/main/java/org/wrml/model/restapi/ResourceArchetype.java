@@ -14,24 +14,28 @@
  * limitations under the License.
  */
 
-package org.wrml.model;
+package org.wrml.model.restapi;
 
-import org.wrml.util.ObservableList;
+/**
+ * Enumeration that captures the resource archetypes.
+ */
+//Generated from a Web Resource Schema
+public enum ResourceArchetype {
 
-// Generated from a Web Resource Schema
-public interface Container<T extends Document> extends Document {
+    DOCUMENT("Document"), COLLECTION("Collection"), STORE("Store"), ACTION("Action");
 
-    public ObservableList<T> getElements();
+    private final String _Title;
 
-    public Container<T> getNext();
+    private ResourceArchetype(String title) {
+        _Title = title;
+    }
 
-    public Integer getPageSize();
+    public final String getTitle() {
+        return _Title;
+    }
 
-    public Integer getPageStartIndex();
-
-    public Container<T> getPrevious();
-
-    public int getSize();
-
-    //public T getElement(ObservableList<UriTemplateParameter> params);
+    @Override
+    public String toString() {
+        return getTitle();
+    }
 }

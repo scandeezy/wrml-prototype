@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package org.wrml.model;
+package org.wrml.model.restapi;
 
 // Generated from a Web Resource Schema
-public interface Collection<T extends Document> extends Container<T> {
+public interface Store<T extends Document> extends Container<T> {
 
     // Generated from Link
-    //     Relation: create
-    //         Methods: POST 
+    //     Relation: save
+    //         Methods: PUT 
     //         RequestSchema: T
     //         ResponseSchema: T
     //     EnabledFormula: id != null && !isReadOnly
     //     DestinationUriTemplate: {id} 
     //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
     //     Href: <id>
-    public T create(T model);
+    public T save(T model);
 }

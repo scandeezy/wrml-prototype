@@ -16,7 +16,7 @@
 
 package org.wrml;
 
-import org.wrml.model.Collection;
+import org.wrml.model.restapi.Collection;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Prototype;
 import org.wrml.model.schema.PrototypeField;

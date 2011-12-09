@@ -18,10 +18,7 @@ package org.wrml.model.restapi;
 
 import java.net.URI;
 
-import org.wrml.model.Collection;
 import org.wrml.model.Descriptive;
-import org.wrml.model.Document;
-import org.wrml.model.ResourceArchetype;
 import org.wrml.model.Versioned;
 import org.wrml.model.schema.PrototypeField;
 import org.wrml.util.ObservableList;

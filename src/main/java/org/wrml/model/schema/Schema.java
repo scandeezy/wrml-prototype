@@ -18,11 +18,11 @@ package org.wrml.model.schema;
 
 import java.net.URI;
 
-import org.wrml.model.Collection;
 import org.wrml.model.Descriptive;
-import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Versioned;
+import org.wrml.model.restapi.Collection;
+import org.wrml.model.restapi.Document;
 import org.wrml.util.ObservableMap;
 
 /**

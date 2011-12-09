@@ -19,6 +19,7 @@ package org.wrml.model;
 import java.net.URI;
 
 import org.wrml.Model;
+import org.wrml.model.schema.ChoiceMenu;
 
 // Generated from a Web Resource Schema
 public interface Choice extends Model {

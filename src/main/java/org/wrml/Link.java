@@ -19,9 +19,9 @@ package org.wrml;
 import java.net.URI;
 import java.util.List;
 
-import org.wrml.model.Document;
 import org.wrml.model.communication.http.Method;
 import org.wrml.model.relation.LinkRelation;
+import org.wrml.model.restapi.Document;
 import org.wrml.model.restapi.LinkTemplate;
 import org.wrml.model.restapi.ResourceTemplate;
 import org.wrml.util.ObservableMap;

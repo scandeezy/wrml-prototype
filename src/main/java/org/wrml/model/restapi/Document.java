@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package org.wrml.model;
+package org.wrml.model.restapi;
 
 import java.net.URI;
 
 import org.wrml.Model;
-import org.wrml.model.restapi.ResourceTemplate;
 
 /**
  * A resource archetype used to model a singular concept.
