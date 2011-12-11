@@ -14,26 +14,12 @@
  * limitations under the License.
  */
 
-package org.wrml.model.communication.http;
+package org.wrml.util;
 
-import org.wrml.Model;
+public interface Factory<I, T> {
 
-/**
- * <a rel="rfc" href="message://www.w3.org/Protocols/rfc2616/rfc2616-sec4
- * .html#sec4">RFC</a> <code>
- * generic-message = start-line
- *                   *(message-header CRLF)
- *                   CRLF
- *                   [ message-body ]
- * start-line      = Request-Line | Status-Line
- * </code>
- */
-// Generated from a Web Resource Schema
-public interface Message extends Model {
+    public T create();
 
-    public Entity getEntity();
+    public T create(I id);
 
-    public StartLine getStartLine();
-
-    public MessageType getType();
 }

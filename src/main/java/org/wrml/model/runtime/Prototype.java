@@ -14,19 +14,21 @@
  * limitations under the License.
  */
 
-package org.wrml.model.restapi;
+package org.wrml.model.runtime;
 
-// Generated from a Web Resource Schema
-public interface Store<T extends Document> extends Container<T> {
+import java.net.URI;
 
-    // Generated from Link
-    //     Relation: save
-    //         Methods: PUT 
-    //         RequestSchema: T
-    //         ResponseSchema: T
-    //     EnabledFormula: id != null && !isReadOnly
-    //     DestinationUriTemplate: {id} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
-    //     Href: <id>
-    public T save(T model);
+import org.wrml.Model;
+import org.wrml.model.schema.Schema;
+import org.wrml.util.ObservableMap;
+
+//Generated from a Web Resource Schema
+public interface Prototype extends Model {
+
+    public ObservableMap<URI, Schema> getAllBaseSchemas();
+
+    public ObservableMap<String, PrototypeField> getPrototypeFields();
+
+    public ObservableMap<URI, PrototypeLinkFormula> getPrototypeLinkFormulas();
+
 }

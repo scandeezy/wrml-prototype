@@ -14,22 +14,25 @@
  * limitations under the License.
  */
 
-package org.wrml.model.communication.http;
+package org.wrml.service;
+
+import java.net.URI;
 
 import org.wrml.Model;
-import org.wrml.util.ObservableMap;
+import org.wrml.model.resource.Action;
 
-/**
- * <blockquote cite="message://www.w3.org/Protocols/rfc2616/rfc2616-sec4
- * .html#sec4.2 "> The order in which header fields with differing field names
- * are received is not significant. However, it is "good practice" to send
- * general-header fields first, followed by request-header or response- header
- * fields, and ending with the entity-header fields. </blockquote>
- */
-// Generated from a Web Resource Schema
-public interface Entity extends Model {
+public interface ExecutableService<K, M extends Model> extends Service<K, M> {
 
-    public Body getBody();
+    // EXECUTE
 
-    public Headers getHeaders();
+    // TODO: Need to package up an Action as an input 
+    // that references a model and some other things?
+
+    public Model execute(URI id);
+
+    public Model execute(URI id, Action action);
+
+    public Model execute(URI id, Action action, Model requestor);
+
+    public Model execute(URI id, Model requestor);
 }

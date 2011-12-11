@@ -28,9 +28,9 @@ import java.util.List;
  * @param <V>
  *            The value type
  */
-public abstract class AbstractObservableMap<K, V> implements ObservableMap<K,V> {
+public abstract class AbstractObservableMap<K, V> implements ObservableMap<K, V> {
 
-    private List<MapEventListener<K,V>> mapEventListeners = new LinkedList<MapEventListener<K, V>>();
+    private final List<MapEventListener<K, V>> mapEventListeners = new LinkedList<MapEventListener<K, V>>();
 
     public void addMapEventListener(MapEventListener<K, V> mapEventListener) {
         mapEventListeners.add(mapEventListener);
@@ -42,6 +42,7 @@ public abstract class AbstractObservableMap<K, V> implements ObservableMap<K,V> 
 
     protected final void fireClearedEvent(MapEvent<K, V> mapEvent) {
         fireEvent(mapEvent, new MapEventHandler<K, V>() {
+
             public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
                 mapEventListener.cleared(mapEvent);
             }
@@ -50,6 +51,7 @@ public abstract class AbstractObservableMap<K, V> implements ObservableMap<K,V> 
 
     protected final void fireClearingEvent(MapEvent<K, V> mapEvent) {
         fireEvent(mapEvent, new MapEventHandler<K, V>() {
+
             public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
                 mapEventListener.clearing(mapEvent);
             }
@@ -58,6 +60,7 @@ public abstract class AbstractObservableMap<K, V> implements ObservableMap<K,V> 
 
     protected final void fireEntryInsertedEvent(MapEvent<K, V> mapEvent) {
         fireEvent(mapEvent, new MapEventHandler<K, V>() {
+
             public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
                 mapEventListener.entryInserted(mapEvent);
             }
@@ -66,6 +69,7 @@ public abstract class AbstractObservableMap<K, V> implements ObservableMap<K,V> 
 
     protected final void fireEntryRemovedEvent(MapEvent<K, V> mapEvent) {
         fireEvent(mapEvent, new MapEventHandler<K, V>() {
+
             public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
                 mapEventListener.entryRemoved(mapEvent);
             }
@@ -74,14 +78,22 @@ public abstract class AbstractObservableMap<K, V> implements ObservableMap<K,V> 
 
     protected final void fireEntryUpdatedEvent(MapEvent<K, V> mapEvent) {
         fireEvent(mapEvent, new MapEventHandler<K, V>() {
+
             public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
                 mapEventListener.entryUpdated(mapEvent);
             }
         });
     }
 
+    protected void fireEvent(MapEvent<K, V> mapEvent, MapEventHandler handler) {
+        for (final MapEventListener<K, V> mapEventListener : mapEventListeners) {
+            handler.handleEvent(mapEvent, mapEventListener);
+        }
+    }
+
     protected final void fireInsertingEntryEvent(MapEvent<K, V> mapEvent) {
         fireEvent(mapEvent, new MapEventHandler<K, V>() {
+
             public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
                 mapEventListener.insertingEntry(mapEvent);
             }
@@ -90,6 +102,7 @@ public abstract class AbstractObservableMap<K, V> implements ObservableMap<K,V> 
 
     protected final void fireRemovingEntryEvent(MapEvent<K, V> mapEvent) {
         fireEvent(mapEvent, new MapEventHandler<K, V>() {
+
             public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
                 mapEventListener.removingEntry(mapEvent);
             }
@@ -98,19 +111,15 @@ public abstract class AbstractObservableMap<K, V> implements ObservableMap<K,V> 
 
     protected final void fireUpdatingEntryEvent(MapEvent<K, V> mapEvent) {
         fireEvent(mapEvent, new MapEventHandler<K, V>() {
+
             public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
                 mapEventListener.updatingEntry(mapEvent);
             }
         });
     }
 
-    protected void fireEvent(MapEvent<K,V> mapEvent, MapEventHandler handler) {
-        for (MapEventListener<K, V> mapEventListener : mapEventListeners) {
-            handler.handleEvent(mapEvent, mapEventListener);
-        }
-    }
-
     private interface MapEventHandler<K, V> {
+
         void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener);
     }
 }

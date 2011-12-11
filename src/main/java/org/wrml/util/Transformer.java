@@ -14,22 +14,11 @@
  * limitations under the License.
  */
 
-package org.wrml.model.communication.http;
+package org.wrml.util;
 
-import org.wrml.Model;
-import org.wrml.util.ObservableMap;
+public interface Transformer<A, B> {
 
-/**
- * <blockquote cite="message://www.w3.org/Protocols/rfc2616/rfc2616-sec4
- * .html#sec4.2 "> The order in which header fields with differing field names
- * are received is not significant. However, it is "good practice" to send
- * general-header fields first, followed by request-header or response- header
- * fields, and ending with the entity-header fields. </blockquote>
- */
-// Generated from a Web Resource Schema
-public interface Entity extends Model {
+    public B aToB(A aValue);
 
-    public Body getBody();
-
-    public Headers getHeaders();
+    public A bToA(B bValue);
 }

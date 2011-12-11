@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.model.restapi;
+package org.wrml.model.resource;
 
 import org.wrml.Model;
 

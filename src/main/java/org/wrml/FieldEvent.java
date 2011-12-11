@@ -22,17 +22,14 @@ import org.wrml.util.MapEvent;
 /**
  * An event that communicates some activity associated with a specific
  * Model instance's specific field.
- * 
- * @param <T>
- *            The field type
  */
-public final class FieldEvent<T> extends CancelableEvent {
+public final class FieldEvent extends CancelableEvent {
 
     private static final long serialVersionUID = -1277427529297982437L;
 
     private final String _FieldName;
     private final MapEvent<String, Object> _SourceEvent;
-    private ConstraintEvent<T> _ConstraintEvent;
+    private ConstraintEvent _ConstraintEvent;
 
     public FieldEvent(Model source, boolean cancelable, String fieldName, MapEvent<String, Object> sourceEvent) {
         super(source, cancelable);
@@ -40,7 +37,7 @@ public final class FieldEvent<T> extends CancelableEvent {
         _SourceEvent = sourceEvent;
     }
 
-    public ConstraintEvent<T> getConstraintEvent() {
+    public ConstraintEvent getConstraintEvent() {
         return _ConstraintEvent;
     }
 
@@ -52,7 +49,7 @@ public final class FieldEvent<T> extends CancelableEvent {
         return _SourceEvent;
     }
 
-    public void setConstraintEvent(ConstraintEvent<T> constraintEvent) {
+    public void setConstraintEvent(ConstraintEvent constraintEvent) {
         _ConstraintEvent = constraintEvent;
     }
 

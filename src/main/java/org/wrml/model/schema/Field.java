@@ -21,7 +21,8 @@ import java.net.URI;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
-import org.wrml.model.restapi.Collection;
+import org.wrml.model.Typed;
+import org.wrml.model.resource.Collection;
 
 /**
  * A web resource schema's field. Conceptually a field is a typed data slot,
@@ -30,7 +31,7 @@ import org.wrml.model.restapi.Collection;
  * 
  */
 // Generated from a Web Resource Schema
-public interface Field<T> extends Named, Titled, Descriptive, Member {
+public interface Field extends Typed, Named, Titled, Descriptive, Member {
 
     // Added to Field
     //     Name: name 
@@ -44,7 +45,7 @@ public interface Field<T> extends Named, Titled, Descriptive, Member {
     //     DestinationUriTemplate: {constraintsId} 
     //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["constraintsId"]]
     //     Href: <constraintsId>
-    public Collection<Constraint<T>> getConstraints();
+    public Collection<Constraint> getConstraints();
 
     // Generated from Field
     //     Name: constraintsId
@@ -53,7 +54,7 @@ public interface Field<T> extends Named, Titled, Descriptive, Member {
     //     Flags: ReadOnly
     public URI getConstraintsId();
 
-    public T getDefaultValue();
+    public Object getDefaultValue();
 
     public boolean isHidden();
 
@@ -63,7 +64,7 @@ public interface Field<T> extends Named, Titled, Descriptive, Member {
 
     public boolean isTransient();
 
-    public T setDefaultValue(T defaultValue);
+    public Object setDefaultValue(Object defaultValue);
 
     public boolean setHidden(boolean hidden);
 

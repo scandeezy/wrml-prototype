@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.wrml.util;
 
 import java.util.Map;
 
 public interface ObservableMap<K, V> extends Map<K, V> {
+
     void addMapEventListener(MapEventListener<K, V> listener);
+
     void removeMapEventListener(MapEventListener<K, V> listener);
 }

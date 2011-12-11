@@ -16,31 +16,37 @@
 
 package org.wrml.model.communication.http;
 
-
 /**
  * http://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.1
  */
+
+/*
+ * TODO: Refactor into a model (here) and a
+ * service (org.wrml.service.communication.http.HttpVersionService)
+ */
+
 // Generated from a Web Resource Schema
 public enum HttpVersion {
 
-    HTTP_1_0(1, 0), HTTP_1_1(1, 1);
+    HTTP_1_0(1, 0),
+    HTTP_1_1(1, 1);
 
     public static HttpVersion fromString(String httpVersionString) {
 
         // Quick, dirty but simple. No regex needed.
-        if(httpVersionString == null ||
-                httpVersionString.length() != 8 ||
-                !httpVersionString.startsWith("HTTP/1.")) {
+        if ((httpVersionString == null) || (httpVersionString.length() != 8)
+                || !httpVersionString.startsWith("HTTP/1.")) {
             throw new IllegalArgumentException("Invalid HTTP version.");
         }
 
-        if(httpVersionString.endsWith("0")) {
+        if (httpVersionString.endsWith("0")) {
             return HTTP_1_0;
         }
 
-        if(httpVersionString.endsWith("1")) {
+        if (httpVersionString.endsWith("1")) {
             return HTTP_1_1;
-        } else {
+        }
+        else {
             throw new IllegalArgumentException("Unsupported HTTP version.");
         }
     }

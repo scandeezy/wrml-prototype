@@ -23,11 +23,11 @@ import java.util.EventListener;
  * 
  * @param <T>
  */
-public interface FieldEventListener<T> extends EventListener {
+public interface FieldEventListener extends EventListener {
 
-    public void constraintViolated(FieldEvent<T> event);
+    public void constraintViolated(FieldEvent event);
 
-    public void valueChanged(FieldEvent<T> event);
+    public void valueChanged(FieldEvent event);
 
-    public void valueInitialized(FieldEvent<T> event);
+    public void valueInitialized(FieldEvent event);
 }

@@ -14,28 +14,33 @@
  * limitations under the License.
  */
 
-package org.wrml.model.restapi;
+package org.wrml.model;
 
-/**
- * Enumeration that captures the resource archetypes.
- */
-//Generated from a Web Resource Schema
-public enum ResourceArchetype {
+public enum PrimitiveType {
 
-    DOCUMENT("Document"), COLLECTION("Collection"), STORE("Store"), ACTION("Action");
+    Boolean("Boolean"),
+    Choice("Choice"),
+    DateTime("DateTime"),
+    Double("Double"),
+    Integer("Integer"),
+    List("List"),
+    Long("Long"),
+    Schema("Schema"),
+    Text("Text");
 
-    private final String _Title;
+    private final String _Name;
 
-    private ResourceArchetype(String title) {
-        _Title = title;
+    private PrimitiveType(final String name) {
+        _Name = name;
     }
 
-    public final String getTitle() {
-        return _Title;
+    public String getName() {
+        return _Name;
     }
 
     @Override
     public String toString() {
-        return getTitle();
+        return getName();
     }
+
 }

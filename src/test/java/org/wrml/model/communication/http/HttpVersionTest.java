@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.wrml.model.communication.http;
 
-import org.junit.Test;
+package org.wrml.model.communication.http;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.wrml.model.communication.http.HttpVersion.*;
+import static org.wrml.model.communication.http.HttpVersion.HTTP_1_0;
+import static org.wrml.model.communication.http.HttpVersion.HTTP_1_1;
+import static org.wrml.model.communication.http.HttpVersion.fromString;
+
+import org.junit.Test;
 
 public class HttpVersionTest {
 

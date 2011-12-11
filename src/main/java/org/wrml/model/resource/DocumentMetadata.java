@@ -14,24 +14,11 @@
  * limitations under the License.
  */
 
-package org.wrml.model.restapi;
+package org.wrml.model.resource;
 
-import org.wrml.util.ObservableList;
+import org.wrml.Model;
 
 // Generated from a Web Resource Schema
-public interface Container<T extends Document> extends Document {
+public interface DocumentMetadata extends Model {
 
-    public ObservableList<T> getElements();
-
-    public Container<T> getNext();
-
-    public Integer getPageSize();
-
-    public Integer getPageStartIndex();
-
-    public Container<T> getPrevious();
-
-    public int getSize();
-
-    //public T getElement(ObservableList<UriTemplateParameter> params);
 }

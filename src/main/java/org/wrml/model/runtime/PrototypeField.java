@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.model.schema;
-
-import java.net.URI;
+package org.wrml.model.runtime;
 
 import org.wrml.Model;
 
@@ -30,23 +28,11 @@ import org.wrml.Model;
  * @param <T>
  */
 // Generated from a Web Resource Schema
-public interface PrototypeField<T> extends Model {
+public interface PrototypeField extends Model {
 
-    public T getDefaultValue();
+    public Object getDefaultValue();
 
     public String getFieldName();
 
-    // Generated from Link
-    //     Relation: ownerSchema
-    //         Methods: GET 
-    //         ResponseSchema: Schema[?]
-    //     EnabledFormula: ownerSchemaId != null
-    //     DestinationUriTemplate: {ownerSchemaId} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["ownerSchemaId"]]
-    //     Href: <ownerSchemaId>
-    public Schema getOwnerSchema();
-
-    public URI getOwnerSchemaId();
-
-    public T setDefaultValue(T defaultValue);
+    public Object setDefaultValue(Object defaultValue);
 }

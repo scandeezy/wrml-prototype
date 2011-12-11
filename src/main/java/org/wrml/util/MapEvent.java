@@ -24,7 +24,7 @@ package org.wrml.util;
  * @param <V>
  *            The value type
  */
-public final class MapEvent<K, V> extends CancelableEvent {
+public class MapEvent<K, V> extends CancelableEvent {
 
     private static final long serialVersionUID = -4697339990791750523L;
 

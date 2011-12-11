@@ -21,9 +21,9 @@ import java.util.List;
 
 import org.wrml.model.communication.http.Method;
 import org.wrml.model.relation.LinkRelation;
-import org.wrml.model.restapi.Document;
-import org.wrml.model.restapi.LinkTemplate;
-import org.wrml.model.restapi.ResourceTemplate;
+import org.wrml.model.resource.Document;
+import org.wrml.model.resource.LinkTemplate;
+import org.wrml.model.resource.ResourceTemplate;
 import org.wrml.util.ObservableMap;
 
 /**
@@ -35,6 +35,11 @@ import org.wrml.util.ObservableMap;
  * state changes by listening to events from the fields that their LinkFormula
  * relies upon.
  */
+
+/*
+ * TODO: Change to a Model (interface) and a RuntimeLink (impl)?
+ */
+
 public final class Link {
 
     private static final long serialVersionUID = -6235652220661484935L;

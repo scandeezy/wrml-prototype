@@ -22,7 +22,7 @@ import org.wrml.model.Named;
 import org.wrml.model.Titled;
 import org.wrml.model.Versioned;
 import org.wrml.model.communication.http.Method;
-import org.wrml.model.restapi.Document;
+import org.wrml.model.resource.Document;
 import org.wrml.util.ObservableList;
 
 /**

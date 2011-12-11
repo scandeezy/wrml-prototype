@@ -21,12 +21,12 @@ import org.wrml.model.schema.Constraint;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.ValidationResult;
 
-public interface Validator<T> {
+public interface Validator {
 
-    public Constraint<T> getConstraint();
+    public Constraint getConstraint();
 
-    public ValidationResult validate(Model model, Field<T> field);
+    public ValidationResult validate(Model model, Field field);
 
-    public ValidationResult validate(Model model, Field<T> field, T value);
+    public ValidationResult validate(Model model, Field field, Object value);
 
 }

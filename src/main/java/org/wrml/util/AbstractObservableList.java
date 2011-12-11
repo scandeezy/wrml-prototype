@@ -21,7 +21,7 @@ import java.util.List;
 
 public abstract class AbstractObservableList<E> implements ObservableList<E> {
 
-    private List<ListEventListener<E>> listeners = new LinkedList<ListEventListener<E>>();
+    private final List<ListEventListener<E>> listeners = new LinkedList<ListEventListener<E>>();
 
     public void addListEventListener(ListEventListener<E> listener) {
         listeners.add(listener);
@@ -33,6 +33,7 @@ public abstract class AbstractObservableList<E> implements ObservableList<E> {
 
     protected final void fireClearedEvent(ListEvent<E> event) {
         fireEvent(event, new ListEventHandler<E>() {
+
             public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
                 listener.cleared(event);
             }
@@ -41,6 +42,7 @@ public abstract class AbstractObservableList<E> implements ObservableList<E> {
 
     protected final void fireClearingEvent(ListEvent<E> event) {
         fireEvent(event, new ListEventHandler<E>() {
+
             public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
                 listener.clearing(event);
             }
@@ -49,6 +51,7 @@ public abstract class AbstractObservableList<E> implements ObservableList<E> {
 
     protected final void fireElementInsertedEvent(ListEvent<E> event) {
         fireEvent(event, new ListEventHandler<E>() {
+
             public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
                 listener.elementInserted(event);
             }
@@ -57,6 +60,7 @@ public abstract class AbstractObservableList<E> implements ObservableList<E> {
 
     protected final void fireElementRemovedEvent(ListEvent<E> event) {
         fireEvent(event, new ListEventHandler<E>() {
+
             public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
                 listener.elementRemoved(event);
             }
@@ -65,14 +69,22 @@ public abstract class AbstractObservableList<E> implements ObservableList<E> {
 
     protected final void fireElementUpdatedEvent(ListEvent<E> event) {
         fireEvent(event, new ListEventHandler<E>() {
+
             public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
                 listener.elementUpdated(event);
             }
         });
     }
 
+    protected void fireEvent(ListEvent<E> event, ListEventHandler handler) {
+        for (final ListEventListener<E> listener : listeners) {
+            handler.handleEvent(event, listener);
+        }
+    }
+
     protected final void fireInsertingElementEvent(ListEvent<E> event) {
         fireEvent(event, new ListEventHandler<E>() {
+
             public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
                 listener.insertingElement(event);
             }
@@ -81,6 +93,7 @@ public abstract class AbstractObservableList<E> implements ObservableList<E> {
 
     protected final void fireRemovingElementEvent(ListEvent<E> event) {
         fireEvent(event, new ListEventHandler<E>() {
+
             public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
                 listener.removingElement(event);
             }
@@ -89,19 +102,15 @@ public abstract class AbstractObservableList<E> implements ObservableList<E> {
 
     protected final void fireUpdatingElementEvent(ListEvent<E> event) {
         fireEvent(event, new ListEventHandler<E>() {
+
             public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
                 listener.updatingElement(event);
             }
         });
     }
 
-    protected void fireEvent(ListEvent<E> event, ListEventHandler handler) {
-        for (ListEventListener<E> listener : listeners) {
-            handler.handleEvent(event, listener);
-        }
-    }
-
     private interface ListEventHandler<E> {
+
         void handleEvent(ListEvent<E> event, ListEventListener<E> listener);
     }
 }

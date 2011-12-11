@@ -21,14 +21,14 @@ import java.util.EventObject;
 import org.wrml.model.schema.ValidationResult;
 import org.wrml.util.Validator;
 
-public class ConstraintEvent<T> extends EventObject {
+public class ConstraintEvent extends EventObject {
 
     private static final long serialVersionUID = 8426522526071747315L;
 
-    private final Validator<T> _Validator;
+    private final Validator _Validator;
     private final ValidationResult _ValidationResult;
 
-    public ConstraintEvent(Model source, Validator<T> validator, ValidationResult validationResult) {
+    public ConstraintEvent(Model source, Validator validator, ValidationResult validationResult) {
         super(source);
         _Validator = validator;
         _ValidationResult = validationResult;
@@ -38,7 +38,7 @@ public class ConstraintEvent<T> extends EventObject {
         return _ValidationResult;
     }
 
-    public Validator<T> getValidator() {
+    public Validator getValidator() {
         return _Validator;
     }
 

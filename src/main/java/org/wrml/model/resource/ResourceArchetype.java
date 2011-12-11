@@ -14,22 +14,31 @@
  * limitations under the License.
  */
 
-package org.wrml.model.communication.http;
-
-import org.wrml.Model;
-import org.wrml.util.ObservableMap;
+package org.wrml.model.resource;
 
 /**
- * <blockquote cite="message://www.w3.org/Protocols/rfc2616/rfc2616-sec4
- * .html#sec4.2 "> The order in which header fields with differing field names
- * are received is not significant. However, it is "good practice" to send
- * general-header fields first, followed by request-header or response- header
- * fields, and ending with the entity-header fields. </blockquote>
+ * Enumeration that captures the resource archetypes.
  */
-// Generated from a Web Resource Schema
-public interface Entity extends Model {
+//Generated from a Web Resource Schema
+public enum ResourceArchetype {
 
-    public Body getBody();
+    DOCUMENT("Document"),
+    COLLECTION("Collection"),
+    STORE("Store"),
+    ACTION("Action");
 
-    public Headers getHeaders();
+    private final String _Title;
+
+    private ResourceArchetype(String title) {
+        _Title = title;
+    }
+
+    public final String getTitle() {
+        return _Title;
+    }
+
+    @Override
+    public String toString() {
+        return getTitle();
+    }
 }

@@ -14,15 +14,18 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.runtime;
 
 import java.net.URI;
 import java.util.List;
 
+import org.wrml.Link;
+import org.wrml.Model;
 import org.wrml.model.UriTemplateParameter;
-import org.wrml.model.restapi.LinkTemplate;
-import org.wrml.model.schema.Prototype;
+import org.wrml.model.resource.LinkTemplate;
+import org.wrml.model.runtime.Prototype;
 import org.wrml.model.schema.Schema;
+import org.wrml.service.Service;
 import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
 
@@ -149,9 +152,9 @@ public abstract class Context {
 
     public abstract URI getSchemaIdForClassName(String className);
 
-    public abstract Service<?> getService(URI schemaId);
+    public abstract Service<?, ?> getService(URI schemaId);
 
-    public Service<?> getServiceForClass(Class<?> clazz) {
+    public Service<?, ?> getServiceForClass(Class<?> clazz) {
         return getService(getSchemaIdForClass(clazz));
     }
 

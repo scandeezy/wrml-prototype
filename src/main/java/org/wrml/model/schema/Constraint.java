@@ -20,7 +20,7 @@ import org.wrml.model.Descriptive;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
 import org.wrml.model.Versioned;
-import org.wrml.model.restapi.Document;
+import org.wrml.model.resource.Document;
 import org.wrml.util.ObservableList;
 import org.wrml.util.Validator;
 
@@ -34,7 +34,7 @@ import org.wrml.util.Validator;
  *            The field type
  */
 // Generated from a Web Resource Schema
-public interface Constraint<T> extends Named, Titled, Versioned, Descriptive, Document {
+public interface Constraint extends Named, Titled, Versioned, Descriptive, Document {
 
     // Added to Field
     //     Name: name 
@@ -54,5 +54,5 @@ public interface Constraint<T> extends Named, Titled, Versioned, Descriptive, Do
      * download and inspect the interface (within the Jar) in order to get the
      * method/type signatures right.
      */
-    public ObservableList<Validator<T>> getValidators();
+    public ObservableList<Validator> getValidators();
 }

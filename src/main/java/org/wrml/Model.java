@@ -20,18 +20,26 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
 
-import org.wrml.model.schema.Prototype;
+import org.wrml.model.runtime.Prototype;
 import org.wrml.model.schema.Schema;
+import org.wrml.runtime.Context;
 import org.wrml.util.Unique;
 
 /**
  * The base interface for all web resource schema instances.
+ * 
+ * TODO: Consider refactoring some/all of this interface into a true WRML
+ * schema-driven model.
  */
 public interface Model extends Unique<URI>, Serializable {
 
     public void addEventListener(ModelEventListener listener);
 
-    public void addFieldEventListener(String fieldName, FieldEventListener<?> listener);
+    public void addFieldEventListener(String fieldName, FieldEventListener listener);
+
+    public void become(Model newThis, boolean atomic);
+
+    public void delete();
 
     public Context getContext();
 
@@ -49,14 +57,18 @@ public interface Model extends Unique<URI>, Serializable {
 
     public boolean isReadOnly();
 
+    public void refresh(boolean atomic);
+
     public void removeEventListener(ModelEventListener listener);
 
-    public void removeFieldEventListener(String fieldName, FieldEventListener<?> listener);
+    public void removeFieldEventListener(String fieldName, FieldEventListener listener);
 
     public void setAllFieldsToDefaultValue();
 
     public void setFieldToDefaultValue(String fieldName);
 
     public Object setFieldValue(String fieldName, Object fieldValue);
+
+    public void vanish();
 
 }

@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package org.wrml.model.restapi;
+package org.wrml.model.resource;
 
 import java.net.URI;
 
 import org.wrml.model.Descriptive;
 import org.wrml.model.Versioned;
-import org.wrml.model.schema.PrototypeField;
+import org.wrml.model.runtime.PrototypeField;
 import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
 
@@ -67,7 +67,7 @@ public interface ResourceTemplate extends Versioned, Descriptive, Document {
     //     Flags: Required, ReadOnly
     public URI getRestApiTemplateId();
 
-    public ObservableMap<URI, ObservableList<PrototypeField<?>>> getSchemaFieldDefaultsMap();
+    public ObservableMap<URI, ObservableList<PrototypeField>> getSchemaFieldDefaultsMap();
 
     public ObservableList<URI> getThereToHereLinkTemplateIds();
 

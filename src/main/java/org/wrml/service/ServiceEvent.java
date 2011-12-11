@@ -14,18 +14,29 @@
  * limitations under the License.
  */
 
-package org.wrml.model.schema;
+package org.wrml.service;
 
 import java.net.URI;
 
 import org.wrml.Model;
+import org.wrml.util.MapEvent;
 import org.wrml.util.ObservableMap;
 
-//Generated from a Web Resource Schema
-public interface Prototype extends Model {
+public class ServiceEvent<M extends Model> extends MapEvent<URI, M> {
 
-    public ObservableMap<URI, Schema> getAllBaseSchemas();
+    public ServiceEvent(ObservableMap<URI, M> map, boolean cancelable) {
+        super(map, cancelable);
+        // TODO Auto-generated constructor stub
+    }
 
-    public ObservableMap<String, PrototypeField<?>> getPrototypeFields();
+    public ServiceEvent(ObservableMap<URI, M> map, boolean cancelable, URI _Key) {
+        super(map, cancelable, _Key);
+        // TODO Auto-generated constructor stub
+    }
+
+    public ServiceEvent(ObservableMap<URI, M> map, boolean cancelable, URI key, M newValue, M oldValue) {
+        super(map, cancelable, key, newValue, oldValue);
+        // TODO Auto-generated constructor stub
+    }
 
 }

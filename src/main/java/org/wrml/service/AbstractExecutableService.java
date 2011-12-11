@@ -14,21 +14,26 @@
  * limitations under the License.
  */
 
-package org.wrml.model.communication.http;
+package org.wrml.service;
+
+import java.net.URI;
 
 import org.wrml.Model;
+import org.wrml.model.resource.Action;
 
-// Generated from a Web Resource Schema
-public interface Header<T> extends Comparable<Header<?>>, Model {
+public abstract class AbstractExecutableService<K, M extends Model> extends AbstractService<K, M> implements
+        ExecutableService<K, M> {
 
-    public HeaderCategory getCategory();
+    public Model execute(URI id) {
+        return execute(id, null, null);
+    }
 
-    public String getName();
+    public Model execute(URI id, Action action) {
+        return execute(id, action, null);
+    }
 
-    public T getValue();
-
-    public void setHeaderCategory(HeaderCategory headerCategory);
-
-    public T setValue(T value);
+    public Model execute(URI id, Model requestor) {
+        return execute(id, null, requestor);
+    }
 
 }

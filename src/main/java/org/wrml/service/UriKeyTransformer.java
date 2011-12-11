@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.wrml.model.restapi;
+package org.wrml.service;
 
-import org.wrml.Model;
+import java.net.URI;
 
-// Generated from a Web Resource Schema
-public interface DocumentMetadata extends Model {
+import org.wrml.util.Transformer;
+
+public interface UriKeyTransformer<K> extends Transformer<URI, K> {
 
 }

@@ -14,12 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml;
-
-import org.wrml.model.schema.Prototype;
-import org.wrml.model.schema.PrototypeField;
-import org.wrml.model.schema.Schema;
-import org.wrml.util.*;
+package org.wrml.runtime;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -28,7 +23,28 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.wrml.FieldEvent;
+import org.wrml.FieldEventListener;
+import org.wrml.Link;
+import org.wrml.Model;
+import org.wrml.ModelEventListener;
+import org.wrml.model.runtime.Prototype;
+import org.wrml.model.runtime.PrototypeField;
+import org.wrml.model.schema.Schema;
+import org.wrml.service.ProxyService;
+import org.wrml.service.Service;
+import org.wrml.service.UriKeyTransformer;
+import org.wrml.util.Identifiable;
+import org.wrml.util.MapEvent;
+import org.wrml.util.MapEventListener;
+import org.wrml.util.ObservableMap;
+import org.wrml.util.Observables;
+
 /**
+ * <pre>
+ * NOTE: This comment's text is a work-in-progress.
+ * </pre>
+ * 
  * <h1>Greetings Program!</h1>
  * 
  * <p>
@@ -294,7 +310,7 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
     private ObservableMap<URI, Link> _LinkMap;
 
     private transient List<ModelEventListener> _EventListeners;
-    private transient Map<String, List<FieldEventListener<?>>> _FieldEventListeners;
+    private transient Map<String, List<FieldEventListener>> _FieldEventListeners;
 
     private transient FieldMapEventListener _FieldMapEventListener;
 
@@ -310,6 +326,87 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         init();
     }
 
+    public void delete() {
+        URI id = getId();
+        if (id == null) {
+            return;
+        }
+
+        // Go all the way to the origin to force a hard delete
+        Service<?, ?> myOriginService = getMyOriginService();
+        Model newThis = myOriginService.remove(id, this);
+
+        // TODO: Do we need to vanish here or can an event trigger
+        // that from somewhere else?
+    }
+
+    public void refresh(boolean atomic) {
+        URI id = getId();
+        if (id == null) {
+            return;
+        }
+
+        // Go all the way to the origin to force a re-GET of "self"
+        Service<?, ?> myOriginService = getMyOriginService();
+
+        Model newThis = myOriginService.get(id, this);
+        become(newThis, atomic);
+    }
+
+    public void become(Model newThis, boolean atomic) {
+
+        // TODO: Transition newThis field listeners to us
+
+        // TODO: Get all of our Links that newThis has listeners for - transfer those listeners too
+
+        // TODO: "Pause" listeners if atomic is true
+
+        // TODO: Set all fields (copy from newThis)
+
+        // TODO: Clear "extra" fields
+
+        // TODO: Create and fire some sort of refresh event
+    }
+
+    // Vanish means that the model is gone but may not be deleted
+    public void vanish() {
+        // TODO: Fire an event about vanishing
+
+        // TODO: Unregister all listeners
+
+        // TODO: Clear caches or do caches auto-clear from an 
+        // vanish event notification?
+    }
+
+    public Service<?, ?> getMyService() {
+        URI schemaId = getSchemaId();
+        Context context = getContext();
+        Service<?, ?> myService = context.getService(schemaId);
+        return myService;
+    }
+
+    public Service<?, ?> getMyOriginService() {
+
+        // Go all the way to the origin to force a re-GET of "self"
+        Service<?, ?> myService = getMyService();
+        while (myService != null && myService instanceof ProxyService<?, ?, ?>) {
+            myService = ((ProxyService<?, ?, ?>) myService).getOriginService();
+        }
+
+        return myService;
+    }
+
+    public Object getAlternateKeyValue() {
+        URI id = getId();
+        if (id == null) {
+            return null;
+        }
+
+        Service<?, ?> myService = getMyService();
+        UriKeyTransformer<?> transformer = myService.getUriKeyTransformer();
+        return transformer.aToB(id);
+    }
+
     public void addEventListener(ModelEventListener listener) {
         if (_EventListeners == null) {
             _EventListeners = new CopyOnWriteArrayList<ModelEventListener>();
@@ -318,14 +415,14 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         _EventListeners.add(listener);
     }
 
-    public void addFieldEventListener(String fieldName, FieldEventListener<?> listener) {
+    public void addFieldEventListener(String fieldName, FieldEventListener listener) {
         if (_FieldEventListeners == null) {
-            _FieldEventListeners = new HashMap<String, List<FieldEventListener<?>>>();
+            _FieldEventListeners = new HashMap<String, List<FieldEventListener>>();
         }
 
-        List<FieldEventListener<?>> fieldEventListenerList = _FieldEventListeners.get(fieldName);
+        List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
         if (fieldEventListenerList == null) {
-            fieldEventListenerList = new CopyOnWriteArrayList<FieldEventListener<?>>();
+            fieldEventListenerList = new CopyOnWriteArrayList<FieldEventListener>();
             _FieldEventListeners.put(fieldName, fieldEventListenerList);
         }
 
@@ -337,24 +434,24 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         return super.equals(obj);
     }
 
-    public Context getContext() {
+    public final Context getContext() {
         return _Context;
     }
 
-    public List<URI> getEmbeddedLinkRelationIds() {
+    public final List<URI> getEmbeddedLinkRelationIds() {
         return _EmbeddedLinkRelationIds;
     }
 
-    public Object getFieldValue(String fieldName) {
+    public final Object getFieldValue(String fieldName) {
         return isFieldValueSet(fieldName) ? _FieldMap.get(fieldName) : null;
     }
 
     @Override
-    public URI getId() {
+    public final URI getId() {
         return (URI) getFieldValue(ID_FIELD_NAME);
     }
 
-    public Link getLink(URI linkRelationId) {
+    public final Link getLink(URI linkRelationId) {
 
         Link link;
 
@@ -374,15 +471,15 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         return link;
     }
 
-    public Prototype getPrototype() {
+    public final Prototype getPrototype() {
         return getContext().getPrototype(getSchemaId(), this);
     }
 
-    public Schema getSchema() {
+    public final Schema getSchema() {
         return getContext().getSchema(getSchemaId(), this);
     }
 
-    public URI getSchemaId() {
+    public final URI getSchemaId() {
         return _SchemaId;
     }
 
@@ -391,11 +488,11 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         return super.hashCode();
     }
 
-    public boolean isFieldValueSet(String fieldName) {
+    public final boolean isFieldValueSet(String fieldName) {
         return (_FieldMap != null) && _FieldMap.containsKey(fieldName);
     }
 
-    public boolean isReadOnly() {
+    public final boolean isReadOnly() {
         return ((Boolean) getFieldValue(READ_ONLY_FIELD_NAME)).booleanValue();
     }
 
@@ -407,12 +504,12 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         _EventListeners.remove(listener);
     }
 
-    public void removeFieldEventListener(String fieldName, FieldEventListener<?> listener) {
+    public void removeFieldEventListener(String fieldName, FieldEventListener listener) {
         if (_FieldEventListeners == null) {
             return;
         }
 
-        final List<FieldEventListener<?>> fieldEventListenerList = _FieldEventListeners.get(fieldName);
+        final List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
         if (fieldEventListenerList == null) {
             return;
         }
@@ -420,10 +517,10 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         fieldEventListenerList.remove(listener);
     }
 
-    public void setAllFieldsToDefaultValue() {
+    public final void setAllFieldsToDefaultValue() {
 
         final Prototype prototype = getPrototype();
-        final Map<String, PrototypeField<?>> prototypeFields = prototype.getPrototypeFields();
+        final Map<String, PrototypeField> prototypeFields = prototype.getPrototypeFields();
         if (prototypeFields != null) {
             final Set<String> fieldNames = prototypeFields.keySet();
             for (final String fieldName : fieldNames) {
@@ -464,17 +561,17 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
      * requestMediaType) { return link.click(requestModel, requestMediaType); }
      */
 
-    public void setFieldToDefaultValue(String fieldName) {
+    public final void setFieldToDefaultValue(String fieldName) {
 
         final Prototype prototype = getPrototype();
-        final Map<String, PrototypeField<?>> prototypeFields = prototype.getPrototypeFields();
+        final Map<String, PrototypeField> prototypeFields = prototype.getPrototypeFields();
 
         if ((prototypeFields != null) && prototypeFields.containsKey(fieldName)) {
             setFieldValue(fieldName, prototypeFields.get(fieldName).getDefaultValue());
         }
     }
 
-    public Object setFieldValue(String fieldName, Object fieldValue) {
+    public final Object setFieldValue(String fieldName, Object fieldValue) {
 
         if (_FieldMap == null) {
             initFieldMap();
@@ -484,22 +581,22 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
     }
 
     @Override
-    public URI setId(URI id) {
+    public final URI setId(URI id) {
         return (URI) setFieldValue(ID_FIELD_NAME, id);
     }
 
-    protected ObservableMap<String, Object> getFieldMap() {
+    protected final ObservableMap<String, Object> getFieldMap() {
         return _FieldMap;
     }
 
-    protected ObservableMap<URI, Link> getLinkMap() {
+    protected final ObservableMap<URI, Link> getLinkMap() {
         return _LinkMap;
     }
 
     private void fireConstraintViolated(final FieldEvent event) {
         final String fieldName = event.getFieldName();
-        final List<FieldEventListener<?>> fieldEventListenerList = _FieldEventListeners.get(fieldName);
-        for (final FieldEventListener<?> fieldEventListener : fieldEventListenerList) {
+        final List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
+        for (final FieldEventListener fieldEventListener : fieldEventListenerList) {
             if (event.isCancelable() && event.isCancelled()) {
                 break;
             }
@@ -510,8 +607,8 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
 
     private void fireValueChanged(final FieldEvent event) {
         final String fieldName = event.getFieldName();
-        final List<FieldEventListener<?>> fieldEventListenerList = _FieldEventListeners.get(fieldName);
-        for (final FieldEventListener<?> fieldEventListener : fieldEventListenerList) {
+        final List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
+        for (final FieldEventListener fieldEventListener : fieldEventListenerList) {
             if (event.isCancelable() && event.isCancelled()) {
                 break;
             }
@@ -523,8 +620,8 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
 
     private void fireValueInitialized(final FieldEvent event) {
         final String fieldName = event.getFieldName();
-        final List<FieldEventListener<?>> fieldEventListenerList = _FieldEventListeners.get(fieldName);
-        for (final FieldEventListener<?> fieldEventListener : fieldEventListenerList) {
+        final List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
+        for (final FieldEventListener fieldEventListener : fieldEventListenerList) {
             if (event.isCancelable() && event.isCancelled()) {
                 break;
             }

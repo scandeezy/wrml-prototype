@@ -19,7 +19,8 @@ package org.wrml.model.communication.http;
 // Generated from a Web Resource Schema
 public enum MessageType {
 
-    REQUEST("Request"), RESPONSE("Response");
+    REQUEST("Request"),
+    RESPONSE("Response");
 
     private final String _Name;
 

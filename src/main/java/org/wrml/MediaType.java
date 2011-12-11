@@ -33,6 +33,10 @@ import org.wrml.util.Identifiable;
  * 
  * media-type = type "/" subtype *( ";" parameter ) type = token subtype = token
  */
+/*
+ * TODO: Refactor into a model (org.wrml.model.communication.MediaType) and a
+ * service (org.wrml.service.communication.MediaTypeService)
+ */
 public final class MediaType extends Identifiable<String> {
 
     private static final long serialVersionUID = 928356234498155596L;

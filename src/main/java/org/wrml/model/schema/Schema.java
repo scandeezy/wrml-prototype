@@ -21,8 +21,8 @@ import java.net.URI;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Named;
 import org.wrml.model.Versioned;
-import org.wrml.model.restapi.Collection;
-import org.wrml.model.restapi.Document;
+import org.wrml.model.resource.Collection;
+import org.wrml.model.resource.Document;
 import org.wrml.util.ObservableMap;
 
 /**
@@ -60,7 +60,7 @@ public interface Schema extends Named, Versioned, Descriptive, Document {
     // Generated from Field
     //     Name: fields 
     //     Value: Map[ Key=Text, Value=Schema[Field[?]] ]
-    public ObservableMap<String, Field<?>> getFields();
+    public ObservableMap<String, Field> getFields();
 
     // Generated from Field
     //     Name: linkFormulas 

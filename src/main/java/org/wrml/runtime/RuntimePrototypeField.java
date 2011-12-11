@@ -14,18 +14,34 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.runtime;
 
 import java.net.URI;
 
-public abstract class AbstractService<T extends Model> implements Service<T> {
+import org.wrml.model.runtime.PrototypeField;
 
-    public T get(URI id) {
-        return get(id, null);
+public class RuntimePrototypeField extends RuntimeModel implements PrototypeField {
+
+    public RuntimePrototypeField(URI schemaId, Context context) {
+        super(schemaId, context);
+        // TODO Auto-generated constructor stub
     }
 
-    public T save(URI id, T modelToSave) {
-        return save(id, modelToSave, null);
+    public Object getDefaultValue() {
+        // TODO Auto-generated method stub
+        return null;
     }
+
+    public String getFieldName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Object setDefaultValue(Object defaultValue) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
 
 }

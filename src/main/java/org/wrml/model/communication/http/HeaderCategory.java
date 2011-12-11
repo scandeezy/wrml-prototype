@@ -19,7 +19,11 @@ package org.wrml.model.communication.http;
 // Generated from a Web Resource Schema
 public enum HeaderCategory {
 
-    GENERAL("General"), REQUEST("Request"), RESPONSE("Response"), ENTITY("Model"), EXTENSION("Extension");
+    GENERAL("General"),
+    REQUEST("Request"),
+    RESPONSE("Response"),
+    ENTITY("Model"),
+    EXTENSION("Extension");
 
     private final String _Name;
 

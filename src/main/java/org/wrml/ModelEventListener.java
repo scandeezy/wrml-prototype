@@ -18,11 +18,11 @@ package org.wrml;
 
 public interface ModelEventListener {
 
-    public void fieldConstraintViolated(FieldEvent<?> event);
+    public void fieldConstraintViolated(FieldEvent event);
 
-    public void fieldValueChanged(FieldEvent<?> event);
+    public void fieldValueChanged(FieldEvent event);
 
-    public void fieldValueInitialized(FieldEvent<?> event);
+    public void fieldValueInitialized(FieldEvent event);
 
     public void linkEnabledStateChanged(LinkEvent event);
 }
