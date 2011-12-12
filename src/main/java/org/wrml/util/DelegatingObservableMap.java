@@ -20,12 +20,12 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> {
+public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> implements Delegating<Map<K, V>> {
 
-    private final Map<K, V> delegate;
+    private final Map<K, V> _Delegate;
 
     public DelegatingObservableMap(Map<K, V> delegate) {
-        this.delegate = delegate;
+        _Delegate = delegate;
     }
 
     public void clear() {
@@ -33,57 +33,57 @@ public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> {
         fireClearingEvent(clearingEvent);
 
         if (!clearingEvent.isCancelled()) {
-            delegate.clear();
+            _Delegate.clear();
             fireClearedEvent(new MapEvent<K, V>(this, false));
         }
     }
 
     public boolean containsKey(Object o) {
-        return delegate.containsKey(o);
+        return _Delegate.containsKey(o);
     }
 
     public boolean containsValue(Object o) {
-        return delegate.containsValue(o);
+        return _Delegate.containsValue(o);
     }
 
     public Set<Entry<K, V>> entrySet() {
-        return delegate.entrySet();
+        return _Delegate.entrySet();
     }
 
     @Override
     public boolean equals(Object o) {
-        return delegate.equals(o);
+        return _Delegate.equals(o);
     }
 
     public V get(Object o) {
-        return delegate.get(o);
+        return _Delegate.get(o);
     }
 
     public Map<K, V> getDelegate() {
-        return delegate;
+        return _Delegate;
     }
 
     @Override
     public int hashCode() {
-        return delegate.hashCode();
+        return _Delegate.hashCode();
     }
 
     public boolean isEmpty() {
-        return delegate.isEmpty();
+        return _Delegate.isEmpty();
     }
 
     public Set<K> keySet() {
-        return delegate.keySet();
+        return _Delegate.keySet();
     }
 
     public V put(K k, V v) {
 
-        final V old = delegate.get(k);
+        final V old = _Delegate.get(k);
         final MapEvent<K, V> event = new MapEvent<K, V>(this, true, k, v, old);
         fireUpdatingEntryEvent(event);
 
         if (!event.isCancelled()) {
-            final V updated = delegate.put(k, v);
+            final V updated = _Delegate.put(k, v);
             fireEntryUpdatedEvent(new MapEvent<K, V>(this, false, k, v, updated));
             return updated;
         }
@@ -96,7 +96,7 @@ public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> {
         // TODO: May need to loop here to fire individual events or 
         // fire a big mega "container" event
 
-        delegate.putAll(map);
+        _Delegate.putAll(map);
     }
 
     public V remove(Object key) {
@@ -108,16 +108,16 @@ public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> {
             return null;
         }
 
-        final V removed = delegate.remove(key);
+        final V removed = _Delegate.remove(key);
         fireEntryRemovedEvent(new MapEvent<K, V>(this, false, (K) key, null, removed));
         return removed;
     }
 
     public int size() {
-        return delegate.size();
+        return _Delegate.size();
     }
 
     public Collection<V> values() {
-        return delegate.values();
+        return _Delegate.values();
     }
 }

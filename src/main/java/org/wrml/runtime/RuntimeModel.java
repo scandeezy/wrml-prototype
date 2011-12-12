@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.wrml.Context;
 import org.wrml.FieldEvent;
 import org.wrml.FieldEventListener;
 import org.wrml.Link;
@@ -33,12 +34,12 @@ import org.wrml.model.runtime.PrototypeField;
 import org.wrml.model.schema.Schema;
 import org.wrml.service.ProxyService;
 import org.wrml.service.Service;
-import org.wrml.service.UriKeyTransformer;
 import org.wrml.util.Identifiable;
 import org.wrml.util.MapEvent;
 import org.wrml.util.MapEventListener;
 import org.wrml.util.ObservableMap;
 import org.wrml.util.Observables;
+import org.wrml.util.UriTransformer;
 
 /**
  * <pre>
@@ -283,15 +284,6 @@ import org.wrml.util.Observables;
  * same interface, similar to modern CDN market.
  * </p>
  * 
- * <p>
- * API Management solution vendor lock-in Lack consistent (standard) interface
- * features to allow client control over details such as collection pagination,
- * partial response, object composition, and expansion of hypermedia links into
- * an embedded object. Leveraging their proprietary (non-standard) API
- * enhancement features may lead to vendor lock-in
- * </p>
- * 
- * 
  */
 public class RuntimeModel extends Identifiable<URI> implements Model {
 
@@ -326,87 +318,6 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         init();
     }
 
-    public void delete() {
-        URI id = getId();
-        if (id == null) {
-            return;
-        }
-
-        // Go all the way to the origin to force a hard delete
-        Service<?, ?> myOriginService = getMyOriginService();
-        Model newThis = myOriginService.remove(id, this);
-
-        // TODO: Do we need to vanish here or can an event trigger
-        // that from somewhere else?
-    }
-
-    public void refresh(boolean atomic) {
-        URI id = getId();
-        if (id == null) {
-            return;
-        }
-
-        // Go all the way to the origin to force a re-GET of "self"
-        Service<?, ?> myOriginService = getMyOriginService();
-
-        Model newThis = myOriginService.get(id, this);
-        become(newThis, atomic);
-    }
-
-    public void become(Model newThis, boolean atomic) {
-
-        // TODO: Transition newThis field listeners to us
-
-        // TODO: Get all of our Links that newThis has listeners for - transfer those listeners too
-
-        // TODO: "Pause" listeners if atomic is true
-
-        // TODO: Set all fields (copy from newThis)
-
-        // TODO: Clear "extra" fields
-
-        // TODO: Create and fire some sort of refresh event
-    }
-
-    // Vanish means that the model is gone but may not be deleted
-    public void vanish() {
-        // TODO: Fire an event about vanishing
-
-        // TODO: Unregister all listeners
-
-        // TODO: Clear caches or do caches auto-clear from an 
-        // vanish event notification?
-    }
-
-    public Service<?, ?> getMyService() {
-        URI schemaId = getSchemaId();
-        Context context = getContext();
-        Service<?, ?> myService = context.getService(schemaId);
-        return myService;
-    }
-
-    public Service<?, ?> getMyOriginService() {
-
-        // Go all the way to the origin to force a re-GET of "self"
-        Service<?, ?> myService = getMyService();
-        while (myService != null && myService instanceof ProxyService<?, ?, ?>) {
-            myService = ((ProxyService<?, ?, ?>) myService).getOriginService();
-        }
-
-        return myService;
-    }
-
-    public Object getAlternateKeyValue() {
-        URI id = getId();
-        if (id == null) {
-            return null;
-        }
-
-        Service<?, ?> myService = getMyService();
-        UriKeyTransformer<?> transformer = myService.getUriKeyTransformer();
-        return transformer.aToB(id);
-    }
-
     public void addEventListener(ModelEventListener listener) {
         if (_EventListeners == null) {
             _EventListeners = new CopyOnWriteArrayList<ModelEventListener>();
@@ -429,9 +340,49 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         fieldEventListenerList.add(listener);
     }
 
+    public void become(Model newThis, boolean atomic) {
+
+        // TODO: Transition newThis field listeners to us
+
+        // TODO: Get all of our Links that newThis has listeners for - transfer those listeners too
+
+        // TODO: "Pause" listeners if atomic is true
+
+        // TODO: Set all fields (copy from newThis)
+
+        // TODO: Clear "extra" fields
+
+        // TODO: Create and fire some sort of refresh event
+    }
+
+    public void delete() {
+        final URI id = getId();
+        if (id == null) {
+            return;
+        }
+
+        // Go all the way to the origin to force a hard delete
+        final Service myOriginService = getMyOriginService();
+        final Model newThis = myOriginService.remove(id, this);
+
+        // TODO: Do we need to vanish here or can an event trigger
+        // that from somewhere else?
+    }
+
     @Override
     public final boolean equals(Object obj) {
         return super.equals(obj);
+    }
+
+    public Object getAlternateKeyValue() {
+        final URI id = getId();
+        if (id == null) {
+            return null;
+        }
+
+        final Service myService = getMyService();
+        final UriTransformer transformer = myService.getIdTransformer(this);
+        return transformer.aToB(id);
     }
 
     public final Context getContext() {
@@ -471,12 +422,35 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         return link;
     }
 
+    public Service getMyOriginService() {
+
+        // Go all the way to the origin to force a re-GET of "self"
+        Service myService = getMyService();
+        while ((myService != null) && (myService instanceof ProxyService)) {
+            myService = ((ProxyService) myService).getOriginService();
+        }
+
+        return myService;
+    }
+
+    public Service getMyService() {
+        final URI schemaId = getSchemaId();
+        final Context context = getContext();
+        final Service myService = context.getService(schemaId);
+        return myService;
+    }
+
     public final Prototype getPrototype() {
-        return getContext().getPrototype(getSchemaId(), this);
+
+        if (this instanceof Prototype || this instanceof PrototypeField) {
+            return null;
+        }
+
+        return getContext().getPrototype(getSchemaId());
     }
 
     public final Schema getSchema() {
-        return getContext().getSchema(getSchemaId(), this);
+        return getContext().getSchema(getSchemaId());
     }
 
     public final URI getSchemaId() {
@@ -494,6 +468,19 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
 
     public final boolean isReadOnly() {
         return ((Boolean) getFieldValue(READ_ONLY_FIELD_NAME)).booleanValue();
+    }
+
+    public void refresh(boolean atomic) {
+        final URI id = getId();
+        if (id == null) {
+            return;
+        }
+
+        // Go all the way to the origin to force a re-GET of "self"
+        final Service myOriginService = getMyOriginService();
+
+        final Model newThis = myOriginService.get(id, this);
+        become(newThis, atomic);
     }
 
     public void removeEventListener(ModelEventListener listener) {
@@ -517,9 +504,23 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         fieldEventListenerList.remove(listener);
     }
 
+    public void save() {
+
+        final Service myService = getMyService();
+        myService.put(getId(), this, this);
+
+        // TODO: Assume write through caches on self-save (on all saves)?
+
+        // TODO: Assume that model update events will trigger any refresh that is needed?
+    }
+
     public final void setAllFieldsToDefaultValue() {
 
         final Prototype prototype = getPrototype();
+        if (prototype == null) {
+            return;
+        }
+
         final Map<String, PrototypeField> prototypeFields = prototype.getPrototypeFields();
         if (prototypeFields != null) {
             final Set<String> fieldNames = prototypeFields.keySet();
@@ -585,6 +586,16 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         return (URI) setFieldValue(ID_FIELD_NAME, id);
     }
 
+    // Vanish means that the model is gone but may not be deleted
+    public void vanish() {
+        // TODO: Fire an event about vanishing
+
+        // TODO: Unregister all listeners
+
+        // TODO: Clear caches or do caches auto-clear from an 
+        // vanish event notification?
+    }
+
     protected final ObservableMap<String, Object> getFieldMap() {
         return _FieldMap;
     }
@@ -633,7 +644,7 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
     /**
      * Called to initialize the Model.
      */
-    private void init() {
+    protected void init() {
         setAllFieldsToDefaultValue();
     }
 

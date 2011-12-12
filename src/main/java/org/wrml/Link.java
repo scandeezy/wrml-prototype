@@ -292,7 +292,7 @@ public final class Link {
         final ResourceTemplate resourceTemplate = document.getResourceTemplate();
 
         final ObservableMap<URI, URI> hereToThereLinkRelationIdToLinkTemplateIdMap = resourceTemplate
-                .getHereToThereLinkRelationIdToLinkTemplateIdMap();
+                .getEndPointLinkRelationIdToLinkTemplateIdMap();
 
         final URI linkTemplateId = hereToThereLinkRelationIdToLinkTemplateIdMap.get(getLinkRelationId());
 

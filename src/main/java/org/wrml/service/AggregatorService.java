@@ -16,23 +16,17 @@
 
 package org.wrml.service;
 
-import java.net.URI;
+import java.util.List;
 
-import org.wrml.Model;
-import org.wrml.model.resource.Action;
+import org.wrml.Context;
 
-public interface ExecutableService extends Service {
+/*
+ * TODO: Create A base Model AggregatorService (http://en.wikipedia.org/wiki/Aggregator)
+ */
+public class AggregatorService extends MultiProxyService {
 
-    // EXECUTE
+    public AggregatorService(Context context, List<Service> services) {
+        super(context, services);
+    }
 
-    // TODO: Need to package up an Action as an input 
-    // that references a model and some other things?
-
-    public Model execute(URI id);
-
-    public Model execute(URI id, Action action);
-
-    public Model execute(URI id, Action action, Model requestor);
-
-    public Model execute(URI id, Model requestor);
 }

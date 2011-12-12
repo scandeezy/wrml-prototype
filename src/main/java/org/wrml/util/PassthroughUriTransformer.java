@@ -14,25 +14,18 @@
  * limitations under the License.
  */
 
-package org.wrml.service;
+package org.wrml.util;
 
 import java.net.URI;
 
-import org.wrml.Model;
-import org.wrml.model.resource.Action;
+public class PassthroughUriTransformer implements UriTransformer {
 
-public interface ExecutableService extends Service {
+    public Object aToB(URI aValue) {
+        return aValue;
+    }
 
-    // EXECUTE
+    public URI bToA(Object bValue) {
+        return (URI) bValue;
+    }
 
-    // TODO: Need to package up an Action as an input 
-    // that references a model and some other things?
-
-    public Model execute(URI id);
-
-    public Model execute(URI id, Action action);
-
-    public Model execute(URI id, Action action, Model requestor);
-
-    public Model execute(URI id, Model requestor);
 }

@@ -18,47 +18,65 @@ package org.wrml.service.runtime;
 
 import java.net.URI;
 
+import org.wrml.Context;
 import org.wrml.Model;
 import org.wrml.model.runtime.Prototype;
 import org.wrml.model.runtime.PrototypeField;
-import org.wrml.runtime.Context;
+import org.wrml.runtime.RuntimePrototype;
 import org.wrml.runtime.RuntimePrototypeField;
+import org.wrml.runtime.StaticModelProxy;
 import org.wrml.service.AbstractService;
-import org.wrml.service.UriKeyTransformer;
+import org.wrml.util.UriTransformer;
 
-/**
- * TODO: Refactor this into a more useful proxy/cache base service.
- */
-public class PrototypeFieldService extends AbstractService<String, PrototypeField> {
+public class PrototypeFieldService extends AbstractService {
 
-    /**
-     * Creates a prototypical instance of the requestor's schema
-     * 
-     * @param id
-     *            the ID of the schema to prototype
-     * @param requestor
-     *            the model requesting its prototypical instance
-     * @return
-     */
-    public PrototypeField create(URI id, Model requestor) {
-        final Context context = requestor.getContext();
-        final URI prototypeSchemaId = context.getSchemaIdForClass(Prototype.class);
+    private UriTransformer _UriTransformer;
 
-        // TODO:
-        final PrototypeField prototype = new RuntimePrototypeField(prototypeSchemaId, context);
-        return prototype;
+    public PrototypeFieldService(Context context) {
+        super(context);
     }
 
-    public UriKeyTransformer<String> getUriKeyTransformer() {
-        // TODO Auto-generated method stub
+    public Model create(URI id, Model requestor) {
+        final UriTransformer uriTransformer = getIdTransformer(requestor);
+        final String fieldName = (String) uriTransformer.aToB(id);
+
+        final Context context = (requestor != null) ? requestor.getContext() : getContext();
+
+        final URI schemaId = getContext().getSchemaId(Prototype.class);
+
+        final Model dynamicModel = new RuntimePrototypeField(schemaId, context, fieldName);
+        //Model staticModel = StaticModelProxy.newProxyInstance(dynamicModel);
+        //return staticModel;
+        return dynamicModel;
+
+    }
+
+    public UriTransformer getIdTransformer(Model requestor) {
+        if (_UriTransformer == null) {
+            _UriTransformer = new FieldNameIdTransformer();
+        }
+        return _UriTransformer;
+    }
+
+    public Model put(URI id, Model modelToSave, Model requestor) {
         return null;
     }
 
-    public PrototypeField put(URI id, PrototypeField modelToSave, Model requestor) {
+    public Model remove(URI id, Model requestor) {
         return null;
     }
 
-    public PrototypeField remove(URI id, Model requestor) {
-        return null;
+    // TODO: Replace this with UriTemplate and a SchemaFieldParameter["fieldName"]
+    private static class FieldNameIdTransformer implements UriTransformer {
+
+        public Object aToB(URI aValue) {
+            return null;
+        }
+
+        public URI bToA(Object bValue) {
+            return null;
+        }
+
     }
+
 }

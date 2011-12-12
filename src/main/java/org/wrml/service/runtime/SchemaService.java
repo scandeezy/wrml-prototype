@@ -14,25 +14,12 @@
  * limitations under the License.
  */
 
-package org.wrml.service;
+package org.wrml.service.runtime;
 
-import java.net.URI;
+import org.wrml.service.Service;
 
-import org.wrml.Model;
-import org.wrml.model.resource.Action;
+public interface SchemaService extends Service {
 
-public interface ExecutableService extends Service {
+    public ClassLoader getSchemaInterfaceLoader();
 
-    // EXECUTE
-
-    // TODO: Need to package up an Action as an input 
-    // that references a model and some other things?
-
-    public Model execute(URI id);
-
-    public Model execute(URI id, Action action);
-
-    public Model execute(URI id, Action action, Model requestor);
-
-    public Model execute(URI id, Model requestor);
 }

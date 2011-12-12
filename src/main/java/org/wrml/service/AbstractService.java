@@ -21,16 +21,23 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.wrml.Context;
 import org.wrml.Model;
+import org.wrml.runtime.RuntimeModel;
+import org.wrml.util.UriTransformer;
 
 /**
  * A base service class that provides some helpful reusable implementations of
  * the Service interface's methods.
  * 
- * @param <T>
- *            the Model subtype the is serviced here.
  */
-public abstract class AbstractService<K, M extends Model> implements Service<K, M> {
+public abstract class AbstractService implements Service {
+
+    private final Context _Context;
+
+    public AbstractService(Context context) {
+        _Context = context;
+    }
 
     /*
      * TODO: These methods should throw a MethodNotAllowed/Supported/Implemented
@@ -48,28 +55,32 @@ public abstract class AbstractService<K, M extends Model> implements Service<K, 
         return false;
     }
 
-    public M create() {
+    public Model create() {
         return create(null, null);
     }
 
-    public M create(Model requestor) {
+    public Model create(Model requestor) {
         return create(null, requestor);
     }
 
-    public M create(URI id) {
+    public Model create(URI id) {
         return create(id, null);
     }
 
-    public Set<java.util.Map.Entry<URI, M>> entrySet() {
+    public Set<java.util.Map.Entry<URI, Model>> entrySet() {
         return null;
     }
 
-    public M get(Object key) {
+    public Model get(Object key) {
         return create((URI) key);
     }
 
-    public M get(URI id, Model requestor) {
+    public Model get(URI id, Model requestor) {
         return create(id, requestor);
+    }
+
+    public final Context getContext() {
+        return _Context;
     }
 
     public boolean isEmpty() {
@@ -80,14 +91,15 @@ public abstract class AbstractService<K, M extends Model> implements Service<K, 
         return null;
     }
 
-    public M put(URI id, M modelToSave) {
+    public Model put(URI id, Model modelToSave) {
         return put(id, modelToSave, null);
     }
 
-    public void putAll(Map<? extends URI, ? extends M> m) {
+    public void putAll(Map<? extends URI, ? extends Model> map) {
+        // TODO ? Loop?        
     }
 
-    public M remove(Object key) {
+    public Model remove(Object key) {
         return remove((URI) key, null);
     }
 
@@ -95,8 +107,12 @@ public abstract class AbstractService<K, M extends Model> implements Service<K, 
         return -1;
     }
 
-    public Collection<M> values() {
+    public Collection<Model> values() {
         return null;
+    }
+
+    public UriTransformer getIdTransformer() {
+        return getIdTransformer(null);
     }
 
 }

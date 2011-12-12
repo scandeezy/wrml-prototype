@@ -18,30 +18,32 @@ package org.wrml.runtime;
 
 import java.net.URI;
 
+import org.wrml.Context;
 import org.wrml.model.runtime.PrototypeField;
 
 public class RuntimePrototypeField extends RuntimeModel implements PrototypeField {
 
-    public RuntimePrototypeField(URI schemaId, Context context) {
+    private static final long serialVersionUID = -5771927546979489208L;
+
+    // TODO: Make this an enum?
+    public static final String FIELD_NAME_FIELD_NAME = "fieldName";
+    public static final String DEFAULT_VALUE_FIELD_NAME = "defaultValue";
+
+    public RuntimePrototypeField(URI schemaId, Context context, String fieldName) {
         super(schemaId, context);
-        // TODO Auto-generated constructor stub
+        setFieldValue(FIELD_NAME_FIELD_NAME, fieldName);
     }
 
     public Object getDefaultValue() {
-        // TODO Auto-generated method stub
-        return null;
+        return getFieldValue(DEFAULT_VALUE_FIELD_NAME);
     }
 
     public String getFieldName() {
-        // TODO Auto-generated method stub
-        return null;
+        return (String) getFieldValue(FIELD_NAME_FIELD_NAME);
     }
 
     public Object setDefaultValue(Object defaultValue) {
-        // TODO Auto-generated method stub
-        return null;
+        return setFieldValue(DEFAULT_VALUE_FIELD_NAME, defaultValue);
     }
-
-
 
 }

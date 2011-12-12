@@ -19,8 +19,10 @@ package org.wrml.service;
 import java.net.URI;
 import java.util.Map;
 
+import org.wrml.Context;
 import org.wrml.Model;
 import org.wrml.util.Factory;
+import org.wrml.util.UriTransformer;
 
 /**
  * This is the (still-evolving) core "backend connection" CRUD interface that is
@@ -30,27 +32,21 @@ import org.wrml.util.Factory;
  * @param <T>
  *            the Model subtype the is serviced here.
  */
-public interface Service<K, M extends Model> extends Factory<URI, M>, Map<URI, M> {
+public interface Service extends Factory<URI, Model>, Map<URI, Model> {
 
-    public M create(Model requestor);
+    public Context getContext();
+    
+    public Model create(Model requestor);
 
-    // CREATE
+    public Model create(URI id, Model requestor);
 
-    public M create(URI id, Model requestor);
+    public Model get(URI id, Model requestor);
 
-    public M get(URI id, Model requestor);
+    public UriTransformer getIdTransformer(Model requestor);
 
-    // READ
+    public Model put(URI id, Model modelToSave, Model requestor);
 
-    public UriKeyTransformer<K> getUriKeyTransformer();
-
-    // UPDATE
-
-    public M put(URI id, M modelToSave, Model requestor);
-
-    // DELETE
-
-    public M remove(URI id, Model requestor);
+    public Model remove(URI id, Model requestor);
 
     // TODO: Support non-model input/output with I/O Streams?
 

@@ -14,25 +14,9 @@
  * limitations under the License.
  */
 
-package org.wrml.service;
+package org.wrml.util;
 
-import java.net.URI;
+public interface Delegating<T> {
 
-import org.wrml.Model;
-import org.wrml.model.resource.Action;
-
-public interface ExecutableService extends Service {
-
-    // EXECUTE
-
-    // TODO: Need to package up an Action as an input 
-    // that references a model and some other things?
-
-    public Model execute(URI id);
-
-    public Model execute(URI id, Action action);
-
-    public Model execute(URI id, Action action, Model requestor);
-
-    public Model execute(URI id, Model requestor);
+    T getDelegate();
 }

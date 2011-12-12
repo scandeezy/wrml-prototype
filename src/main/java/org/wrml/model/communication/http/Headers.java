@@ -20,62 +20,60 @@ import org.wrml.Model;
 
 // Generated from a Web Resource Schema
 public interface Headers extends Model {
-    
-    public AcceptHeader getAcceptHeader();    
+
+    public AcceptHeader getAcceptHeader();
+
     public AcceptHeader setAcceptHeader(AcceptHeader acceptHeader);
-    
+
     /*
-    TODO: Add methods and models for all of the common HTTP headers 
-    
-    ACCEPT_CHARSET("Accept-Charset", HeaderCategory.REQUEST),
-    ACCEPT_ENCODING("Accept-Encoding", HeaderCategory.REQUEST),
-    ACCEPT_LANGUAGE("Accept-Language", HeaderCategory.REQUEST),
-    ACCEPT_RANGES("Accept-Ranges", HeaderCategory.RESPONSE),
-    AGE("Age", HeaderCategory.RESPONSE),
-    ALLOW("Allow", HeaderCategory.ENTITY),
-    AUTHORIZATION("Authorization", HeaderCategory.REQUEST),
-    CACHE_CONTROL("Cache-Control", HeaderCategory.GENERAL),
-    CONNECTION("Connection", HeaderCategory.GENERAL),
-    CONTENT_ENCODING("Content-Encoding", HeaderCategory.ENTITY),
-    CONTENT_LANGUAGE("Content-Language", HeaderCategory.ENTITY),
-    CONTENT_LENGTH("Content-Length", HeaderCategory.ENTITY),
-    CONTENT_LOCATION("Content-Location", HeaderCategory.ENTITY),
-    CONTENT_MD5("Content-MD5", HeaderCategory.ENTITY),
-    CONTENT_RANGE("Content-Range", HeaderCategory.ENTITY),
-    CONTENT_TYPE("Content-Type", HeaderCategory.ENTITY),
-    DATE("Date", HeaderCategory.GENERAL),
-    ETAG("ETag", HeaderCategory.RESPONSE),
-    EXPECT("Expect", HeaderCategory.REQUEST),
-    EXPIRES("Expires", HeaderCategory.ENTITY),
-    FROM("From", HeaderCategory.REQUEST),
-    HOST("Host", HeaderCategory.REQUEST),
-    IF_MATCH("If-Match", HeaderCategory.REQUEST),
-    IF_MODIFIED_SINCE("If-Modified-Since", HeaderCategory.REQUEST),
-    IF_NONE_MATCH("If-None-Match", HeaderCategory.REQUEST),
-    IF_RANGE("If-Range", HeaderCategory.REQUEST),
-    IF_UNMODIFIED_SINCE("If-Unmodified-Since", HeaderCategory.REQUEST),
-    LAST_MODIFIED("Last-Modified", HeaderCategory.ENTITY),
-    LOCATION("Location", HeaderCategory.RESPONSE),
-    MAX_FORWARDS("Max-Forwards", HeaderCategory.REQUEST),
-    PRAGMA("Pragma", HeaderCategory.GENERAL),
-    PROXY_AUTHENTICATE("Proxy-Authenticate", HeaderCategory.RESPONSE),
-    PROXY_AUTHORIZATION("Proxy-Authorization", HeaderCategory.REQUEST),
-    RANGE("Range", HeaderCategory.REQUEST),
-    REFERER("Referer", HeaderCategory.REQUEST),
-    RETRY_AFTER("Retry-After", HeaderCategory.RESPONSE),
-    SERVER("Server", HeaderCategory.RESPONSE),
-    TE("TE", HeaderCategory.REQUEST),
-    TRAILER("Trailer", HeaderCategory.GENERAL),
-    TRANSFER_ENCODING("Transfer-Encoding", HeaderCategory.GENERAL),
-    UPGRADE("Upgrade", HeaderCategory.GENERAL),
-    USER_AGENT("User-Agent", HeaderCategory.REQUEST),
-    VARY("Vary", HeaderCategory.RESPONSE),
-    VIA("Via", HeaderCategory.GENERAL),
-    WARNING("Warning", HeaderCategory.GENERAL),
-    WWW_AUTHENTICATE("WWW-Authenticate", HeaderCategory.RESPONSE);
-    
-    */
-    
-    
+     * TODO: Add methods and models for all of the common HTTP headers
+     * 
+     * ACCEPT_CHARSET("Accept-Charset", HeaderCategory.REQUEST),
+     * ACCEPT_ENCODING("Accept-Encoding", HeaderCategory.REQUEST),
+     * ACCEPT_LANGUAGE("Accept-Language", HeaderCategory.REQUEST),
+     * ACCEPT_RANGES("Accept-Ranges", HeaderCategory.RESPONSE),
+     * AGE("Age", HeaderCategory.RESPONSE),
+     * ALLOW("Allow", HeaderCategory.ENTITY),
+     * AUTHORIZATION("Authorization", HeaderCategory.REQUEST),
+     * CACHE_CONTROL("Cache-Control", HeaderCategory.GENERAL),
+     * CONNECTION("Connection", HeaderCategory.GENERAL),
+     * CONTENT_ENCODING("Content-Encoding", HeaderCategory.ENTITY),
+     * CONTENT_LANGUAGE("Content-Language", HeaderCategory.ENTITY),
+     * CONTENT_LENGTH("Content-Length", HeaderCategory.ENTITY),
+     * CONTENT_LOCATION("Content-Location", HeaderCategory.ENTITY),
+     * CONTENT_MD5("Content-MD5", HeaderCategory.ENTITY),
+     * CONTENT_RANGE("Content-Range", HeaderCategory.ENTITY),
+     * CONTENT_TYPE("Content-Type", HeaderCategory.ENTITY),
+     * DATE("Date", HeaderCategory.GENERAL),
+     * ETAG("ETag", HeaderCategory.RESPONSE),
+     * EXPECT("Expect", HeaderCategory.REQUEST),
+     * EXPIRES("Expires", HeaderCategory.ENTITY),
+     * FROM("From", HeaderCategory.REQUEST),
+     * HOST("Host", HeaderCategory.REQUEST),
+     * IF_MATCH("If-Match", HeaderCategory.REQUEST),
+     * IF_MODIFIED_SINCE("If-Modified-Since", HeaderCategory.REQUEST),
+     * IF_NONE_MATCH("If-None-Match", HeaderCategory.REQUEST),
+     * IF_RANGE("If-Range", HeaderCategory.REQUEST),
+     * IF_UNMODIFIED_SINCE("If-Unmodified-Since", HeaderCategory.REQUEST),
+     * LAST_MODIFIED("Last-Modified", HeaderCategory.ENTITY),
+     * LOCATION("Location", HeaderCategory.RESPONSE),
+     * MAX_FORWARDS("Max-Forwards", HeaderCategory.REQUEST),
+     * PRAGMA("Pragma", HeaderCategory.GENERAL),
+     * PROXY_AUTHENTICATE("Proxy-Authenticate", HeaderCategory.RESPONSE),
+     * PROXY_AUTHORIZATION("Proxy-Authorization", HeaderCategory.REQUEST),
+     * RANGE("Range", HeaderCategory.REQUEST),
+     * REFERER("Referer", HeaderCategory.REQUEST),
+     * RETRY_AFTER("Retry-After", HeaderCategory.RESPONSE),
+     * SERVER("Server", HeaderCategory.RESPONSE),
+     * TE("TE", HeaderCategory.REQUEST),
+     * TRAILER("Trailer", HeaderCategory.GENERAL),
+     * TRANSFER_ENCODING("Transfer-Encoding", HeaderCategory.GENERAL),
+     * UPGRADE("Upgrade", HeaderCategory.GENERAL),
+     * USER_AGENT("User-Agent", HeaderCategory.REQUEST),
+     * VARY("Vary", HeaderCategory.RESPONSE),
+     * VIA("Via", HeaderCategory.GENERAL),
+     * WARNING("Warning", HeaderCategory.GENERAL),
+     * WWW_AUTHENTICATE("WWW-Authenticate", HeaderCategory.RESPONSE);
+     */
 
 }

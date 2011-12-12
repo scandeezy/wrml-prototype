@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
-package org.wrml.service;
+package org.wrml.util;
 
 import java.net.URI;
 
-import org.wrml.util.Transformer;
-
-public interface UriKeyTransformer<K> extends Transformer<URI, K> {
+public interface UriTransformer extends Transformer<URI, Object> {
 
 }

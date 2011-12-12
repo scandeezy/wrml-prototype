@@ -28,14 +28,17 @@ import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
+import org.wrml.Context;
 import org.wrml.model.resource.Collection;
 import org.wrml.model.runtime.Prototype;
 import org.wrml.model.runtime.PrototypeField;
 import org.wrml.model.runtime.PrototypeLinkFormula;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Schema;
+import org.wrml.service.Service;
 import org.wrml.util.ObservableMap;
 import org.wrml.util.Observables;
+import org.wrml.util.UriTransformer;
 
 /**
  * The runtime instance of the Prototype schema. This model is implemented by
@@ -233,7 +236,7 @@ public class RuntimePrototype extends RuntimeModel implements Prototype {
              * we return here since we want _all_ fields.
              */
 
-            putSchemaFields(getId(), allYourFields);
+            initPrototypeFields(getId(), allYourFields);
 
             prototypeFields = Observables.observableMap(allYourFields);
             // Cache the schema's field prototypes for use by model instances
@@ -251,12 +254,12 @@ public class RuntimePrototype extends RuntimeModel implements Prototype {
         Collections.reverse(baseIds);
         for (final URI baseId : baseIds) {
             // Include the base schema fields
-            putSchemaFields(baseId, allYourFields);
+            initPrototypeFields(baseId, allYourFields);
         }
 
         // Include our source schema fields last to achieve 
         // final locality
-        putSchemaFields(getId(), allYourFields);
+        initPrototypeFields(getId(), allYourFields);
 
         prototypeFields = Observables.observableMap(allYourFields);
         // Cache the schema's field prototypes for use by model instances
@@ -269,7 +272,7 @@ public class RuntimePrototype extends RuntimeModel implements Prototype {
     }
 
     public Schema getSourceSchema() {
-        return getContext().getSchema(getId(), this);
+        return getContext().getSchema(getId());
     }
 
     /**
@@ -286,7 +289,11 @@ public class RuntimePrototype extends RuntimeModel implements Prototype {
      */
     private void enqueueBaseSchemas(final Queue<Schema> queue, final URI schemaId, final HashMap<URI, URI> enqueuedIds) {
 
-        final Schema schema = getContext().getSchema(schemaId, this);
+        final Schema schema = getContext().getSchema(schemaId);
+        if (schema == null) {
+            System.out.println("Schema is null: " + schemaId);
+            return;
+        }
 
         final Collection<Schema> baseSchemaCollection = schema.getBaseSchemas();
         if (baseSchemaCollection == null) {
@@ -318,75 +325,41 @@ public class RuntimePrototype extends RuntimeModel implements Prototype {
         }
     }
 
-    private void putSchemaFields(final URI schemaId, final SortedMap<String, PrototypeField> allYourFields) {
+    private void initPrototypeFields(final URI schemaId, final SortedMap<String, PrototypeField> allYourFields) {
 
-        final Schema schema = getContext().getSchema(schemaId, this);
+        @SuppressWarnings("unchecked")
+        final Service prototypeFieldService = getContext().getService(PrototypeField.class);
+        final UriTransformer uriTransformer = prototypeFieldService.getIdTransformer(this);
+        final Schema schema = getContext().getSchema(schemaId);
+        
+        if (schema == null) {
+            System.out.println("Schema is null: " + schemaId);
+            return;
+        }
+        
         final Map<String, Field> fields = schema.getFields();
 
-        // TODO: Put or update the PrototypeField based on the Schema Field
+        for (final String fieldName : fields.keySet()) {
+
+            final Field field = fields.get(fieldName);
+
+            if (field == null) {
+                continue;
+            }
+
+            PrototypeField prototypeField = allYourFields.get(fieldName);
+            if (prototypeField == null) {
+                final URI fieldId = uriTransformer.bToA(fieldName);
+                prototypeField = (PrototypeField) prototypeFieldService.get(fieldId, this);
+            }
+
+            final Object defaultValue = field.getDefaultValue();
+
+            // TODO: Any other state to copy?
+
+            prototypeField.setDefaultValue(defaultValue);
+
+        }
 
     }
-
 }
-
-// TODO: Check to see if Field exists 
-
-//        if (prototypeFields != null && prototypeFields.size() > 0) {
-//            _FieldDefaultMap = new HashMap<String, PrototypeField<?>>();
-//
-//            for (PrototypeField<?> fieldDefault : prototypeFields) {
-//                _FieldDefaultMap.put(fieldDefault.getFieldName(), fieldDefault);
-//            }
-//        }
-
-//        final Schema schema = model.getSchema();
-//        final Field<?> field = schema.getFields().get(fieldName);
-//        final Object defaultValue = field.getDefaultValue();
-//        if (defaultValue != null) {
-//            return defaultValue;
-//        }
-
-// TODO: Traverse up the rest of resource template tree to find a
-// default specified in the resource hierarchy
-
-//final Schema fieldDeclaredSchema = getSchema(field.getDeclaredSchemaId());
-
-// TODO: Traverse up the base schemas from this object's schema through
-// the list of schemas between it and the field's declared schema.
-// This is not the same as going over all of the base schemas. Nor is it
-// necessary to go over all base schemas and their ancestors. Again, the
-// schemas that need to be checked range from this object's schema to
-// the fields delcared schema (only).
-
-/*
- * List<URI> baseSchemaIds = schema.getBaseSchemaIds(); if
- * (baseSchemaIds != null && !baseSchemaIds.isEmpty()) { for (URI
- * baseSchemaId : baseSchemaIds) {
- * 
- * baseSchema = getContext().getSchema();
- * 
- * }
- * 
- * }
- */
-
-//        final ObservableMap<URI, ObservableList<PrototypeField<?>>> fieldDefaultsMap = resourceTemplate
-//                .getSchemaPrototypeFieldsMap();
-//
-//        final URI schemaId = getSchemaId();
-//        if (fieldDefaultsMap != null && fieldDefaultsMap.containsKey(schemaId)) {
-//
-//            ObservableList<PrototypeField<?>> schemaPrototypeFields = fieldDefaultsMap.get(schemaId);
-//            if (schemaPrototypeFields != null && schemaPrototypeFields.size() > 0) {
-//                for (PrototypeField<?> fieldDefault : schemaPrototypeFields) {
-//                    String fieldName = fieldDefault.getFieldName();
-//                    Object fieldValue = fieldDefault.getDefaultValue();
-//                    model.setFieldValue(fieldName, fieldValue);
-//                }
-//            }
-//        }
-
-//        prototype.setPrototypeFields(prototypeFields);
-//        return prototypeFields;
-//    }
-

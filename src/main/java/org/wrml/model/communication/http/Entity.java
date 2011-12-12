@@ -17,7 +17,6 @@
 package org.wrml.model.communication.http;
 
 import org.wrml.Model;
-import org.wrml.util.ObservableMap;
 
 /**
  * <blockquote cite="message://www.w3.org/Protocols/rfc2616/rfc2616-sec4

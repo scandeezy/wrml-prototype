@@ -21,12 +21,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 
-final class DelegatingObservableList<E> extends AbstractObservableList<E> {
+public class DelegatingObservableList<E> extends AbstractObservableList<E> implements Delegating<List<E>> {
 
-    private final List<E> backingList;
+    private final List<E> _Delegate;
 
-    public DelegatingObservableList(List<E> backingList) {
-        this.backingList = backingList;
+    public DelegatingObservableList(List<E> delegate) {
+        _Delegate = delegate;
     }
 
     public boolean add(E e) {
@@ -37,21 +37,21 @@ final class DelegatingObservableList<E> extends AbstractObservableList<E> {
             return false;
         }
 
-        final boolean result = backingList.add(e);
+        final boolean result = _Delegate.add(e);
         fireElementInsertedEvent(new ListEvent<E>(this, false, e, null));
         return result;
     }
 
     public void add(int i, E e) {
-        backingList.add(i, e);
+        _Delegate.add(i, e);
     }
 
     public boolean addAll(Collection<? extends E> es) {
-        return backingList.addAll(es);
+        return _Delegate.addAll(es);
     }
 
     public boolean addAll(int i, Collection<? extends E> es) {
-        return backingList.addAll(i, es);
+        return _Delegate.addAll(i, es);
     }
 
     public void clear() {
@@ -59,59 +59,63 @@ final class DelegatingObservableList<E> extends AbstractObservableList<E> {
         fireClearingEvent(clearingEvent);
 
         if (!clearingEvent.isCancelled()) {
-            backingList.clear();
+            _Delegate.clear();
             fireClearedEvent(new ListEvent<E>(this, false));
         }
     }
 
     public boolean contains(Object o) {
-        return backingList.contains(o);
+        return _Delegate.contains(o);
     }
 
     public boolean containsAll(Collection<?> objects) {
-        return backingList.containsAll(objects);
+        return _Delegate.containsAll(objects);
     }
 
     @Override
     public boolean equals(Object o) {
-        return backingList.equals(o);
+        return _Delegate.equals(o);
     }
 
     public E get(int i) {
-        return backingList.get(i);
+        return _Delegate.get(i);
+    }
+
+    public List<E> getDelegate() {
+        return _Delegate;
     }
 
     @Override
     public int hashCode() {
-        return backingList.hashCode();
+        return _Delegate.hashCode();
     }
 
     public int indexOf(Object o) {
-        return backingList.indexOf(o);
+        return _Delegate.indexOf(o);
     }
 
     public boolean isEmpty() {
-        return backingList.isEmpty();
+        return _Delegate.isEmpty();
     }
 
     public Iterator<E> iterator() {
-        return backingList.iterator();
+        return _Delegate.iterator();
     }
 
     public int lastIndexOf(Object o) {
-        return backingList.lastIndexOf(o);
+        return _Delegate.lastIndexOf(o);
     }
 
     public ListIterator<E> listIterator() {
-        return backingList.listIterator();
+        return _Delegate.listIterator();
     }
 
     public ListIterator<E> listIterator(int i) {
-        return backingList.listIterator(i);
+        return _Delegate.listIterator(i);
     }
 
     public E remove(int i) {
-        return backingList.remove(i);
+        return _Delegate.remove(i);
     }
 
     public boolean remove(Object o) {
@@ -120,36 +124,36 @@ final class DelegatingObservableList<E> extends AbstractObservableList<E> {
         if (removingEvent.isCancelled()) {
             return false;
         }
-        final boolean result = backingList.remove(o);
+        final boolean result = _Delegate.remove(o);
         fireElementRemovedEvent(new ListEvent<E>(this, false, null, (E) o));
         return result;
     }
 
     public boolean removeAll(Collection<?> objects) {
-        return backingList.removeAll(objects);
+        return _Delegate.removeAll(objects);
     }
 
     public boolean retainAll(Collection<?> objects) {
-        return backingList.retainAll(objects);
+        return _Delegate.retainAll(objects);
     }
 
     public E set(int i, E e) {
-        return backingList.set(i, e);
+        return _Delegate.set(i, e);
     }
 
     public int size() {
-        return backingList.size();
+        return _Delegate.size();
     }
 
     public List<E> subList(int i, int i1) {
-        return backingList.subList(i, i1);
+        return _Delegate.subList(i, i1);
     }
 
     public Object[] toArray() {
-        return backingList.toArray();
+        return _Delegate.toArray();
     }
 
     public <T> T[] toArray(T[] ts) {
-        return backingList.toArray(ts);
+        return _Delegate.toArray(ts);
     }
 }

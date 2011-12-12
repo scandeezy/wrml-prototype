@@ -14,25 +14,30 @@
  * limitations under the License.
  */
 
-package org.wrml.service;
+package org.wrml.service.runtime;
 
 import java.net.URI;
 
-import org.wrml.Model;
-import org.wrml.model.resource.Action;
+import org.wrml.util.UriTransformer;
 
-public interface ExecutableService extends Service {
+public class SchemaClassNameUriTransformer implements UriTransformer {
+    
+    public final URI _BaseUri;
 
-    // EXECUTE
+    public SchemaClassNameUriTransformer(URI baseUri) {
+        _BaseUri = baseUri;
+    }
 
-    // TODO: Need to package up an Action as an input 
-    // that references a model and some other things?
+    public Object aToB(URI aValue) {
+        return getBaseUri().relativize(aValue).toString().replace('/', '.');
+    }
 
-    public Model execute(URI id);
+    public URI bToA(Object bValue) {
+        return getBaseUri().resolve(bValue.toString().replace('.', '/'));
+    }
 
-    public Model execute(URI id, Action action);
+    public URI getBaseUri() {
+        return _BaseUri;
+    }
 
-    public Model execute(URI id, Action action, Model requestor);
-
-    public Model execute(URI id, Model requestor);
 }

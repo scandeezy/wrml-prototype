@@ -17,35 +17,44 @@
 package org.wrml.service;
 
 import java.net.URI;
+import java.util.Map;
 
+import org.wrml.Context;
 import org.wrml.Model;
 import org.wrml.model.resource.Action;
 import org.wrml.util.DelegatingObservableMap;
+import org.wrml.util.UriTransformer;
 
-public class ProxyService<K, M extends Model, S extends Service<K, M>> extends DelegatingObservableMap<URI, M>
-        implements Service<K, M> {
+public class ProxyService extends DelegatingObservableMap<URI, Model> implements DelegatingService<Map<URI, Model>> {
 
     // TODO: Add service event handler add/remove and event firing logic
 
-    public ProxyService(S originService) {
+    private final Context _Context;
+
+    public ProxyService(Context context, Service originService) {
         super(originService);
+        _Context = context;
     }
 
-    public M create() {
+    public final Context getContext() {
+        return _Context;
+    }
+
+    public Model create() {
         return getOriginService().create();
     }
 
-    public M create(Model requestor) {
+    public Model create(Model requestor) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public M create(URI id) {
+    public Model create(URI id) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public M create(URI id, Model requestor) {
+    public Model create(URI id, Model requestor) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -70,25 +79,28 @@ public class ProxyService<K, M extends Model, S extends Service<K, M>> extends D
         return null;
     }
 
-    public M get(URI id, Model requestor) {
+    public Model get(URI id, Model requestor) {
         return getOriginService().get(id, requestor);
+    }
+
+    public UriTransformer getIdTransformer() {
+        return getOriginService().getIdTransformer(null);
+    }
+
+    public UriTransformer getIdTransformer(Model requestor) {
+        return getOriginService().getIdTransformer(requestor);
     }
 
     @SuppressWarnings("unchecked")
-    public S getOriginService() {
-        return (S) super.getDelegate();
+    public Service getOriginService() {
+        return (Service) super.getDelegate();
     }
 
-    public UriKeyTransformer<K> getUriKeyTransformer() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public M put(URI id, M modelToSave, Model requestor) {
+    public Model put(URI id, Model modelToSave, Model requestor) {
         return getOriginService().get(id, requestor);
     }
 
-    public M remove(URI id, Model requestor) {
+    public Model remove(URI id, Model requestor) {
         return null;
     }
 

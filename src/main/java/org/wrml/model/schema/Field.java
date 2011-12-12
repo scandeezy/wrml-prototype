@@ -54,6 +54,8 @@ public interface Field extends Typed, Named, Titled, Descriptive, Member {
     //     Flags: ReadOnly
     public URI getConstraintsId();
 
+    // TODO: We need to figure out how to represent Object in WRML.
+    // Should it be a PrimitiveType or should we use a "marker" Schema?
     public Object getDefaultValue();
 
     public boolean isHidden();

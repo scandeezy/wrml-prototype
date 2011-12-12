@@ -18,41 +18,43 @@ package org.wrml.service.runtime;
 
 import java.net.URI;
 
+import org.wrml.Context;
 import org.wrml.Model;
 import org.wrml.model.runtime.Prototype;
-import org.wrml.runtime.Context;
+import org.wrml.model.schema.Schema;
+import org.wrml.runtime.RuntimeModel;
 import org.wrml.runtime.RuntimePrototype;
+import org.wrml.runtime.RuntimePrototypeField;
+import org.wrml.runtime.StaticModelProxy;
 import org.wrml.service.AbstractService;
-import org.wrml.service.UriKeyTransformer;
+import org.wrml.util.UriTransformer;
 
-public class PrototypeService extends AbstractService<URI, Prototype> {
+public class PrototypeService extends AbstractService {
 
-    /**
-     * Creates a prototypical instance of the requestor's schema
-     * 
-     * @param id
-     *            the ID of the schema to prototype
-     * @param requestor
-     *            the model requesting its prototypical instance
-     * @return
-     */
-    public Prototype create(URI id, Model requestor) {
-        final Context context = requestor.getContext();
-        final URI prototypeSchemaId = context.getSchemaIdForClass(Prototype.class);
-        final Prototype prototype = new RuntimePrototype(prototypeSchemaId, context, id);
-        return prototype;
+    public PrototypeService(Context context) {
+        super(context);
     }
 
-    public UriKeyTransformer<URI> getUriKeyTransformer() {
+    public Model create(URI id, Model requestor) {
+        final Context context = (requestor != null) ? requestor.getContext() : getContext();
+        final URI schemaId = getContext().getSchemaId(Prototype.class);                        
+        final Model dynamicModel = new RuntimePrototype(schemaId, context, id);
+        //Model staticModel = StaticModelProxy.newProxyInstance(dynamicModel);
+        //return staticModel;
+        return dynamicModel;
+    }
+
+    public UriTransformer getIdTransformer(Model requestor) {
+        return getContext().getService(Schema.class).getIdTransformer(requestor);
+    }
+
+    public Model put(URI id, Model modelToSave, Model requestor) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Prototype put(URI id, Prototype modelToSave, Model requestor) {
-        return null;
-    }
-
-    public Prototype remove(URI id, Model requestor) {
+    public Model remove(URI id, Model requestor) {
+        // TODO Auto-generated method stub
         return null;
     }
 

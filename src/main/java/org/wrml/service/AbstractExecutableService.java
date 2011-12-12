@@ -18,11 +18,15 @@ package org.wrml.service;
 
 import java.net.URI;
 
+import org.wrml.Context;
 import org.wrml.Model;
 import org.wrml.model.resource.Action;
 
-public abstract class AbstractExecutableService<K, M extends Model> extends AbstractService<K, M> implements
-        ExecutableService<K, M> {
+public abstract class AbstractExecutableService extends AbstractService implements ExecutableService {
+
+    public AbstractExecutableService(Context context) {
+        super(context);
+    }
 
     public Model execute(URI id) {
         return execute(id, null, null);

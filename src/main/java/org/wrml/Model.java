@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.wrml.model.runtime.Prototype;
 import org.wrml.model.schema.Schema;
-import org.wrml.runtime.Context;
 import org.wrml.util.Unique;
 
 /**
@@ -63,6 +62,8 @@ public interface Model extends Unique<URI>, Serializable {
 
     public void removeFieldEventListener(String fieldName, FieldEventListener listener);
 
+    public void save();
+
     public void setAllFieldsToDefaultValue();
 
     public void setFieldToDefaultValue(String fieldName);
@@ -70,5 +71,7 @@ public interface Model extends Unique<URI>, Serializable {
     public Object setFieldValue(String fieldName, Object fieldValue);
 
     public void vanish();
+
+    //public URI setId(URI id);
 
 }

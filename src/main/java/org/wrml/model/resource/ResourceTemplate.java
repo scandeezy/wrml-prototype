@@ -20,7 +20,6 @@ import java.net.URI;
 
 import org.wrml.model.Descriptive;
 import org.wrml.model.Versioned;
-import org.wrml.model.runtime.PrototypeField;
 import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
 
@@ -51,7 +50,7 @@ public interface ResourceTemplate extends Versioned, Descriptive, Document {
     //     Flags: ReadOnly
     public URI getChildResourceTemplatesId();
 
-    public ObservableMap<URI, URI> getHereToThereLinkRelationIdToLinkTemplateIdMap();
+    public ObservableMap<URI, URI> getEndPointLinkRelationIdToLinkTemplateIdMap();
 
     public ResourceTemplate getParentResourceTemplate();
 
@@ -67,9 +66,10 @@ public interface ResourceTemplate extends Versioned, Descriptive, Document {
     //     Flags: Required, ReadOnly
     public URI getRestApiTemplateId();
 
-    public ObservableMap<URI, ObservableList<PrototypeField>> getSchemaFieldDefaultsMap();
+    // TODO: The (half-baked) idea here was to allow resource tree nodes to override model defaults...
+    // public ObservableMap<URI, ObservableList<PrototypeField>> getSchemaFieldDefaultsMap();
 
-    public ObservableList<URI> getThereToHereLinkTemplateIds();
+    public ObservableList<URI> getStartingPointLinkTemplateIds();
 
     public URI setParentResourceTemplateId(URI parentResourceTemplateId);
 
