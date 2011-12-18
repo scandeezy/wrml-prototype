@@ -20,12 +20,9 @@ import java.net.URI;
 
 import org.wrml.Context;
 import org.wrml.Model;
+import org.wrml.RuntimePrototype;
 import org.wrml.model.runtime.Prototype;
 import org.wrml.model.schema.Schema;
-import org.wrml.runtime.RuntimeModel;
-import org.wrml.runtime.RuntimePrototype;
-import org.wrml.runtime.RuntimePrototypeField;
-import org.wrml.runtime.StaticModelProxy;
 import org.wrml.service.AbstractService;
 import org.wrml.util.UriTransformer;
 
@@ -36,16 +33,12 @@ public class PrototypeService extends AbstractService {
     }
 
     public Model create(URI id, Model requestor) {
-        final Context context = (requestor != null) ? requestor.getContext() : getContext();
-        final URI schemaId = getContext().getSchemaId(Prototype.class);                        
-        final Model dynamicModel = new RuntimePrototype(schemaId, context, id);
-        //Model staticModel = StaticModelProxy.newProxyInstance(dynamicModel);
-        //return staticModel;
-        return dynamicModel;
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    public UriTransformer getIdTransformer(Model requestor) {
-        return getContext().getService(Schema.class).getIdTransformer(requestor);
+    public UriTransformer getIdTransformer() {
+        return getContext().getService(Schema.class).getIdTransformer();
     }
 
     public Model put(URI id, Model modelToSave, Model requestor) {
@@ -56,6 +49,14 @@ public class PrototypeService extends AbstractService {
     public Model remove(URI id, Model requestor) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public Model get(URI modelId, Model requestor) {
+        final Context context = (requestor != null) ? requestor.getContext() : getContext();
+        final URI schemaId = getContext().getSchemaId(Prototype.class);
+        final Model dynamicModel = new RuntimePrototype(schemaId, context, modelId);
+        Model staticModel = context.instantiateStaticModel(dynamicModel);
+        return staticModel;
     }
 
 }

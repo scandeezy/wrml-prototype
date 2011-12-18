@@ -21,4 +21,5 @@ import org.wrml.Model;
 // Generated from a Web Resource Schema
 public interface DocumentMetadata extends Model {
 
+    // MSMTODO: Design this Model
 }

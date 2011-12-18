@@ -24,6 +24,8 @@ import org.wrml.util.ObservableMap;
 
 public class ServiceEvent<M extends Model> extends MapEvent<URI, M> {
 
+    private static final long serialVersionUID = 6956353992776164917L;
+
     public ServiceEvent(ObservableMap<URI, M> map, boolean cancelable) {
         super(map, cancelable);
         // TODO Auto-generated constructor stub

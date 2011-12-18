@@ -19,8 +19,6 @@ package org.wrml.service.runtime;
 import java.net.URI;
 
 import org.wrml.Context;
-import org.wrml.Model;
-import org.wrml.model.schema.Schema;
 import org.wrml.service.ProxyService;
 import org.wrml.service.Service;
 import org.wrml.util.UriTransformer;
@@ -39,9 +37,9 @@ public class SystemSchemaService extends ProxyService implements SchemaService {
     }
 
     @Override
-    public UriTransformer getIdTransformer(Model requestor) {
+    public final UriTransformer getIdTransformer() {
         if (_UriTransformer == null) {
-            _UriTransformer = new SchemaClassNameUriTransformer(DEFAULT_SCHEMA_API_DOCROOT);
+            _UriTransformer = createIdTransformer();
         }
         return _UriTransformer;
     }
@@ -51,10 +49,8 @@ public class SystemSchemaService extends ProxyService implements SchemaService {
         return getClass().getClassLoader();
     }
 
-    public Model create(URI id, Model requestor) {
-        final Context context = (requestor != null) ? requestor.getContext() : getContext();
-        final URI schemaId = context.getSchemaId(Schema.class);
-        final Model model = context.createModel(schemaId, id, requestor);
-        return model;
+    protected UriTransformer createIdTransformer() {
+        return new SchemaClassNameUriTransformer(DEFAULT_SCHEMA_API_DOCROOT);
     }
+
 }

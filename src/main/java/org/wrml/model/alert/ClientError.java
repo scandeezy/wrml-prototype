@@ -14,11 +14,8 @@
  * limitations under the License.
  */
 
-package org.wrml.model.resource;
+package org.wrml.model.alert;
 
-import org.wrml.Model;
+public interface ClientError extends Error {
 
-// Generated from a Web Resource Schema
-public interface DocumentOptions extends Model {
-    // MSMTODO: Design this Model
 }

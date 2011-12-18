@@ -14,23 +14,46 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime;
+package org.wrml;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
-import org.wrml.Context;
-import org.wrml.Model;
-import org.wrml.model.runtime.Prototype;
-import org.wrml.model.schema.Schema;
 import org.wrml.util.DelegatingInvocationHandler;
 
-public final class StaticModelProxy {
+class StaticModelProxy {
 
+    public final static Model newProxyInstance(Model dynamicModel) {
+        
+        URI schemaId = dynamicModel.getSchemaId();
+        Context context = dynamicModel.getContext();
+                
+        String className = context.getClassName(schemaId);
+        System.out.println("Loading schema class: " + className);
+        ClassLoader schemaInterfaceLoader = context.getSchemaService().getSchemaInterfaceLoader();
+        Class<?> schemaInterface = null;
+        try {
+            
+            schemaInterface = schemaInterfaceLoader.loadClass(className);
+        }
+        catch (Throwable t) {
+            // TODO Auto-generated catch block
+            t.printStackTrace();
+        }
+        
+        Class<?>[] schemaInterfaceArray = new Class<?>[] { schemaInterface };
+        StaticModelHandler invocationHandler = new StaticModelHandler(dynamicModel);
+        return (Model) Proxy.newProxyInstance(schemaInterfaceLoader, schemaInterfaceArray, invocationHandler);
+    }
+    
+    
+    
+   /* 
+    * TODO: This approach adds all base schema interfaces. Only need to add the model's actual schema interface, since the interface inheritance should cover the rest. 
+    */
+    
+    /*
     public final static Model newProxyInstance(Model dynamicModel) {
 
         URI schemaId = dynamicModel.getSchemaId();
@@ -76,7 +99,8 @@ public final class StaticModelProxy {
             schemaInterfaces.add(schemaInterface);
         }
     }
-
+*/
+    
     private static class StaticModelHandler extends DelegatingInvocationHandler {
 
         public StaticModelHandler(Model dyanmicModel) {
@@ -111,6 +135,10 @@ public final class StaticModelProxy {
 
             if (fieldName != null) {
                 fieldName = Character.toLowerCase(fieldName.charAt(0)) + fieldName.substring(1);
+                                            
+                
+                // TODO: Refactor this to Handle booleans (see how ReadOnly is done in RuntimeModel)
+                
                 fieldValue = getDyanmicModel().getFieldValue(fieldName);
                 if (fieldValue != null) {
                     return fieldValue;
@@ -132,6 +160,9 @@ public final class StaticModelProxy {
             return null;
         }
 
+        
+        
+        
     }
 
 }

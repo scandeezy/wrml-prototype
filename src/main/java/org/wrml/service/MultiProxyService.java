@@ -65,4 +65,9 @@ public class MultiProxyService extends AbstractService implements DelegatingServ
         return null;
     }
 
+    public Model get(URI id, Model requestor) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

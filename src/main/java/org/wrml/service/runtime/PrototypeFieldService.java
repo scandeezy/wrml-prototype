@@ -20,11 +20,8 @@ import java.net.URI;
 
 import org.wrml.Context;
 import org.wrml.Model;
-import org.wrml.model.runtime.Prototype;
+import org.wrml.RuntimePrototypeField;
 import org.wrml.model.runtime.PrototypeField;
-import org.wrml.runtime.RuntimePrototype;
-import org.wrml.runtime.RuntimePrototypeField;
-import org.wrml.runtime.StaticModelProxy;
 import org.wrml.service.AbstractService;
 import org.wrml.util.UriTransformer;
 
@@ -37,46 +34,57 @@ public class PrototypeFieldService extends AbstractService {
     }
 
     public Model create(URI id, Model requestor) {
-        final UriTransformer uriTransformer = getIdTransformer(requestor);
-        final String fieldName = (String) uriTransformer.aToB(id);
-
-        final Context context = (requestor != null) ? requestor.getContext() : getContext();
-
-        final URI schemaId = getContext().getSchemaId(Prototype.class);
-
-        final Model dynamicModel = new RuntimePrototypeField(schemaId, context, fieldName);
-        //Model staticModel = StaticModelProxy.newProxyInstance(dynamicModel);
-        //return staticModel;
-        return dynamicModel;
-
+        return null;
     }
 
-    public UriTransformer getIdTransformer(Model requestor) {
+    @Override
+    public final UriTransformer getIdTransformer() {
         if (_UriTransformer == null) {
-            _UriTransformer = new FieldNameIdTransformer();
+            _UriTransformer = createIdTransformer();
         }
         return _UriTransformer;
     }
 
-    public Model put(URI id, Model modelToSave, Model requestor) {
-        return null;
-    }
-
-    public Model remove(URI id, Model requestor) {
-        return null;
+    protected UriTransformer createIdTransformer() {
+        return new FieldNameIdTransformer();
     }
 
     // TODO: Replace this with UriTemplate and a SchemaFieldParameter["fieldName"]
     private static class FieldNameIdTransformer implements UriTransformer {
 
         public Object aToB(URI aValue) {
+            // TODO: Implement
             return null;
         }
 
         public URI bToA(Object bValue) {
+            // TODO: Implement
             return null;
         }
 
+    }
+
+    public Model get(URI modelId, Model requestor) {
+
+        final Context context = (requestor != null) ? requestor.getContext() : getContext();
+
+        final UriTransformer uriTransformer = getIdTransformer();
+        final String fieldName = (String) uriTransformer.aToB(modelId);
+
+        final URI schemaId = getContext().getSchemaId(PrototypeField.class);
+        final Model dynamicModel = new RuntimePrototypeField(schemaId, context, fieldName);
+        Model staticModel = context.instantiateStaticModel(dynamicModel);
+        return staticModel;
+    }
+
+    public Model put(URI modelId, Model modelToSave, Model requestor) {
+        // TODO Not supported. Throw an exception
+        return null;
+    }
+
+    public Model remove(URI modelId, Model requestor) {
+        // TODO Not supported. Throw an exception
+        return null;
     }
 
 }

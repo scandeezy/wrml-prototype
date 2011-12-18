@@ -54,6 +54,8 @@ public interface Model extends Unique<URI>, Serializable {
 
     public URI getSchemaId();
 
+    public boolean setReadOnly(boolean readOnly);
+
     public boolean isReadOnly();
 
     public void refresh(boolean atomic);

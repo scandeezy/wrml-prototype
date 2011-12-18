@@ -17,13 +17,22 @@
 package org.wrml;
 
 import java.net.URI;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.wrml.model.runtime.Prototype;
+import org.wrml.model.runtime.PrototypeField;
 import org.wrml.model.schema.Schema;
 import org.wrml.service.CachingService;
 import org.wrml.service.Service;
+import org.wrml.service.WebClient;
+import org.wrml.service.runtime.PrototypeFieldService;
+import org.wrml.service.runtime.PrototypeService;
 import org.wrml.service.runtime.SchemaService;
+import org.wrml.service.runtime.SystemSchemaService;
+import org.wrml.util.DelegatingObservableMap;
 import org.wrml.util.ObservableMap;
+import org.wrml.util.UriTransformer;
 
 /**
  * 
@@ -101,38 +110,117 @@ import org.wrml.util.ObservableMap;
  * This Proxy approach may prove to be the final solution or we may decide
  * to auto-generate impl classes via our own code generation.
  */
-public interface Context {
+public class Context {
 
-    public Model createModel(URI schemaId);
+    private final ObservableMap<URI, Service> _ServiceMap;
+    private PrototypeService _PrototypeService;
+    private CachingService _PrototypeCachingService;
 
-    public Model createModel(URI schemaId, URI modelId);
+    private SchemaService _SchemaService;
+    private CachingService _SchemaCachingService;
 
-    public Model createModel(URI schemaId, URI modelId, Model requestor);
+    public Context() {
+        _ServiceMap = new DelegatingObservableMap<URI, Service>(new HashMap<URI, Service>());
+        SchemaService schemaService = new SystemSchemaService(this, new WebClient(this));
+        setSchemaService(schemaService);
+    }
+            
+    public Model instantiateDynamicModel(Class<?> schemaClass, URI modelId, Model requestor) {
+        final Context context = (requestor != null) ? requestor.getContext() : this;
+        final URI schemaId = context.getSchemaId(schemaClass);
+        return instantiateDynamicModel(schemaId, modelId, requestor);
+    }
 
-    public String getClassName(URI schemaId);
+    public Model instantiateDynamicModel(URI schemaId, URI modelId, Model requestor) {
+        final Context context = (requestor != null) ? requestor.getContext() : this;
+        RuntimeModel dynamicModel = new RuntimeModel(schemaId, context, modelId);
+        return dynamicModel;
+    }
 
-    public Model getModel(Class<?> clazz, URI modelId);
+    public Model instantiateStaticModel(Class<?> schemaClass, URI modelId, Model requestor) {
+        Model dynamicModel = instantiateDynamicModel(schemaClass, modelId, requestor);
+        return instantiateStaticModel(dynamicModel);
+    }
 
-    public Model getModel(Class<?> clazz, URI modelId, Model requestor);
+    public Model instantiateStaticModel(Model dynamicModel) {
+        Model staticModel = StaticModelProxy.newProxyInstance(dynamicModel);
+        return staticModel;
+    }
 
-    public Prototype getPrototype(URI schemaId);
+    public String getClassName(URI schemaId) {
+        UriTransformer schemaIdTransformer = _SchemaService.getIdTransformer();
+        return (String) schemaIdTransformer.aToB(schemaId);
+    }
 
-    public Schema getSchema(URI schemaId);
+    public Prototype getPrototype(URI schemaId) {
+        return (Prototype) _PrototypeCachingService.get(schemaId);
+    }
 
-    public URI getSchemaId(Class<?> clazz);
+    public Schema getSchema(URI schemaId) {
+        return (Schema) _SchemaCachingService.get(schemaId);
+    }
 
-    public URI getSchemaId(String className);
+    public URI getSchemaId(Class<?> clazz) {
+        return getSchemaId(clazz.getCanonicalName());
+    }
 
-    public SchemaService getSchemaService();
+    public URI getSchemaId(String className) {
+        UriTransformer schemaIdTransformer = _SchemaService.getIdTransformer();
+        return schemaIdTransformer.bToA(className);
+    }
 
-    public Service getService(Class<?> clazz);
+    public SchemaService getSchemaService() {
+        return _SchemaService;
+    }
 
-    public Service getService(String className);
+    public Service getService(Class<?> clazz) {
+        URI schemaId = getSchemaId(clazz);
+        return getService(schemaId);
+    }
 
-    public Service getService(URI schemaId);
+    public Service getService(String className) {
+        URI schemaId = getSchemaId(className);
+        return getService(schemaId);
+    }
 
-    public ObservableMap<URI, Service> getServiceMap();
+    public Service getService(URI schemaId) {
+        
+        /*
+         * TODO: Allow for more complex mapping of schemas to services
+         * For example, allow for a base schema to be registered for
+         * sub-services or a uri pattern match.
+         */
 
-    public CachingService createCachingService(Service originService);
+        return _ServiceMap.get(schemaId);
+    }
+
+    public void setSchemaService(SchemaService schemaService) {
+
+        _SchemaService = schemaService;
+        _PrototypeService = new PrototypeService(this);
+        final Service prototypeFieldService = new PrototypeFieldService(this);
+
+        _SchemaCachingService = instantiateCachingService(schemaService);
+        _PrototypeCachingService = instantiateCachingService(_PrototypeService);
+        final CachingService prototypeFieldCachingService = instantiateCachingService(prototypeFieldService);
+
+        URI schemaSchemaId = getSchemaId(Schema.class);
+        URI prototypeSchemaId = getSchemaId(Prototype.class);
+        URI prototypeFieldSchemaId = getSchemaId(PrototypeField.class);
+
+        _ServiceMap.put(schemaSchemaId, _SchemaCachingService);
+        _ServiceMap.put(prototypeSchemaId, _PrototypeCachingService);
+        _ServiceMap.put(prototypeFieldSchemaId, prototypeFieldCachingService);
+    }
+
+    public CachingService instantiateCachingService(Service originService) {
+        final Map<URI, Model> rawModelMap = new HashMap<URI, Model>();
+        final ObservableMap<URI, Model> observableModelCache = new DelegatingObservableMap<URI, Model>(rawModelMap);
+        return new CachingService(this, originService, observableModelCache);
+    }
+
+    public ObservableMap<URI, Service> getServiceMap() {
+        return _ServiceMap;
+    }
 
 }

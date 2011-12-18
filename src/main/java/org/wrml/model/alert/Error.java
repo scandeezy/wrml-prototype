@@ -14,11 +14,12 @@
  * limitations under the License.
  */
 
-package org.wrml.model.resource;
+package org.wrml.model.alert;
 
-import org.wrml.Model;
+public interface Error extends Alert {
 
-// Generated from a Web Resource Schema
-public interface DocumentOptions extends Model {
-    // MSMTODO: Design this Model
+    public String getCode();
+
+    public String getTrace();
+
 }

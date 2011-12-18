@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime;
+package org.wrml;
 
 import java.net.URI;
 
-import org.wrml.Context;
 import org.wrml.model.runtime.PrototypeField;
 
-public class RuntimePrototypeField extends RuntimeModel implements PrototypeField {
+public final class RuntimePrototypeField extends RuntimeModel implements PrototypeField {
 
     private static final long serialVersionUID = -5771927546979489208L;
 

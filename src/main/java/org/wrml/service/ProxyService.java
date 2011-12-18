@@ -21,7 +21,6 @@ import java.util.Map;
 
 import org.wrml.Context;
 import org.wrml.Model;
-import org.wrml.model.resource.Action;
 import org.wrml.util.DelegatingObservableMap;
 import org.wrml.util.UriTransformer;
 
@@ -40,68 +39,40 @@ public class ProxyService extends DelegatingObservableMap<URI, Model> implements
         return _Context;
     }
 
-    public Model create() {
-        return getOriginService().create();
-    }
-
-    public Model create(Model requestor) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Model create(URI id) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Model create(URI id, Model requestor) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Model execute(URI id) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Model execute(URI id, Action action) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Model execute(URI id, Action action, Model requestor) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Model execute(URI id, Model requestor) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Model get(URI id, Model requestor) {
-        return getOriginService().get(id, requestor);
-    }
-
     public UriTransformer getIdTransformer() {
-        return getOriginService().getIdTransformer(null);
+        return getOriginService().getIdTransformer();
     }
 
-    public UriTransformer getIdTransformer(Model requestor) {
-        return getOriginService().getIdTransformer(requestor);
-    }
-
-    @SuppressWarnings("unchecked")
     public Service getOriginService() {
         return (Service) super.getDelegate();
     }
 
-    public Model put(URI id, Model modelToSave, Model requestor) {
-        return getOriginService().get(id, requestor);
+    public Model create(Model requestor) {
+        return getOriginService().create(requestor);
     }
 
-    public Model remove(URI id, Model requestor) {
-        return null;
+    public Model create(URI modelId, Model requestor) {
+        return getOriginService().create(modelId, requestor);
+    }
+
+    public Model get(URI modelId, Model requestor) {
+        return getOriginService().get(modelId, requestor);
+    }
+
+    public Model put(URI modelId, Model modelToSave, Model requestor) {
+        return getOriginService().put(modelId, modelToSave, requestor);
+    }
+
+    public Model remove(URI modelId, Model requestor) {
+        return getOriginService().remove(modelId, requestor);
+    }
+
+    public Model create() {
+        return getOriginService().create();
+    }
+
+    public Model create(URI id) {
+        return getOriginService().create(id);
     }
 
 }

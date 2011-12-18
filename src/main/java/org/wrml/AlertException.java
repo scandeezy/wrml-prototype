@@ -14,18 +14,22 @@
  * limitations under the License.
  */
 
-package org.wrml.util;
+package org.wrml;
 
-import java.net.URI;
+import org.wrml.model.alert.Alert;
 
-public class PassthroughUriTransformer implements UriTransformer {
+public class AlertException extends RuntimeException {
 
-    public Object aToB(URI aValue) {
-        return aValue;
+    private static final long serialVersionUID = -4887032027932971775L;
+
+    private final Alert _Alert;
+
+    public AlertException(Alert alert) {
+        _Alert = alert;
     }
 
-    public URI bToA(Object bValue) {
-        return (URI) bValue;
+    public Alert getAlert() {
+        return _Alert;
     }
 
 }

@@ -53,4 +53,8 @@ public final class FieldEvent extends CancelableEvent {
         _ConstraintEvent = constraintEvent;
     }
 
+    public Model getSourceModel() {
+        return (Model) getSource();
+    }
+
 }

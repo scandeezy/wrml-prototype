@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime;
+package org.wrml;
 
 import java.net.URI;
 import java.util.HashMap;
@@ -23,12 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.wrml.Context;
-import org.wrml.FieldEvent;
-import org.wrml.FieldEventListener;
-import org.wrml.Link;
-import org.wrml.Model;
-import org.wrml.ModelEventListener;
 import org.wrml.model.runtime.Prototype;
 import org.wrml.model.runtime.PrototypeField;
 import org.wrml.model.schema.Schema;
@@ -307,14 +301,18 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
     private transient FieldMapEventListener _FieldMapEventListener;
 
     public RuntimeModel(URI schemaId, Context context) {
-        this(schemaId, context, null);
+        this(schemaId, context, null, null);
     }
 
-    public RuntimeModel(URI schemaId, Context context, List<URI> embeddedLinkRelationIds) {
+    public RuntimeModel(URI schemaId, Context context, URI id) {
+        this(schemaId, context, id, null);
+    }
+
+    public RuntimeModel(URI schemaId, Context context, URI id, List<URI> embeddedLinkRelationIds) {
         _SchemaId = schemaId;
         _Context = context;
         _EmbeddedLinkRelationIds = embeddedLinkRelationIds;
-
+        setId(id);
         init();
     }
 
@@ -381,7 +379,7 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         }
 
         final Service myService = getMyService();
-        final UriTransformer transformer = myService.getIdTransformer(this);
+        final UriTransformer transformer = myService.getIdTransformer();
         return transformer.aToB(id);
     }
 
@@ -467,7 +465,7 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
     }
 
     public final boolean isReadOnly() {
-        return ((Boolean) getFieldValue(READ_ONLY_FIELD_NAME)).booleanValue();
+        return getBooleanFieldValue(READ_ONLY_FIELD_NAME);
     }
 
     public void refresh(boolean atomic) {
@@ -530,6 +528,16 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         }
     }
 
+    public final void setFieldToDefaultValue(String fieldName) {
+
+        final Prototype prototype = getPrototype();
+        final Map<String, PrototypeField> prototypeFields = prototype.getPrototypeFields();
+
+        if ((prototypeFields != null) && prototypeFields.containsKey(fieldName)) {
+            setFieldValue(fieldName, prototypeFields.get(fieldName).getDefaultValue());
+        }
+    }
+
     // TODO: Add public clickLink methods to the Model interface
 
     /*
@@ -562,16 +570,6 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
      * requestMediaType) { return link.click(requestModel, requestMediaType); }
      */
 
-    public final void setFieldToDefaultValue(String fieldName) {
-
-        final Prototype prototype = getPrototype();
-        final Map<String, PrototypeField> prototypeFields = prototype.getPrototypeFields();
-
-        if ((prototypeFields != null) && prototypeFields.containsKey(fieldName)) {
-            setFieldValue(fieldName, prototypeFields.get(fieldName).getDefaultValue());
-        }
-    }
-
     public final Object setFieldValue(String fieldName, Object fieldValue) {
 
         if (_FieldMap == null) {
@@ -586,6 +584,10 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         return (URI) setFieldValue(ID_FIELD_NAME, id);
     }
 
+    public final boolean setReadOnly(boolean readOnly) {
+        return setBooleanFieldValue(READ_ONLY_FIELD_NAME, readOnly);
+    }
+
     // Vanish means that the model is gone but may not be deleted
     public void vanish() {
         // TODO: Fire an event about vanishing
@@ -596,12 +598,34 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
         // vanish event notification?
     }
 
+    protected final boolean getBooleanFieldValue(String fieldName) {
+        Boolean booleanFieldValue = (Boolean) getFieldValue(fieldName);
+        return (booleanFieldValue != null) ? booleanFieldValue.booleanValue() : false;
+    }
+
     protected final ObservableMap<String, Object> getFieldMap() {
         return _FieldMap;
     }
 
     protected final ObservableMap<URI, Link> getLinkMap() {
         return _LinkMap;
+    }
+
+    /**
+     * Called to initialize the Model.
+     */
+    protected void init() {
+        setAllFieldsToDefaultValue();
+    }
+
+    protected final boolean setBooleanFieldValue(String fieldName, boolean fieldValue) {
+        boolean oldValue = getBooleanFieldValue(fieldName);
+        if (fieldValue != oldValue) {
+            setFieldValue(fieldName, (fieldValue ? Boolean.TRUE : Boolean.FALSE));
+        }
+
+        return oldValue;
+
     }
 
     private void fireConstraintViolated(final FieldEvent event) {
@@ -639,13 +663,6 @@ public class RuntimeModel extends Identifiable<URI> implements Model {
 
             fieldEventListener.valueInitialized(event);
         }
-    }
-
-    /**
-     * Called to initialize the Model.
-     */
-    protected void init() {
-        setAllFieldsToDefaultValue();
     }
 
     private void initFieldMap() {

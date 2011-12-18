@@ -16,20 +16,13 @@
 
 package org.wrml.proto.schema;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-
-import org.junit.Ignore;
-import org.junit.Test;
-
-import org.wrml.model.schema.Schema;
 
 /**
  * Tests for the behavior of SchemaLoader
  */
 public class SchemaLoaderTest {
 
+    /*
     @Ignore("ObservableMap needs an implementation. (This is no longer a unit test.)")
     @Test
     public void shouldLoadSimpleSchema() {
@@ -39,4 +32,5 @@ public class SchemaLoaderTest {
 
         assertThat("example schema field", schema.getFields().get("example"), is(notNullValue()));
     }
+    */
 }

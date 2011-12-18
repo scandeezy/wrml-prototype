@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.wrml.Context;
 import org.wrml.Model;
-import org.wrml.runtime.RuntimeModel;
 import org.wrml.util.UriTransformer;
 
 /**
@@ -72,11 +71,7 @@ public abstract class AbstractService implements Service {
     }
 
     public Model get(Object key) {
-        return create((URI) key);
-    }
-
-    public Model get(URI id, Model requestor) {
-        return create(id, requestor);
+        return get((URI) key, null);
     }
 
     public final Context getContext() {
@@ -112,7 +107,7 @@ public abstract class AbstractService implements Service {
     }
 
     public UriTransformer getIdTransformer() {
-        return getIdTransformer(null);
+        return getIdTransformer();
     }
 
 }

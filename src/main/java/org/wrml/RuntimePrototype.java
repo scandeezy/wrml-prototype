@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime;
+package org.wrml;
 
 import java.net.URI;
 import java.util.ArrayList;
@@ -28,7 +28,6 @@ import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.wrml.Context;
 import org.wrml.model.resource.Collection;
 import org.wrml.model.runtime.Prototype;
 import org.wrml.model.runtime.PrototypeField;
@@ -47,24 +46,25 @@ import org.wrml.util.UriTransformer;
  * wishes to remote prototypes then this class will need to be refactored
  * somehow.
  */
-public class RuntimePrototype extends RuntimeModel implements Prototype {
+public final class RuntimePrototype extends RuntimeModel implements Prototype {
 
     private static final long serialVersionUID = 918319903519537474L;
 
+    
     /*
      * TODO: Should the Java code generation framework just auto generate a
      * separate
      * "FieldNames" enum for each Schema - with the enum constants being the
      * field names.
      */
-
+    
     // TODO: Make this an enum?
     public static final String ALL_BASE_SCHEMAS_FIELD_NAME = "allBaseSchemas";
     public static final String PROTOTYPE_FIELDS_FIELD_NAME = "prototypeFields";
-
+    
+    
     public RuntimePrototype(URI schemaId, Context context, URI id) {
-        super(schemaId, context);
-        setFieldValue(RuntimeModel.ID_FIELD_NAME, id);
+        super(schemaId, context, id);
     }
 
     /**
@@ -327,16 +327,15 @@ public class RuntimePrototype extends RuntimeModel implements Prototype {
 
     private void initPrototypeFields(final URI schemaId, final SortedMap<String, PrototypeField> allYourFields) {
 
-        @SuppressWarnings("unchecked")
         final Service prototypeFieldService = getContext().getService(PrototypeField.class);
-        final UriTransformer uriTransformer = prototypeFieldService.getIdTransformer(this);
+        final UriTransformer uriTransformer = prototypeFieldService.getIdTransformer();
         final Schema schema = getContext().getSchema(schemaId);
-        
+
         if (schema == null) {
             System.out.println("Schema is null: " + schemaId);
             return;
         }
-        
+
         final Map<String, Field> fields = schema.getFields();
 
         for (final String fieldName : fields.keySet()) {

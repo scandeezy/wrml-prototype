@@ -19,7 +19,6 @@ package org.wrml;
 import java.net.URI;
 
 import org.wrml.model.Titled;
-import org.wrml.runtime.RuntimeContext;
 import org.wrml.service.AbstractService;
 import org.wrml.service.Service;
 import org.wrml.util.UriTransformer;
@@ -34,16 +33,20 @@ public class App {
         String title = "Greetings Program!";
         System.out.println("Introduction Title: " + title);
 
-        Context context = new RuntimeContext();
+        Context context = new Context();
 
-        final URI titledSchemaId = context.getSchemaId(Titled.class);
+        Class<?> titledClass = Titled.class;
 
-        Service titledService = context.createCachingService(new TitledService(context));
+        final URI titledSchemaId = context.getSchemaId(titledClass);
+
+        Service titledService = context.instantiateCachingService(new TitledService(context));
         context.getServiceMap().put(titledSchemaId, titledService);
 
-        URI modelId = URI.create("http://api.example.wrml.org/titles/1234");
-        Class<?> modelClass = Titled.class;
-        Model dynamicModel = context.getModel(modelClass, modelId, null);
+        URI modelId = URI.create("http://localhost/titles/1234");
+
+        Service fetchedTitleService = context.getService(titledClass);
+        Model dynamicModel = fetchedTitleService.create(modelId, null);
+
         dynamicModel.setFieldValue("title", title);
 
         System.out.println("Dynamic Title: " + dynamicModel.getFieldValue("title"));
@@ -51,6 +54,8 @@ public class App {
         Titled staticModel = (Titled) dynamicModel;
 
         System.out.println("Static Title: " + staticModel.getTitle());
+        System.out.println("Static Id: " + staticModel.getId());
+        System.out.println("Static ReadOnly: " + staticModel.isReadOnly());        
     }
 
     private static class TitledService extends AbstractService {
@@ -59,14 +64,13 @@ public class App {
             super(context);
         }
 
-        public Model create(URI id, Model requestor) {
-            final Context context = (requestor != null) ? requestor.getContext() : getContext();
-            final URI schemaId = context.getSchemaId(Titled.class);
-            final Model model = context.createModel(schemaId, id, requestor);
+        public Model create(URI modelId, Model requestor) {
+            final Titled model = (Titled) getContext().instantiateStaticModel(Titled.class, modelId, requestor);
+            model.setReadOnly(true);
             return model;
         }
 
-        public UriTransformer getIdTransformer(Model requestor) {
+        public UriTransformer getIdTransformer() {
             // TODO Auto-generated method stub
             return null;
         }
@@ -77,6 +81,11 @@ public class App {
         }
 
         public Model remove(URI id, Model requestor) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public Model get(URI id, Model requestor) {
             // TODO Auto-generated method stub
             return null;
         }

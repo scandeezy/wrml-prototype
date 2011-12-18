@@ -35,18 +35,18 @@ import org.wrml.util.UriTransformer;
 public interface Service extends Factory<URI, Model>, Map<URI, Model> {
 
     public Context getContext();
-    
+
     public Model create(Model requestor);
 
-    public Model create(URI id, Model requestor);
+    public Model create(URI modelId, Model requestor);
 
-    public Model get(URI id, Model requestor);
+    public Model get(URI modelId, Model requestor);
 
-    public UriTransformer getIdTransformer(Model requestor);
+    public UriTransformer getIdTransformer();
 
-    public Model put(URI id, Model modelToSave, Model requestor);
+    public Model put(URI modelId, Model modelToSave, Model requestor);
 
-    public Model remove(URI id, Model requestor);
+    public Model remove(URI modelId, Model requestor);
 
     // TODO: Support non-model input/output with I/O Streams?
 
