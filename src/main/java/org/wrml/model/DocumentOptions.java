@@ -14,29 +14,11 @@
  * limitations under the License.
  */
 
-package org.wrml.model.runtime;
-
-import java.net.URI;
+package org.wrml.model;
 
 import org.wrml.Model;
-import org.wrml.model.schema.Constraint;
-import org.wrml.model.schema.Field;
-import org.wrml.model.schema.Link;
-import org.wrml.model.schema.Schema;
-import org.wrml.util.ObservableMap;
 
-public interface Prototype extends Model {
-
-    public ObservableMap<URI, Schema> getAllBaseSchemas();
-
-    public ObservableMap<URI, Constraint> getConstraints();
-
-    public ObservableMap<String, Field> getFields();
-
-    public ObservableMap<URI, Link> getLinks();
-
-    public URI getBlueprintSchemaId();
-
-    public Schema getBlueprintSchema();
-
+// Generated from a Web Resource Schema
+public interface DocumentOptions extends Model {
+    // MSMTODO: Design this Model
 }

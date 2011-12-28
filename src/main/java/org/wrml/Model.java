@@ -22,7 +22,6 @@ import java.util.List;
 
 import org.wrml.model.runtime.Prototype;
 import org.wrml.model.schema.Schema;
-import org.wrml.util.Unique;
 
 /**
  * The base interface for all web resource schema instances.
@@ -30,15 +29,15 @@ import org.wrml.util.Unique;
  * TODO: Consider refactoring some/all of this interface into a true WRML
  * schema-driven model.
  */
-public interface Model extends Unique<URI>, Serializable {
+public interface Model extends Serializable {
 
     public void addEventListener(ModelEventListener listener);
 
     public void addFieldEventListener(String fieldName, FieldEventListener listener);
 
-    public void become(Model newThis, boolean atomic);
+    public void addLinkEventListener(URI linkRelationId, LinkEventListener listener);
 
-    public void delete();
+    public void extend(boolean atomic, Model modelToExtend, Model... additionalModelsToExtend);
 
     public Context getContext();
 
@@ -46,25 +45,19 @@ public interface Model extends Unique<URI>, Serializable {
 
     public Object getFieldValue(String fieldName);
 
-    public Link getLink(URI linkRelationId);
-
     public Prototype getPrototype();
 
     public Schema getSchema();
 
     public URI getSchemaId();
 
-    public boolean setReadOnly(boolean readOnly);
-
-    public boolean isReadOnly();
-
-    public void refresh(boolean atomic);
+    public Model getStaticInterface();
 
     public void removeEventListener(ModelEventListener listener);
 
     public void removeFieldEventListener(String fieldName, FieldEventListener listener);
 
-    public void save();
+    public void removeLinkEventListener(URI linkRelationId, LinkEventListener listener);
 
     public void setAllFieldsToDefaultValue();
 
@@ -72,8 +65,9 @@ public interface Model extends Unique<URI>, Serializable {
 
     public Object setFieldValue(String fieldName, Object fieldValue);
 
-    public void vanish();
-
-    //public URI setId(URI id);
+    /**
+     *  Die means that the model is gone but may not be deleted
+     */
+    public void die();
 
 }

@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-package org.wrml.model.resource;
+package org.wrml.model;
 
-import org.wrml.util.ObservableList;
+import java.net.URI;
 
-// Generated from a Web Resource Schema
-public interface Container<T extends Document> extends Document {
+public interface Child<D extends Document> {
 
-    public ObservableList<T> getElements();
+    public D getParent();
 
-    public Container<T> getNext();
+    public URI getParentId();
 
-    public Integer getPageSize();
-
-    public Integer getPageStartIndex();
-
-    public Container<T> getPrevious();
-
-    public int getSize();
-
-    //public T getElement(ObservableList<UriTemplateParameter> params);
+    public URI setParentId(URI parentId);
 }

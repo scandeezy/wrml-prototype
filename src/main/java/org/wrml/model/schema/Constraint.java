@@ -17,12 +17,11 @@
 package org.wrml.model.schema;
 
 import org.wrml.model.Descriptive;
+import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
 import org.wrml.model.Versioned;
-import org.wrml.model.resource.Document;
 import org.wrml.util.ObservableList;
-import org.wrml.util.Validator;
 
 /**
  * A field constraint's metadata and pointers to "executable" Validators.
@@ -40,19 +39,9 @@ public interface Constraint extends Named, Titled, Versioned, Descriptive, Docum
     //     Name: name 
     //     Constraints: TextSyntax - Mixed-Upper Case
 
-    /*
-     * TODO: Note that the getValidators() method may need to be "magically"
-     * generated to enable code-on-demand.
-     * 
-     * WRML's Java framework should have a generalized design for how to
-     * incorporate hooks to non-model (executable) Java code. Everything from
-     * how it is packaged (Jar, Manifest file, etc) and design a REST API-based
-     * exchange hidden behind WRML's Service JAVA API.
-     * 
-     * Possibly need to add some kind of marker to the metadata to indicate that
-     * there is downloadable code and then the interface generation code can
-     * download and inspect the interface (within the Jar) in order to get the
-     * method/type signatures right.
+    /**
+     * Get the (optional) code-on-demand validators
+     * @return
      */
-    public ObservableList<Validator> getValidators();
+    public ObservableList<CodeOnDemand> getValidators();
 }

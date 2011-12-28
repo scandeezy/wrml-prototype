@@ -23,7 +23,7 @@ import org.wrml.Context;
 /*
  * TODO: Create A base Model AggregatorService (http://en.wikipedia.org/wiki/Aggregator)
  */
-public class AggregatorService extends MultiProxyService {
+public abstract class AggregatorService extends MultiProxyService {
 
     public AggregatorService(Context context, List<Service> services) {
         super(context, services);

@@ -14,19 +14,24 @@
  * limitations under the License.
  */
 
-package org.wrml.util;
+package org.wrml.model;
 
-import org.wrml.Model;
-import org.wrml.model.schema.Constraint;
-import org.wrml.model.schema.Field;
-import org.wrml.model.schema.ValidationResult;
+import org.wrml.util.ObservableList;
 
-public interface Validator {
+// Generated from a Web Resource Schema
+public interface Container<D extends Document> extends Document {
 
-    public Constraint getConstraint();
+    public ObservableList<D> getElements();
 
-    public ValidationResult validate(Model model, Field field);
+    public Container<D> getNext();
 
-    public ValidationResult validate(Model model, Field field, Object value);
+    public Integer getPageSize();
 
+    public Integer getPageStartIndex();
+
+    public Container<D> getPrevious();
+
+    public int getSize();
+
+    //public T getElement(ObservableList<UriTemplateParameter> params);
 }

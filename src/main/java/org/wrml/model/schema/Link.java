@@ -14,31 +14,28 @@
  * limitations under the License.
  */
 
-package org.wrml.model.resource;
+package org.wrml.model.schema;
 
-/**
- * Enumeration that captures the resource archetypes.
- */
-//Generated from a Web Resource Schema
-public enum ResourceArchetype {
+import java.net.URI;
 
-    DOCUMENT("Document"),
-    COLLECTION("Collection"),
-    STORE("Store"),
-    ACTION("Action");
+import org.wrml.model.relation.LinkRelation;
 
-    private final String _Title;
+public interface Link extends Member {
 
-    private ResourceArchetype(String title) {
-        _Title = title;
-    }
+    public LinkRelation getLinkRelation();
 
-    public final String getTitle() {
-        return _Title;
-    }
+    public URI getLinkRelationId();
 
-    @Override
-    public String toString() {
-        return getTitle();
-    }
+    /**
+     * 
+     * 
+     * @param stateExpression
+     *            The (optional) boolean expression that can be evaluated to
+     *            determine the state of a link.
+     * @return
+     */
+    public String setStateExpression(String stateExpression);
+
+    public String getStateExpression();
+
 }

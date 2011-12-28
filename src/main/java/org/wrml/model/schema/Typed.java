@@ -14,9 +14,12 @@
  * limitations under the License.
  */
 
-package org.wrml.util;
+package org.wrml.model.schema;
 
-public interface Rooted<R, P extends Rooted<R, ?>> extends Hierarchical<P> {
+import org.wrml.Model;
 
-    public R getRoot();
+//Generated from a Web Resource Schema
+public interface Typed extends Model {
+
+    public Type getType();
 }

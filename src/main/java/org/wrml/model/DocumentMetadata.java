@@ -14,25 +14,12 @@
  * limitations under the License.
  */
 
-package org.wrml.model.runtime;
+package org.wrml.model;
 
 import org.wrml.Model;
 
-/**
- * The default initial values for a schema field.
- * 
- * Note: This is a metadata class - instances should be edited with tools and
- * persisted for reuse.
- * 
- * 
- * @param <T>
- */
 // Generated from a Web Resource Schema
-public interface PrototypeField extends Model {
+public interface DocumentMetadata extends Model {
 
-    public Object getDefaultValue();
-
-    public String getFieldName();
-
-    public Object setDefaultValue(Object defaultValue);
+    // MSMTODO: Design this Model
 }

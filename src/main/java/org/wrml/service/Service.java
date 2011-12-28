@@ -38,15 +38,15 @@ public interface Service extends Factory<URI, Model>, Map<URI, Model> {
 
     public Model create(Model requestor);
 
-    public Model create(URI modelId, Model requestor);
+    public Model create(URI documentId, Model requestor);
 
-    public Model get(URI modelId, Model requestor);
+    public Model get(URI documentId, Model requestor);
 
-    public UriTransformer getIdTransformer();
+    public UriTransformer<?> getIdTransformer();
 
-    public Model put(URI modelId, Model modelToSave, Model requestor);
+    public Model put(URI documentId, Model document, Model requestor);
 
-    public Model remove(URI modelId, Model requestor);
+    public Model remove(URI documentId, Model requestor);
 
     // TODO: Support non-model input/output with I/O Streams?
 

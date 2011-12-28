@@ -14,19 +14,13 @@
  * limitations under the License.
  */
 
-package org.wrml.model.resource;
+package org.wrml;
 
-// Generated from a Web Resource Schema
-public interface Store<T extends Document> extends Container<T> {
+import org.wrml.model.schema.Field;
+import org.wrml.model.schema.FieldValidationResult;
 
-    // Generated from Link
-    //     Relation: save
-    //         Methods: PUT 
-    //         RequestSchema: T
-    //         ResponseSchema: T
-    //     EnabledFormula: id != null && !isReadOnly
-    //     DestinationUriTemplate: {id} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
-    //     Href: <id>
-    public T save(T model);
+public interface FieldValidator {
+    
+    public FieldValidationResult validateFieldValue(Model model, Field field, Object newValue);
+
 }

@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package org.wrml.model.resource;
+package org.wrml.model;
 
 import java.net.URI;
 
 import org.wrml.MediaType;
-import org.wrml.model.UriTemplateParameter;
-import org.wrml.model.Versioned;
 import org.wrml.model.relation.LinkRelation;
 import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
@@ -67,12 +65,12 @@ public interface LinkTemplate extends Versioned, Document {
     // Generated from Link
     //     Relation: restApiTemplate
     //         Methods: GET 
-    //         ResponseSchema: RestApiTemplate
+    //         ResponseSchema: Api
     //     EnabledFormula: restApiTemplateId != null
     //     DestinationUriTemplate: {restApiTemplateId} 
     //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["restApiTemplateId"]]
     //     Href: <restApiTemplateId>
-    public RestApiTemplate getRestApiTemplate();
+    public Api getRestApiTemplate();
 
     // Generated from Field
     //     Name: restApiTemplateId 

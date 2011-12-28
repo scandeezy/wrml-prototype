@@ -28,19 +28,18 @@ import java.util.Queue;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
-import org.wrml.model.resource.Collection;
+import org.wrml.model.Collection;
 import org.wrml.model.runtime.Prototype;
-import org.wrml.model.runtime.PrototypeField;
-import org.wrml.model.runtime.PrototypeLinkFormula;
+import org.wrml.model.schema.Constraint;
 import org.wrml.model.schema.Field;
+import org.wrml.model.schema.Link;
 import org.wrml.model.schema.Schema;
-import org.wrml.service.Service;
 import org.wrml.util.ObservableMap;
 import org.wrml.util.Observables;
-import org.wrml.util.UriTransformer;
 
 /**
- * The runtime instance of the Prototype schema. This model is implemented by
+ * The runtime instance of the RuntimePrototype schema. This model is
+ * implemented by
  * hand, as its core logic is always local to the WRML runtime and thus the
  * framework's lazy loading is not needed. If some future version or language
  * wishes to remote prototypes then this class will need to be refactored
@@ -50,21 +49,22 @@ public final class RuntimePrototype extends RuntimeModel implements Prototype {
 
     private static final long serialVersionUID = 918319903519537474L;
 
-    
     /*
      * TODO: Should the Java code generation framework just auto generate a
      * separate
      * "FieldNames" enum for each Schema - with the enum constants being the
      * field names.
      */
-    
+
     // TODO: Make this an enum?
     public static final String ALL_BASE_SCHEMAS_FIELD_NAME = "allBaseSchemas";
-    public static final String PROTOTYPE_FIELDS_FIELD_NAME = "prototypeFields";
+    public static final String FIELDS_FIELD_NAME = "fields";
+    public static final String BLUEPRINT_SCHEMA_ID_FIELD_NAME = "blueprintSchemaId";
     
-    
-    public RuntimePrototype(URI schemaId, Context context, URI id) {
-        super(schemaId, context, id);
+
+    public RuntimePrototype(URI schemaId, Context context, URI blueprintSchemaId) {
+        super(schemaId, context);
+        setBlueprintSchemaId(blueprintSchemaId);
     }
 
     /**
@@ -98,7 +98,7 @@ public final class RuntimePrototype extends RuntimeModel implements Prototype {
      *             \ /       \ / \ /
      *             [A,   B,   C,  D]
      *               \   |    |  /
-     *            Prototype's  Schema ($)
+     *            RuntimePrototype's  Schema ($)
      * 
      * $ extends A, B, C, D (, Model)
      * A extends E, F (, Model)
@@ -168,10 +168,10 @@ public final class RuntimePrototype extends RuntimeModel implements Prototype {
         final HashMap<URI, URI> enqueuedIds = new HashMap<URI, URI>();
 
         /*
-         * Start by enqueueing our immediate base schemas.
+         * Start by enqueueing our blueprint's immediate base schemas.
          */
-        final URI id = getId();
-        enqueueBaseSchemas(queue, id, enqueuedIds);
+        final URI blueprintSchemaId = getBlueprintSchemaId();
+        enqueueBaseSchemas(queue, blueprintSchemaId, enqueuedIds);
 
         /*
          * Dequeue the first base schema and start the processing loop.
@@ -183,10 +183,10 @@ public final class RuntimePrototype extends RuntimeModel implements Prototype {
 
             /*
              * Check to see if we have already "processed" the base schema and
-             * also double check to make sure that our base is not us - that
-             * would be weird.
+             * also double check to make sure that the base schema is not the
+             * blueprint - that would be weird.
              */
-            if (!allYourBase.containsKey(baseSchemaId) && !id.equals(baseSchemaId)) {
+            if (!allYourBase.containsKey(baseSchemaId) && !blueprintSchemaId.equals(baseSchemaId)) {
 
                 /*
                  * Process the base schema by adding it to our ordered
@@ -210,11 +210,24 @@ public final class RuntimePrototype extends RuntimeModel implements Prototype {
         return (ObservableMap<URI, Schema>) setFieldValue(ALL_BASE_SCHEMAS_FIELD_NAME, allBaseSchemas);
     }
 
-    @SuppressWarnings("unchecked")
-    public ObservableMap<String, PrototypeField> getPrototypeFields() {
+    public Schema getBlueprintSchema() {
+        return getContext().getSchema(getBlueprintSchemaId());
+    }
 
-        ObservableMap<String, PrototypeField> prototypeFields = (ObservableMap<String, PrototypeField>) getFieldValue(PROTOTYPE_FIELDS_FIELD_NAME);
-        if (prototypeFields != null) {
+    public URI getBlueprintSchemaId() {        
+        return (URI) getFieldValue(BLUEPRINT_SCHEMA_ID_FIELD_NAME);
+    }
+
+    public ObservableMap<URI, Constraint> getConstraints() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ObservableMap<String, Field> getFields() {
+
+        ObservableMap<String, Field> fields = (ObservableMap<String, Field>) getFieldValue(FIELDS_FIELD_NAME);
+        if (fields != null) {
 
             /*
              * We have been here before, and we've already done all of
@@ -222,25 +235,25 @@ public final class RuntimePrototype extends RuntimeModel implements Prototype {
              * cached results.
              */
 
-            return prototypeFields;
+            return fields;
         }
 
-        final SortedMap<String, PrototypeField> allYourFields = new TreeMap<String, PrototypeField>();
+        final SortedMap<String, Field> allYourFields = new TreeMap<String, Field>();
 
         final ObservableMap<URI, Schema> allYourBase = getAllBaseSchemas();
         if (allYourBase == null) {
             // We have no base schemas (like "Document").
 
             /*
-             * Need to add just the schema's fields before
+             * Need to add just the blueprint schema's fields before
              * we return here since we want _all_ fields.
              */
 
-            initPrototypeFields(getId(), allYourFields);
+            initFields(getBlueprintSchemaId(), allYourFields);
 
-            prototypeFields = Observables.observableMap(allYourFields);
+            fields = Observables.observableMap(allYourFields);
             // Cache the schema's field prototypes for use by model instances
-            return (ObservableMap<String, PrototypeField>) setFieldValue(PROTOTYPE_FIELDS_FIELD_NAME, prototypeFields);
+            return (ObservableMap<String, Field>) setFieldValue(FIELDS_FIELD_NAME, fields);
         }
 
         /*
@@ -254,25 +267,20 @@ public final class RuntimePrototype extends RuntimeModel implements Prototype {
         Collections.reverse(baseIds);
         for (final URI baseId : baseIds) {
             // Include the base schema fields
-            initPrototypeFields(baseId, allYourFields);
+            initFields(baseId, allYourFields);
         }
 
-        // Include our source schema fields last to achieve 
-        // final locality
-        initPrototypeFields(getId(), allYourFields);
+        // Include our blueprint schema fields last to achieve final locality
+        initFields(getBlueprintSchemaId(), allYourFields);
 
-        prototypeFields = Observables.observableMap(allYourFields);
+        fields = Observables.observableMap(allYourFields);
         // Cache the schema's field prototypes for use by model instances
-        return (ObservableMap<String, PrototypeField>) setFieldValue(PROTOTYPE_FIELDS_FIELD_NAME, prototypeFields);
+        return (ObservableMap<String, Field>) setFieldValue(FIELDS_FIELD_NAME, fields);
     }
 
-    public ObservableMap<URI, PrototypeLinkFormula> getPrototypeLinkFormulas() {
+    public ObservableMap<URI, Link> getLinks() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    public Schema getSourceSchema() {
-        return getContext().getSchema(getId());
     }
 
     /**
@@ -305,15 +313,17 @@ public final class RuntimePrototype extends RuntimeModel implements Prototype {
             return;
         }
 
+        final URI blueprintSchemaId = getBlueprintSchemaId();
+
         for (final Schema baseSchema : baseSchemas) {
 
             final URI baseSchemaId = baseSchema.getId();
 
             /*
              * Double check that we haven't enqueued this base schema yet and
-             * that it isn't our immediate base schema.
+             * that it isn't our blueprint schema.
              */
-            if (!enqueuedIds.containsKey(baseSchemaId) && !getId().equals(baseSchemaId)) {
+            if (!enqueuedIds.containsKey(baseSchemaId) && !blueprintSchemaId.equals(baseSchemaId)) {
 
                 /**
                  * Add the base schema to the queue and mark it as such (in the
@@ -325,11 +335,10 @@ public final class RuntimePrototype extends RuntimeModel implements Prototype {
         }
     }
 
-    private void initPrototypeFields(final URI schemaId, final SortedMap<String, PrototypeField> allYourFields) {
+    private void initFields(final URI schemaId, final SortedMap<String, Field> allYourFields) {
 
-        final Service prototypeFieldService = getContext().getService(PrototypeField.class);
-        final UriTransformer uriTransformer = prototypeFieldService.getIdTransformer();
-        final Schema schema = getContext().getSchema(schemaId);
+        final Context context = getContext();
+        final Schema schema = context.getSchema(schemaId);
 
         if (schema == null) {
             System.out.println("Schema is null: " + schemaId);
@@ -346,10 +355,10 @@ public final class RuntimePrototype extends RuntimeModel implements Prototype {
                 continue;
             }
 
-            PrototypeField prototypeField = allYourFields.get(fieldName);
+            Field prototypeField = allYourFields.get(fieldName);
             if (prototypeField == null) {
-                final URI fieldId = uriTransformer.bToA(fieldName);
-                prototypeField = (PrototypeField) prototypeFieldService.get(fieldId, this);
+                prototypeField = (Field) context.instantiateModel(Field.class, this).getStaticInterface();
+                allYourFields.put(fieldName, prototypeField);
             }
 
             final Object defaultValue = field.getDefaultValue();
@@ -358,7 +367,16 @@ public final class RuntimePrototype extends RuntimeModel implements Prototype {
 
             prototypeField.setDefaultValue(defaultValue);
 
+            // TODO:
+            prototypeField.extend(true, field);
+            
+            
         }
 
     }
+
+    private URI setBlueprintSchemaId(URI blueprintSchemaId) {
+        return (URI) setFieldValue(BLUEPRINT_SCHEMA_ID_FIELD_NAME, blueprintSchemaId);        
+    }
+
 }

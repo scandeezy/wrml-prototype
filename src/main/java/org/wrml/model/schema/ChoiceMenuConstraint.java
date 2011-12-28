@@ -14,8 +14,16 @@
  * limitations under the License.
  */
 
-package org.wrml.model.resource;
+package org.wrml.model.schema;
 
-public interface Action extends Document {
+import java.net.URI;
+
+public interface ChoiceMenuConstraint extends Constraint {
+
+    public ChoiceMenu getMenu();
+
+    public URI getMenuId();
+
+    public URI setMenuId(URI menuId);
 
 }

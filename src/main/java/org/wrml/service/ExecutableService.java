@@ -19,7 +19,7 @@ package org.wrml.service;
 import java.net.URI;
 
 import org.wrml.Model;
-import org.wrml.model.resource.Action;
+import org.wrml.model.Action;
 
 public interface ExecutableService extends Service {
 

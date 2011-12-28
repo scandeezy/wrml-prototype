@@ -23,7 +23,6 @@ import java.util.Set;
 
 import org.wrml.Context;
 import org.wrml.Model;
-import org.wrml.util.UriTransformer;
 
 /**
  * A base service class that provides some helpful reusable implementations of
@@ -86,8 +85,8 @@ public abstract class AbstractService implements Service {
         return null;
     }
 
-    public Model put(URI id, Model modelToSave) {
-        return put(id, modelToSave, null);
+    public Model put(URI documentId, Model document) {
+        return put(documentId, document, null);
     }
 
     public void putAll(Map<? extends URI, ? extends Model> map) {
@@ -104,10 +103,6 @@ public abstract class AbstractService implements Service {
 
     public Collection<Model> values() {
         return null;
-    }
-
-    public UriTransformer getIdTransformer() {
-        return getIdTransformer();
     }
 
 }

@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package org.wrml.model.resource;
+package org.wrml.model.schema;
 
 import org.wrml.Model;
 
 // Generated from a Web Resource Schema
-public interface DocumentOptions extends Model {
-    // MSMTODO: Design this Model
+public interface FieldValidationResult extends Model {
+
+    // TODO: Define interface
+    // success/failure
+    // oldvalue new value
 }

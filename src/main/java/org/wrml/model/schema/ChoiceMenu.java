@@ -17,9 +17,9 @@
 package org.wrml.model.schema;
 
 import org.wrml.model.Descriptive;
+import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Versioned;
-import org.wrml.model.resource.Document;
 import org.wrml.util.ObservableList;
 
 // Generated from a Web Resource Schema
@@ -29,9 +29,10 @@ public interface ChoiceMenu extends Named, Versioned, Descriptive, Document {
     //     Name: name 
     //     Constraints: TextSyntax - Mixed-Upper Case
 
-    public String getDefaultValue();
+    public int getDefaultChoiceIndex();
 
     public ObservableList<String> getItems();
 
-    public String setDefaultValue(String defaultValue);
+    public int setDefaultChoiceIndex(int defaultChoiceIndex);
+    
 }

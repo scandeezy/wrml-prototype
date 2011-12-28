@@ -16,19 +16,16 @@
 
 package org.wrml.service;
 
-import java.net.URI;
 import java.util.List;
 
 import org.wrml.Context;
-import org.wrml.Model;
 import org.wrml.util.DelegatingObservableList;
-import org.wrml.util.UriTransformer;
 
 /**
  * TODO: Make this a useful base class for various types of multiproxies (load
  * balancers, aggregators, and other cluster-oriented operators).
  */
-public class MultiProxyService extends AbstractService implements DelegatingService<List<Service>> {
+public abstract class MultiProxyService extends AbstractService implements DelegatingService<List<Service>> {
 
     private final DelegatingObservableList<Service> _Services;
 
@@ -43,31 +40,6 @@ public class MultiProxyService extends AbstractService implements DelegatingServ
 
     public List<Service> getDelegate() {
         return _Services.getDelegate();
-    }
-
-    public UriTransformer getIdTransformer(Model requestor) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Model put(URI id, Model modelToSave, Model requestor) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Model remove(URI id, Model requestor) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Model create(URI id, Model requestor) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    public Model get(URI id, Model requestor) {
-        // TODO Auto-generated method stub
-        return null;
     }
 
 }

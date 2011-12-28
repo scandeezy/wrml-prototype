@@ -25,9 +25,9 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import org.wrml.Context;
 import org.wrml.Model;
-import org.wrml.model.resource.Action;
-import org.wrml.model.resource.Collection;
-import org.wrml.model.resource.Document;
+import org.wrml.model.Action;
+import org.wrml.model.Collection;
+import org.wrml.model.Document;
 import org.wrml.util.UriTransformer;
 
 /*
@@ -88,16 +88,6 @@ public class WebClient extends AbstractExecutableService {
         return super.create();
     }
 
-    @Override
-    public Model create(URI id) {
-
-        /*
-         * TODO: HTTP POST to a collection
-         */
-
-        return null;
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public Model create(Model requestor) {
@@ -108,6 +98,16 @@ public class WebClient extends AbstractExecutableService {
          */
 
         return create(((Collection<Document>) requestor).getId(), requestor);
+    }
+
+    @Override
+    public Model create(URI id) {
+
+        /*
+         * TODO: HTTP POST to a collection
+         */
+
+        return null;
     }
 
     public Model create(URI id, Model requestor) {
@@ -211,8 +211,7 @@ public class WebClient extends AbstractExecutableService {
         return null;
     }
 
-    public UriTransformer getIdTransformer(Model requestor) {
-
+    public UriTransformer<URI> getIdTransformer() {
         // By default, this service treat's URIs as native identifiers, 
         // therefore we can use a passthrough transformer.
 
@@ -242,13 +241,13 @@ public class WebClient extends AbstractExecutableService {
     }
 
     @Override
-    public Model put(URI id, Model modelToSave) {
+    public Model put(URI documentId, Model document) {
 
         /*
          * TODO: HTTP PUT
          */
 
-        return super.put(id, modelToSave);
+        return super.put(documentId, document);
     }
 
     public Model put(URI id, Model modelToSave, Model requestor) {
@@ -312,16 +311,24 @@ public class WebClient extends AbstractExecutableService {
         super.finalize();
     }
 
-    public static class PassthroughUriTransformer implements UriTransformer {
+    public static class PassthroughUriTransformer implements UriTransformer<URI> {
 
         public static final PassthroughUriTransformer Instance = new PassthroughUriTransformer();
 
-        public Object aToB(URI aValue) {
+        public URI aToB(URI aValue) {
             return aValue;
         }
 
-        public URI bToA(Object bValue) {
-            return (URI) bValue;
+        public URI bToA(URI bValue) {
+            return bValue;
+        }
+
+        public Class<URI> getA() {
+            return URI.class;
+        }
+
+        public Class<URI> getB() {
+            return URI.class;
         }
 
     }

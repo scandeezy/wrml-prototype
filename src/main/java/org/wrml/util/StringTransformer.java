@@ -14,19 +14,8 @@
  * limitations under the License.
  */
 
-package org.wrml.model;
+package org.wrml.util;
 
-import java.net.URI;
+public interface StringTransformer<B> extends Transformer<String, B> {
 
-import org.wrml.Model;
-import org.wrml.model.schema.ChoiceMenu;
-
-// Generated from a Web Resource Schema
-public interface Choice extends Model {
-
-    public ChoiceMenu getMenu();
-
-    public URI getMenuId();
-
-    public String getValue();
 }

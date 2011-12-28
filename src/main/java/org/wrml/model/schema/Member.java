@@ -18,13 +18,13 @@ package org.wrml.model.schema;
 
 import java.net.URI;
 
-import org.wrml.Model;
+import org.wrml.model.Owned;
 
 /**
  * Base class for members of a schema.
  */
 // Generated from a Web Resource Schema
-public interface Member extends Model {
+public interface Member extends Owned<Schema> {
 
     // Generated from Link
     //     Relation: declaredSchema
@@ -38,15 +38,4 @@ public interface Member extends Model {
 
     public URI getDeclaredSchemaId();
 
-    // Generated from Link
-    //     Relation: ownerSchema
-    //         Methods: GET 
-    //         ResponseSchema: Schema[?]
-    //     EnabledFormula: ownerSchemaId != null
-    //     DestinationUriTemplate: {ownerSchemaId} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["ownerSchemaId"]]
-    //     Href: <ownerSchemaId>
-    public Schema getOwnerSchema();
-
-    public URI getOwnerSchemaId();
 }

@@ -16,10 +16,6 @@
 
 package org.wrml.model.communication.http;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-
 import org.wrml.Model;
 
 // Generated from a Web Resource Schema
@@ -28,7 +24,7 @@ public interface Body extends Model {
     // TODO: It might be useful to have "marker" schemas for InputStream and OutputStream
     // these raw Streams will be critical for all non-Wrml media type data throughput.
 
-    public InputStream asInputStream() throws IOException;
+    public Object asInputStream();
 
-    public OutputStream asOutputStream() throws IOException;
+    public Object asOutputStream();
 }

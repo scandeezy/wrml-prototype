@@ -20,7 +20,7 @@ import java.net.URI;
 
 import org.wrml.Context;
 import org.wrml.Model;
-import org.wrml.model.resource.Action;
+import org.wrml.model.Action;
 
 public abstract class AbstractExecutableService extends AbstractService implements ExecutableService {
 

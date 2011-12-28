@@ -21,4 +21,9 @@ public interface Transformer<A, B> {
     public B aToB(A aValue);
 
     public A bToA(B bValue);
+
+    public Class<A> getA();
+
+    public Class<B> getB();
+
 }

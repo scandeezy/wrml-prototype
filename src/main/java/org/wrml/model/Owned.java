@@ -14,10 +14,16 @@
  * limitations under the License.
  */
 
-package org.wrml.model.runtime;
+package org.wrml.model;
+
+import java.net.URI;
 
 import org.wrml.Model;
 
-public interface PrototypeLinkFormula extends Model {
+public interface Owned<D extends Document> extends Model {
+
+    public URI getOwnerId();
+
+    public D getOwner();
 
 }

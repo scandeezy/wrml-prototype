@@ -29,7 +29,7 @@ public final class FieldEvent extends CancelableEvent {
 
     private final String _FieldName;
     private final MapEvent<String, Object> _SourceEvent;
-    private ConstraintEvent _ConstraintEvent;
+    private FieldConstraintEvent _FieldConstraintEvent;
 
     public FieldEvent(Model source, boolean cancelable, String fieldName, MapEvent<String, Object> sourceEvent) {
         super(source, cancelable);
@@ -37,8 +37,8 @@ public final class FieldEvent extends CancelableEvent {
         _SourceEvent = sourceEvent;
     }
 
-    public ConstraintEvent getConstraintEvent() {
-        return _ConstraintEvent;
+    public FieldConstraintEvent getConstraintEvent() {
+        return _FieldConstraintEvent;
     }
 
     public String getFieldName() {
@@ -49,8 +49,8 @@ public final class FieldEvent extends CancelableEvent {
         return _SourceEvent;
     }
 
-    public void setConstraintEvent(ConstraintEvent constraintEvent) {
-        _ConstraintEvent = constraintEvent;
+    public void setConstraintEvent(FieldConstraintEvent fieldConstraintEvent) {
+        _FieldConstraintEvent = fieldConstraintEvent;
     }
 
     public Model getSourceModel() {

@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-package org.wrml;
+package org.wrml.model;
 
-import org.wrml.model.schema.Link;
-import org.wrml.util.CancelableEvent;
+// Generated from a Web Resource Schema
+public interface Store<D extends Document> extends Container<D> {
 
-/**
- * Used to communicate the change in a Link's state.
- */
-public final class LinkEvent extends CancelableEvent {
-
-    private static final long serialVersionUID = -3145602918059087982L;
-
-    public LinkEvent(Link link, boolean cancelable) {
-        super(link, cancelable);
-    }
-
-    public Link getLink() {
-        return (Link) getSource();
-    }
-
+    // Generated from Link
+    //     Relation: save
+    //         Methods: PUT 
+    //         RequestSchema: T
+    //         ResponseSchema: T
+    //     EnabledFormula: id != null && !isReadOnly
+    //     DestinationUriTemplate: {id} 
+    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
+    //     Href: <id>
+    public D save(D model);
 }

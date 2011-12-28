@@ -18,11 +18,10 @@ package org.wrml.model.schema;
 
 import java.net.URI;
 
+import org.wrml.model.Collection;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
-import org.wrml.model.Typed;
-import org.wrml.model.resource.Collection;
 
 /**
  * A web resource schema's field. Conceptually a field is a typed data slot,
@@ -55,7 +54,7 @@ public interface Field extends Typed, Named, Titled, Descriptive, Member {
     public URI getConstraintsId();
 
     // TODO: We need to figure out how to represent Object in WRML.
-    // Should it be a PrimitiveType or should we use a "marker" Schema?
+    // Should it be a Type or should we use a "marker" Schema (Native)?
     public Object getDefaultValue();
 
     public boolean isHidden();

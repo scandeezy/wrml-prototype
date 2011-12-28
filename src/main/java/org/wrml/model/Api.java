@@ -14,29 +14,27 @@
  * limitations under the License.
  */
 
-package org.wrml.model.runtime;
+package org.wrml.model;
 
 import java.net.URI;
 
-import org.wrml.Model;
-import org.wrml.model.schema.Constraint;
-import org.wrml.model.schema.Field;
-import org.wrml.model.schema.Link;
-import org.wrml.model.schema.Schema;
-import org.wrml.util.ObservableMap;
+/**
+ * This interface holds the REST API's metadata and the docroot of the
+ * API's resource model.
+ */
 
-public interface Prototype extends Model {
+// Generated from a Web Resource Schema
+public interface Api extends Named, Titled, Document {
 
-    public ObservableMap<URI, Schema> getAllBaseSchemas();
+    // Note: Added to Field
+    //     Name: name 
+    //     Constraints: TextSyntax - Mixed-Upper Case
 
-    public ObservableMap<URI, Constraint> getConstraints();
+    public ResourceTemplate getDocroot();
 
-    public ObservableMap<String, Field> getFields();
+    public URI getDocrootId();
 
-    public ObservableMap<URI, Link> getLinks();
+    public Collection<LinkTemplate> getLinkTemplates();
 
-    public URI getBlueprintSchemaId();
-
-    public Schema getBlueprintSchema();
-
+    public URI getLinkTemplatesCollectionId();
 }

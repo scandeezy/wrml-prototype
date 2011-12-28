@@ -18,28 +18,27 @@ package org.wrml;
 
 import java.util.EventObject;
 
-import org.wrml.model.schema.ValidationResult;
-import org.wrml.util.Validator;
+import org.wrml.model.schema.FieldValidationResult;
 
-public class ConstraintEvent extends EventObject {
+public class FieldConstraintEvent extends EventObject {
 
     private static final long serialVersionUID = 8426522526071747315L;
 
-    private final Validator _Validator;
-    private final ValidationResult _ValidationResult;
+    private final FieldValidator _FieldValidator;
+    private final FieldValidationResult _FieldValidationResult;
 
-    public ConstraintEvent(Model source, Validator validator, ValidationResult validationResult) {
+    public FieldConstraintEvent(Model source, FieldValidator fieldValidator, FieldValidationResult fieldValidationResult) {
         super(source);
-        _Validator = validator;
-        _ValidationResult = validationResult;
+        _FieldValidator = fieldValidator;
+        _FieldValidationResult = fieldValidationResult;
     }
 
-    public ValidationResult getValidationResult() {
-        return _ValidationResult;
+    public FieldValidationResult getValidationResult() {
+        return _FieldValidationResult;
     }
 
-    public Validator getValidator() {
-        return _Validator;
+    public FieldValidator getValidator() {
+        return _FieldValidator;
     }
 
 }

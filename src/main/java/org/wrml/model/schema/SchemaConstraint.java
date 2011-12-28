@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package org.wrml.model.resource;
+package org.wrml.model.schema;
 
-// Generated from a Web Resource Schema
-public interface Collection<T extends Document> extends Container<T> {
+import java.net.URI;
 
-    // Generated from Link
-    //     Relation: create
-    //         Methods: POST 
-    //         RequestSchema: T
-    //         ResponseSchema: T
-    //     EnabledFormula: id != null && !isReadOnly
-    //     DestinationUriTemplate: {id} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
-    //     Href: <id>
-    public T create(T model);
+public interface SchemaConstraint extends Constraint {
+
+    public Schema Schema();
+
+    public URI getSchemaId();
+
+    public URI setSchemaId(URI menuId);
+
 }

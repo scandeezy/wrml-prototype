@@ -30,14 +30,14 @@ public class SystemSchemaService extends ProxyService implements SchemaService {
 
     public static final URI DEFAULT_SCHEMA_API_DOCROOT = URI.create("http://api.schemas.wrml.org/");
 
-    private UriTransformer _UriTransformer;
+    private UriTransformer<String> _UriTransformer;
 
     public SystemSchemaService(Context context, Service originService) {
         super(context, originService);
     }
 
     @Override
-    public final UriTransformer getIdTransformer() {
+    public final UriTransformer<String> getIdTransformer() {
         if (_UriTransformer == null) {
             _UriTransformer = createIdTransformer();
         }
@@ -49,7 +49,7 @@ public class SystemSchemaService extends ProxyService implements SchemaService {
         return getClass().getClassLoader();
     }
 
-    protected UriTransformer createIdTransformer() {
+    protected UriTransformer<String> createIdTransformer() {
         return new SchemaClassNameUriTransformer(DEFAULT_SCHEMA_API_DOCROOT);
     }
 

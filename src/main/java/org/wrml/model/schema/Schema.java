@@ -18,11 +18,11 @@ package org.wrml.model.schema;
 
 import java.net.URI;
 
+import org.wrml.model.Collection;
 import org.wrml.model.Descriptive;
+import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Versioned;
-import org.wrml.model.resource.Collection;
-import org.wrml.model.resource.Document;
 import org.wrml.util.ObservableMap;
 
 /**
@@ -57,15 +57,46 @@ public interface Schema extends Named, Versioned, Descriptive, Document {
     //     Flags: ReadOnly
     public URI getBaseSchemasId();
 
+    // Generated from Link
+    //     Relation: constraints
+    //         Methods: GET 
+    //         ResponseSchema: Collection[Constraint]
+    //     EnabledFormula: constraintsId != null
+    //     DestinationUriTemplate: {constraintsId} 
+    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["constraintsId"]]
+    //     Href: <constraintsId>
+
+    /**
+     * The ability to add Constraints to Schemas can have serve a few different
+     * functions.
+     * 
+     * 1. SchemaConstraints can be added to generate parameterized types. For
+     * example a SchemaConstraint named "T" could be used in a WRML schema like
+     * "Container" to generate "Container<T extends Model>" in Java. The use of
+     * one or more named SchemaConstraints at the Schema level has the effect of
+     * creating named schema "slots" whenever these types are referenced in WRML
+     * "builder" GUI tools.
+     * 
+     * @return
+     */
+    public Collection<Constraint> getConstraints();
+
+    // Generated from Field
+    //     Name: constraintsId
+    //     Value: Text[URI]
+    //     Constraints: TextSyntax - URI
+    //     Flags: ReadOnly
+    public URI getConstraintsId();
+
     // Generated from Field
     //     Name: fields 
     //     Value: Map[ Key=Text, Value=Schema[Field[?]] ]
     public ObservableMap<String, Field> getFields();
 
     // Generated from Field
-    //     Name: linkFormulas 
-    //     Value: Map[ Key=Text[URI], Value=Schema[LinkFormula]] ]
-    //     Constraints: KeyType - Text[URI], ValueType - Schema[LinkFormula]
-    public ObservableMap<URI, LinkFormula> getLinkFormulas();
+    //     Name: links 
+    //     Value: Map[ Key=Text[URI], Value=Schema[Link]] ]
+    //     Constraints: KeyType - Text[URI], ValueType - Schema[Link]
+    public ObservableMap<URI, Link> getLinks();
 
 }

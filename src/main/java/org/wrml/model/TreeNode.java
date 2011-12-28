@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package org.wrml.model.schema;
+package org.wrml.model;
 
-// Generated from a Web Resource Schema
-public interface SimpleLinkFormula extends LinkFormula {
+public interface TreeNode<R extends Document, P extends Document, C extends Document> extends Rooted<R>, Parent<P>,
+        Child<C> {
 
-    public String getSourceCode();
-
-    public String setSourceCode(String sourceCode);
 }

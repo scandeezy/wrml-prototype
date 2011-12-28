@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package org.wrml.model.schema;
+package org.wrml.model;
 
-import org.wrml.Model;
+import java.net.URI;
 
-// Generated from a Web Resource Schema
-public interface ValidationResult extends Model {
+public interface Parent<D extends Document> {
 
-    // TODO: Define interface
-    // success/failure
-    // oldvalue new value
+    public Container<D> getChildren();
+
+    public URI getChildrenContainerId();
 }

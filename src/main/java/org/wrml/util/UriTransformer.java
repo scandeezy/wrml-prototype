@@ -18,6 +18,6 @@ package org.wrml.util;
 
 import java.net.URI;
 
-public interface UriTransformer extends Transformer<URI, Object> {
+public interface UriTransformer<B> extends Transformer<URI, B> {
 
 }

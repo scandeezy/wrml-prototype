@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.wrml.Context;
 import org.wrml.Model;
+import org.wrml.model.Document;
 import org.wrml.util.ObservableMap;
 
 public class CachingService extends ProxyService {
@@ -55,7 +56,8 @@ public class CachingService extends ProxyService {
 
         Map<URI, Model> cache = getCache();
 
-        boolean isRefresh = (requestor != null && id.equals(requestor.getId()));
+        boolean isRefresh = (requestor != null && requestor instanceof Document && id.equals(((Document) requestor)
+                .getId()));
 
         if (!isRefresh) {
             if (cache.containsKey(id) && !isRefresh) {

@@ -20,24 +20,32 @@ import java.net.URI;
 
 import org.wrml.util.UriTransformer;
 
-public class SchemaClassNameUriTransformer implements UriTransformer {
-    
+public class SchemaClassNameUriTransformer implements UriTransformer<String> {
+
     public final URI _BaseUri;
 
     public SchemaClassNameUriTransformer(URI baseUri) {
         _BaseUri = baseUri;
     }
 
-    public Object aToB(URI aValue) {
+    public String aToB(URI aValue) {
         return getBaseUri().relativize(aValue).toString().replace('/', '.');
     }
 
-    public URI bToA(Object bValue) {
+    public URI bToA(String bValue) {
         return getBaseUri().resolve(bValue.toString().replace('.', '/'));
     }
 
     public URI getBaseUri() {
         return _BaseUri;
+    }
+
+    public Class<URI> getA() {
+        return URI.class;
+    }
+
+    public Class<String> getB() {
+        return String.class;
     }
 
 }

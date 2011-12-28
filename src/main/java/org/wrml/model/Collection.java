@@ -14,9 +14,19 @@
  * limitations under the License.
  */
 
-package org.wrml.util;
+package org.wrml.model;
 
-public interface Hierarchical<P> {
+// Generated from a Web Resource Schema
+public interface Collection<D extends Document> extends Container<D> {
 
-    public P getParent();
+    // Generated from Link
+    //     Relation: create
+    //         Methods: POST 
+    //         RequestSchema: T
+    //         ResponseSchema: T
+    //     EnabledFormula: id != null && !isReadOnly
+    //     DestinationUriTemplate: {id} 
+    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
+    //     Href: <id>
+    public D create(D document);
 }

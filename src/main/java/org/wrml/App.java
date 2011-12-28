@@ -18,7 +18,7 @@ package org.wrml;
 
 import java.net.URI;
 
-import org.wrml.model.Titled;
+import org.wrml.model.relation.LinkRelation;
 import org.wrml.service.AbstractService;
 import org.wrml.service.Service;
 import org.wrml.util.UriTransformer;
@@ -30,64 +30,63 @@ public class App {
 
     public static void main(String[] args) throws Throwable {
 
-        String title = "Greetings Program!";
-        System.out.println("Introduction Title: " + title);
+        String title = "Self";
+        System.out.println("Title: " + title);
 
         Context context = new Context();
 
-        Class<?> titledClass = Titled.class;
+        Class<?> linkRelationClass = LinkRelation.class;
 
-        final URI titledSchemaId = context.getSchemaId(titledClass);
+        final URI linkRelationSchemaId = context.getSchemaId(linkRelationClass);
 
-        Service titledService = context.instantiateCachingService(new TitledService(context));
-        context.getServiceMap().put(titledSchemaId, titledService);
+        Service linkRelationService = context.instantiateCachingService(new LinkRelationService(context));
+        context.getServiceMap().put(linkRelationSchemaId, linkRelationService);
 
-        URI modelId = URI.create("http://localhost/titles/1234");
+        URI modelId = URI.create("http://api.relations.wrml.org/common/self");
 
-        Service fetchedTitleService = context.getService(titledClass);
-        Model dynamicModel = fetchedTitleService.create(modelId, null);
+        Service fetchedTitleService = context.getService(linkRelationClass);
+        Model dynamicModel = fetchedTitleService.get(modelId, null);
 
         dynamicModel.setFieldValue("title", title);
 
         System.out.println("Dynamic Title: " + dynamicModel.getFieldValue("title"));
 
-        Titled staticModel = (Titled) dynamicModel;
+        LinkRelation staticModel = (LinkRelation) dynamicModel.getStaticInterface();
+
+        staticModel.setId(modelId);
 
         System.out.println("Static Title: " + staticModel.getTitle());
         System.out.println("Static Id: " + staticModel.getId());
-        System.out.println("Static ReadOnly: " + staticModel.isReadOnly());        
     }
 
-    private static class TitledService extends AbstractService {
+    private static class LinkRelationService extends AbstractService {
 
-        public TitledService(Context context) {
+        public LinkRelationService(Context context) {
             super(context);
         }
 
-        public Model create(URI modelId, Model requestor) {
-            final Titled model = (Titled) getContext().instantiateStaticModel(Titled.class, modelId, requestor);
-            model.setReadOnly(true);
-            return model;
-        }
-
-        public UriTransformer getIdTransformer() {
+        public Model create(URI documentId, Model requestor) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public Model put(URI id, Model modelToSave, Model requestor) {
+        public UriTransformer<?> getIdTransformer() {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public Model remove(URI id, Model requestor) {
+        public Model put(URI documentId, Model document, Model requestor) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public Model get(URI id, Model requestor) {
+        public Model remove(URI documentId, Model requestor) {
             // TODO Auto-generated method stub
             return null;
+        }
+
+        public Model get(URI documentId, Model requestor) {
+            return getContext().instantiateModel(LinkRelation.class, requestor);
         }
 
     }

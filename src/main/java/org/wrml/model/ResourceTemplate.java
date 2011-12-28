@@ -14,23 +14,28 @@
  * limitations under the License.
  */
 
-package org.wrml.model.schema;
-
-import java.net.URI;
-
-import org.wrml.model.relation.LinkRelation;
+package org.wrml.model;
 
 /**
- * The metadata that represents a simple boolean formula that can be evaluated
- * to determine the state of a link.
+ * A single "node" in a REST API's path-based Web resource model's hierarchical
+ * usage.
  * 
  * Note: This is a metadata class - instances should be edited with tools and
  * persisted for reuse.
  */
 // Generated from a Web Resource Schema
-public interface LinkFormula extends Member {
+public interface ResourceTemplate extends Versioned, Descriptive,
+        TreeNode<Api, ResourceTemplate, ResourceTemplate>, Document {
 
-    public LinkRelation getLinkRelation();
+    public String getPathSegment();
 
-    public URI getLinkRelationId();
+    public ResourceArchetype getResourceArchetype();
+
+    public String setPathSegment(String pathSegment);
+
+    public ResourceArchetype setResourceArchetype(ResourceArchetype resourceArchetype);
+
+    // TODO: The (half-baked) idea here was to allow resource tree nodes to override model defaults...
+    // public ObservableMap<URI, ObservableList<RuntimePrototypeField>> getSchemaFieldDefaultsMap();
+
 }

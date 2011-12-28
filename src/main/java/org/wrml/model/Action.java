@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package org.wrml.model.resource;
+package org.wrml.model;
 
-import org.wrml.model.Named;
-import org.wrml.model.Titled;
-
-// Generated from a Web Resource Schema
-public interface RestApiTemplate extends Named, Titled, ResourceTemplate {
-
-    // Added to Field
-    //     Name: name 
-    //     Constraints: TextSyntax - Mixed-Upper Case
+public interface Action extends Document {
 
 }

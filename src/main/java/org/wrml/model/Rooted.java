@@ -14,29 +14,13 @@
  * limitations under the License.
  */
 
-package org.wrml.model.runtime;
+package org.wrml.model;
 
 import java.net.URI;
 
-import org.wrml.Model;
-import org.wrml.model.schema.Constraint;
-import org.wrml.model.schema.Field;
-import org.wrml.model.schema.Link;
-import org.wrml.model.schema.Schema;
-import org.wrml.util.ObservableMap;
+public interface Rooted<R extends Document> {
 
-public interface Prototype extends Model {
+    public R getRoot();
 
-    public ObservableMap<URI, Schema> getAllBaseSchemas();
-
-    public ObservableMap<URI, Constraint> getConstraints();
-
-    public ObservableMap<String, Field> getFields();
-
-    public ObservableMap<URI, Link> getLinks();
-
-    public URI getBlueprintSchemaId();
-
-    public Schema getBlueprintSchema();
-
+    public URI getRootId();
 }

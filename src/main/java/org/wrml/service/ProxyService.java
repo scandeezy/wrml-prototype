@@ -39,7 +39,7 @@ public class ProxyService extends DelegatingObservableMap<URI, Model> implements
         return _Context;
     }
 
-    public UriTransformer getIdTransformer() {
+    public UriTransformer<?> getIdTransformer() {
         return getOriginService().getIdTransformer();
     }
 
@@ -59,8 +59,8 @@ public class ProxyService extends DelegatingObservableMap<URI, Model> implements
         return getOriginService().get(modelId, requestor);
     }
 
-    public Model put(URI modelId, Model modelToSave, Model requestor) {
-        return getOriginService().put(modelId, modelToSave, requestor);
+    public Model put(URI documentId, Model document, Model requestor) {
+        return getOriginService().put(documentId, document, requestor);
     }
 
     public Model remove(URI modelId, Model requestor) {

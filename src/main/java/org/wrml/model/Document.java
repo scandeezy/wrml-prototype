@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.model.resource;
+package org.wrml.model;
 
 import java.net.URI;
 
@@ -37,6 +37,10 @@ public interface Document extends Model {
     public void delete();
 
     public String getEtag();
+
+    public URI getId();
+
+    public URI setId(URI id);
 
     // Generated from Link
     //     Relation: metadata
@@ -88,11 +92,6 @@ public interface Document extends Model {
     //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
     //     Href: <id>
     public Document getSelf();
-
-    // Generated from Field
-    //     Name: docroot 
-    //     Flags: ReadOnly
-    public boolean isDocroot();
 
     // Generated from Field
     //     Name: readOnly 

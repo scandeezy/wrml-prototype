@@ -14,12 +14,26 @@
  * limitations under the License.
  */
 
-package org.wrml.model;
+package org.wrml.model.schema;
+
+import java.net.URI;
 
 import org.wrml.Model;
+import org.wrml.model.Descriptive;
+import org.wrml.model.Named;
+import org.wrml.model.Titled;
+import org.wrml.model.Versioned;
 
-//Generated from a Web Resource Schema
-public interface Typed extends Model {
+/*
+ * WRML's Java framework should have a generalized design for how to
+ * incorporate hooks to non-model (executable) Java code. Everything from
+ * how it is packaged (Jar, Manifest file, etc) and design a REST API-based
+ * exchange hidden behind WRML's Service JAVA API.
+ */
+public interface CodeOnDemand extends Named, Titled, Versioned, Descriptive, Model {
 
-    public PrimitiveType getType();
+    public URI getCodeLocation();
+
+    public URI setCodeLocation(URI codeLocation);
+
 }

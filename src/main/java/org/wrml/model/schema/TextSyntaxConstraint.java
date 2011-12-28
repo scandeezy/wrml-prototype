@@ -14,12 +14,9 @@
  * limitations under the License.
  */
 
-package org.wrml.model.resource;
+package org.wrml.model.schema;
 
-import org.wrml.Model;
+// A marker interface to map
+public interface TextSyntaxConstraint extends Constraint {
 
-// Generated from a Web Resource Schema
-public interface DocumentMetadata extends Model {
-
-    // MSMTODO: Design this Model
 }

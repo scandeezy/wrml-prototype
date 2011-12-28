@@ -32,31 +32,30 @@ public class PrototypeService extends AbstractService {
         super(context);
     }
 
-    public Model create(URI id, Model requestor) {
+    public Model create(URI documentId, Model requestor) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public UriTransformer getIdTransformer() {
+    public UriTransformer<?> getIdTransformer() {
         return getContext().getService(Schema.class).getIdTransformer();
     }
 
-    public Model put(URI id, Model modelToSave, Model requestor) {
+    public Model put(URI documentId, Model document, Model requestor) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Model remove(URI id, Model requestor) {
+    public Model remove(URI documentId, Model requestor) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    public Model get(URI modelId, Model requestor) {
-        final Context context = (requestor != null) ? requestor.getContext() : getContext();
-        final URI schemaId = getContext().getSchemaId(Prototype.class);
-        final Model dynamicModel = new RuntimePrototype(schemaId, context, modelId);
-        Model staticModel = context.instantiateStaticModel(dynamicModel);
-        return staticModel;
+    public Model get(URI documentId, Model requestor) {
+        final Context context = getContext();
+        final URI schemaId = context.getSchemaId(Prototype.class);
+        final RuntimePrototype prototype = new RuntimePrototype(schemaId, context, documentId);
+        return prototype;
     }
 
 }

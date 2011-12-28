@@ -21,17 +21,17 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.wrml.model.runtime.Prototype;
-import org.wrml.model.runtime.PrototypeField;
 import org.wrml.model.schema.Schema;
+import org.wrml.model.schema.TextSyntaxConstraint;
 import org.wrml.service.CachingService;
 import org.wrml.service.Service;
 import org.wrml.service.WebClient;
-import org.wrml.service.runtime.PrototypeFieldService;
 import org.wrml.service.runtime.PrototypeService;
 import org.wrml.service.runtime.SchemaService;
 import org.wrml.service.runtime.SystemSchemaService;
 import org.wrml.util.DelegatingObservableMap;
 import org.wrml.util.ObservableMap;
+import org.wrml.util.StringTransformer;
 import org.wrml.util.UriTransformer;
 
 /**
@@ -124,31 +124,28 @@ public class Context {
         SchemaService schemaService = new SystemSchemaService(this, new WebClient(this));
         setSchemaService(schemaService);
     }
-            
-    public Model instantiateDynamicModel(Class<?> schemaClass, URI modelId, Model requestor) {
+
+    /*
+     * TODO: Consider moving all of this voodoo to the SchemaService interface.
+     * Keep this class more universally useful to all apss - not just the
+     * bootstrapping of the WRML runtime "app".
+     */
+
+    public Model instantiateModel(Class<?> schemaClass, Model requestor) {
         final Context context = (requestor != null) ? requestor.getContext() : this;
         final URI schemaId = context.getSchemaId(schemaClass);
-        return instantiateDynamicModel(schemaId, modelId, requestor);
+        return instantiateModel(schemaId, requestor);
     }
 
-    public Model instantiateDynamicModel(URI schemaId, URI modelId, Model requestor) {
+    public Model instantiateModel(URI schemaId, Model requestor) {
         final Context context = (requestor != null) ? requestor.getContext() : this;
-        RuntimeModel dynamicModel = new RuntimeModel(schemaId, context, modelId);
-        return dynamicModel;
+        RuntimeModel model = new RuntimeModel(schemaId, context);
+        return model;
     }
 
-    public Model instantiateStaticModel(Class<?> schemaClass, URI modelId, Model requestor) {
-        Model dynamicModel = instantiateDynamicModel(schemaClass, modelId, requestor);
-        return instantiateStaticModel(dynamicModel);
-    }
-
-    public Model instantiateStaticModel(Model dynamicModel) {
-        Model staticModel = StaticModelProxy.newProxyInstance(dynamicModel);
-        return staticModel;
-    }
 
     public String getClassName(URI schemaId) {
-        UriTransformer schemaIdTransformer = _SchemaService.getIdTransformer();
+        UriTransformer<?> schemaIdTransformer = _SchemaService.getIdTransformer();
         return (String) schemaIdTransformer.aToB(schemaId);
     }
 
@@ -165,7 +162,8 @@ public class Context {
     }
 
     public URI getSchemaId(String className) {
-        UriTransformer schemaIdTransformer = _SchemaService.getIdTransformer();
+        @SuppressWarnings("unchecked")
+        UriTransformer<String> schemaIdTransformer = (UriTransformer<String>) _SchemaService.getIdTransformer();
         return schemaIdTransformer.bToA(className);
     }
 
@@ -184,7 +182,7 @@ public class Context {
     }
 
     public Service getService(URI schemaId) {
-        
+
         /*
          * TODO: Allow for more complex mapping of schemas to services
          * For example, allow for a base schema to be registered for
@@ -198,19 +196,15 @@ public class Context {
 
         _SchemaService = schemaService;
         _PrototypeService = new PrototypeService(this);
-        final Service prototypeFieldService = new PrototypeFieldService(this);
 
         _SchemaCachingService = instantiateCachingService(schemaService);
         _PrototypeCachingService = instantiateCachingService(_PrototypeService);
-        final CachingService prototypeFieldCachingService = instantiateCachingService(prototypeFieldService);
 
         URI schemaSchemaId = getSchemaId(Schema.class);
         URI prototypeSchemaId = getSchemaId(Prototype.class);
-        URI prototypeFieldSchemaId = getSchemaId(PrototypeField.class);
 
         _ServiceMap.put(schemaSchemaId, _SchemaCachingService);
         _ServiceMap.put(prototypeSchemaId, _PrototypeCachingService);
-        _ServiceMap.put(prototypeFieldSchemaId, prototypeFieldCachingService);
     }
 
     public CachingService instantiateCachingService(Service originService) {
@@ -221,6 +215,12 @@ public class Context {
 
     public ObservableMap<URI, Service> getServiceMap() {
         return _ServiceMap;
+    }
+
+    public StringTransformer<?> getStringTransformer(TextSyntaxConstraint textSyntaxConstraint) {
+        // TODO: Implement this mapping with configuration-based mapping falling back to code on demand
+        return null;
+
     }
 
 }

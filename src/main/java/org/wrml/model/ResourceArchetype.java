@@ -16,31 +16,29 @@
 
 package org.wrml.model;
 
-public enum PrimitiveType {
+/**
+ * Enumeration that captures the resource archetypes.
+ */
+//Generated from a Web Resource Schema
+public enum ResourceArchetype {
 
-    Boolean("Boolean"),
-    Choice("Choice"),
-    DateTime("DateTime"),
-    Double("Double"),
-    Integer("Integer"),
-    List("List"),
-    Long("Long"),
-    Schema("Schema"),
-    Text("Text");
+    DOCUMENT("Document"),
+    COLLECTION("Collection"),
+    STORE("Store"),
+    ACTION("Action");
 
-    private final String _Name;
+    private final String _Title;
 
-    private PrimitiveType(final String name) {
-        _Name = name;
+    private ResourceArchetype(String title) {
+        _Title = title;
     }
 
-    public String getName() {
-        return _Name;
+    public final String getTitle() {
+        return _Title;
     }
 
     @Override
     public String toString() {
-        return getName();
+        return getTitle();
     }
-
 }
