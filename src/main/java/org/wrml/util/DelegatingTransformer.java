@@ -16,15 +16,24 @@
 
 package org.wrml.util;
 
-public interface Transformer<A, B> {
+public class DelegatingTransformer<A, B, T extends Transformer<A, B>> implements Delegating<T>, Transformer<A, B> {
 
-    public B aToB(A aValue);
+    private final T _Delegate;
 
-    public A bToA(B bValue);
+    public DelegatingTransformer(T delegate) {
+        _Delegate = delegate;
+    }
 
-    /*
-    public Class<A> getA();
+    public B aToB(A aValue) {
+        return getDelegate().aToB(aValue);
+    }
 
-    public Class<B> getB();
-*/
+    public A bToA(B bValue) {
+        return getDelegate().bToA(bValue);
+    }
+
+    public final T getDelegate() {
+        return _Delegate;
+    }
+
 }

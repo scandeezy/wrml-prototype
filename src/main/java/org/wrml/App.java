@@ -86,7 +86,7 @@ public class App {
         }
 
         public Model get(URI documentId, Model requestor) {
-            return getContext().instantiateModel(LinkRelation.class, requestor);
+            return getContext().instantiateModel(LinkRelation.class);
         }
 
     }

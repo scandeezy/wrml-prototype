@@ -16,12 +16,10 @@
 
 package org.wrml.model.schema;
 
-import java.net.URI;
-
-import org.wrml.model.Collection;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
+import org.wrml.util.ObservableList;
 
 /**
  * A web resource schema's field. Conceptually a field is a typed data slot,
@@ -36,22 +34,7 @@ public interface Field extends Typed, Named, Titled, Descriptive, Member {
     //     Name: name 
     //     Constraints: TextSyntax - Mixed-Lower Case
 
-    // Generated from Link
-    //     Relation: constraints
-    //         Methods: GET 
-    //         ResponseSchema: Collection[Constraint]
-    //     EnabledFormula: constraintsId != null
-    //     DestinationUriTemplate: {constraintsId} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["constraintsId"]]
-    //     Href: <constraintsId>
-    public Collection<Constraint> getConstraints();
-
-    // Generated from Field
-    //     Name: constraintsId
-    //     Value: Text[URI]
-    //     Constraints: TextSyntax - URI
-    //     Flags: ReadOnly
-    public URI getConstraintsId();
+    public ObservableList<Constraint> getConstraints();
 
     // TODO: We need to figure out how to represent Object in WRML.
     // Should it be a Type or should we use a "marker" Schema (Native)?

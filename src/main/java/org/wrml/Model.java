@@ -20,7 +20,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
 
-import org.wrml.model.runtime.Prototype;
+import org.wrml.model.communication.http.MediaType;
 import org.wrml.model.schema.Schema;
 
 /**
@@ -37,15 +37,18 @@ public interface Model extends Serializable {
 
     public void addLinkEventListener(URI linkRelationId, LinkEventListener listener);
 
-    public void extend(boolean atomic, Model modelToExtend, Model... additionalModelsToExtend);
+    /**
+     * Die means that the model is gone but may not be deleted
+     */
+    public void die();
+
+    public void extend(Model modelToExtend, Model... additionalModelsToExtend);
 
     public Context getContext();
 
     public List<URI> getEmbeddedLinkRelationIds();
 
     public Object getFieldValue(String fieldName);
-
-    public Prototype getPrototype();
 
     public Schema getSchema();
 
@@ -65,9 +68,6 @@ public interface Model extends Serializable {
 
     public Object setFieldValue(String fieldName, Object fieldValue);
 
-    /**
-     *  Die means that the model is gone but may not be deleted
-     */
-    public void die();
+    public Object clickLink(URI rel, MediaType responseMediaType, Object requestEntity, List<String> hrefParams);
 
 }

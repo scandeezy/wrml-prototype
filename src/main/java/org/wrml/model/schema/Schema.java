@@ -18,11 +18,11 @@ package org.wrml.model.schema;
 
 import java.net.URI;
 
-import org.wrml.model.Collection;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Versioned;
+import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
 
 /**
@@ -40,22 +40,7 @@ public interface Schema extends Named, Versioned, Descriptive, Document {
     //     Name: name 
     //     Constraints: TextSyntax - Mixed-Upper Case
 
-    // Generated from Link
-    //     Relation: baseSchemas
-    //         Methods: GET 
-    //         ResponseSchema: Collection[Schema]
-    //     EnabledFormula: baseSchemasId != null
-    //     DestinationUriTemplate: {baseSchemasId} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["baseSchemasId"]]
-    //     Href: <baseSchemasId>
-    public Collection<Schema> getBaseSchemas();
-
-    // Generated from Field
-    //     Name: baseSchemasId
-    //     Value: Text[URI]
-    //     Constraints: TextSyntax - URI
-    //     Flags: ReadOnly
-    public URI getBaseSchemasId();
+    public ObservableList<Schema> getBaseSchemas();
 
     // Generated from Link
     //     Relation: constraints
@@ -79,14 +64,7 @@ public interface Schema extends Named, Versioned, Descriptive, Document {
      * 
      * @return
      */
-    public Collection<Constraint> getConstraints();
-
-    // Generated from Field
-    //     Name: constraintsId
-    //     Value: Text[URI]
-    //     Constraints: TextSyntax - URI
-    //     Flags: ReadOnly
-    public URI getConstraintsId();
+    public ObservableList<Constraint> getConstraints();
 
     // Generated from Field
     //     Name: fields 

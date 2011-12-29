@@ -16,12 +16,12 @@
 
 package org.wrml.model.relation;
 
-import org.wrml.MediaType;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
 import org.wrml.model.Versioned;
+import org.wrml.model.communication.http.MediaType;
 import org.wrml.model.communication.http.Method;
 import org.wrml.util.ObservableList;
 

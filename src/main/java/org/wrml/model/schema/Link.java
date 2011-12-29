@@ -18,14 +18,31 @@ package org.wrml.model.schema;
 
 import java.net.URI;
 
+import org.wrml.model.communication.http.MediaType;
 import org.wrml.model.relation.LinkRelation;
+import org.wrml.util.ObservableList;
 
 public interface Link extends Member {
 
-    public LinkRelation getLinkRelation();
+    public LinkRelation getRel();
 
-    public URI getLinkRelationId();
+    public URI getRelId();
 
+    public URI getHref();
+
+    public URI setHref(URI href);
+    
+    
+    // Generated from Field
+    //     Name: requestTypes 
+    //     Value: List[Text[MediaType]]
+    public ObservableList<MediaType> getRequestTypes();
+
+    // Generated from Field
+    //     Name: responseTypes 
+    //     Value: List[Text[MediaType]]    
+    public ObservableList<MediaType> getResponseTypes();
+    
     /**
      * 
      * 

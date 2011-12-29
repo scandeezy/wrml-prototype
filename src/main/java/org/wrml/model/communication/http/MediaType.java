@@ -14,29 +14,25 @@
  * limitations under the License.
  */
 
-package org.wrml.model.runtime;
+package org.wrml.model.communication.http;
 
-import java.net.URI;
+import java.util.SortedMap;
 
 import org.wrml.Model;
-import org.wrml.model.schema.Constraint;
-import org.wrml.model.schema.Field;
-import org.wrml.model.schema.Link;
-import org.wrml.model.schema.Schema;
-import org.wrml.util.ObservableMap;
 
-public interface Prototype extends Model {
+/**
+ * A media type. Instances are immutable.
+ * 
+ * message://www.w3.org/Protocols/rfc2616/rfc2616-sec3.html#sec3.7
+ * 
+ * media-type = type "/" subtype *( ";" parameter ) type = token subtype = token
+ */
+public interface MediaType extends Model {
 
-    public ObservableMap<URI, Schema> getAllBaseSchemas();
+    public String getType();
 
-    public ObservableMap<URI, Constraint> getConstraints();
+    public String getSubtype();
 
-    public ObservableMap<String, Field> getFields();
-
-    public ObservableMap<URI, Link> getLinks();
-
-    public URI getBlueprintSchemaId();
-
-    public Schema getBlueprintSchema();
+    public SortedMap<String, String> getParameters();
 
 }

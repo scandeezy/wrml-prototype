@@ -18,7 +18,7 @@ package org.wrml.model;
 
 import java.net.URI;
 
-import org.wrml.MediaType;
+import org.wrml.model.communication.http.MediaType;
 import org.wrml.model.relation.LinkRelation;
 import org.wrml.util.ObservableList;
 import org.wrml.util.ObservableMap;
