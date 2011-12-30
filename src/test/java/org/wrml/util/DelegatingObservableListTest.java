@@ -30,6 +30,11 @@ import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
+import org.wrml.util.observable.DelegatingObservableList;
+import org.wrml.util.observable.ListEvent;
+import org.wrml.util.observable.ListEventListener;
+import org.wrml.util.observable.ObservableList;
+
 public class DelegatingObservableListTest {
 
     @Test

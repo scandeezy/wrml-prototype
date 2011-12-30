@@ -16,12 +16,13 @@
 
 package org.wrml.model.schema;
 
+import org.wrml.model.CodeOnDemand;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
 import org.wrml.model.Versioned;
-import org.wrml.util.ObservableList;
+import org.wrml.util.observable.ObservableList;
 
 /**
  * A field constraint's metadata and pointers to "executable" Validators.

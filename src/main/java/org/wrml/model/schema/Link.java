@@ -18,9 +18,9 @@ package org.wrml.model.schema;
 
 import java.net.URI;
 
-import org.wrml.model.communication.http.MediaType;
+import org.wrml.model.communication.MediaType;
 import org.wrml.model.relation.LinkRelation;
-import org.wrml.util.ObservableList;
+import org.wrml.util.observable.ObservableList;
 
 public interface Link extends Member {
 

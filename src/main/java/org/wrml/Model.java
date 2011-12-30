@@ -19,9 +19,15 @@ package org.wrml;
 import java.io.Serializable;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
-import org.wrml.model.communication.http.MediaType;
+import org.wrml.event.FieldEventListener;
+import org.wrml.event.LinkEventListener;
+import org.wrml.event.ModelEventListener;
+import org.wrml.model.api.ResourceTemplate;
+import org.wrml.model.communication.MediaType;
 import org.wrml.model.schema.Schema;
+import org.wrml.runtime.Context;
 
 /**
  * The base interface for all web resource schema instances.
@@ -37,6 +43,8 @@ public interface Model extends Serializable {
 
     public void addLinkEventListener(URI linkRelationId, LinkEventListener listener);
 
+    public Object clickLink(URI rel, MediaType responseType, Object requestEntity, Map<String, String> hrefParams);
+
     /**
      * Die means that the model is gone but may not be deleted
      */
@@ -49,6 +57,10 @@ public interface Model extends Serializable {
     public List<URI> getEmbeddedLinkRelationIds();
 
     public Object getFieldValue(String fieldName);
+
+    public ResourceTemplate getResourceTemplate();
+
+    public URI getResourceTemplateId();
 
     public Schema getSchema();
 
@@ -67,7 +79,5 @@ public interface Model extends Serializable {
     public void setFieldToDefaultValue(String fieldName);
 
     public Object setFieldValue(String fieldName, Object fieldValue);
-
-    public Object clickLink(URI rel, MediaType responseMediaType, Object requestEntity, List<String> hrefParams);
 
 }

@@ -23,12 +23,10 @@ import java.util.Set;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import org.wrml.Context;
 import org.wrml.Model;
 import org.wrml.model.Action;
-import org.wrml.model.Collection;
-import org.wrml.model.Document;
-import org.wrml.util.UriTransformer;
+import org.wrml.runtime.Context;
+import org.wrml.util.transformer.UriTransformer;
 
 /*
  * Implements the service interface with a REST API client.
@@ -77,50 +75,14 @@ public class WebClient extends AbstractExecutableService {
         return super.containsValue(value);
     }
 
-    @Override
-    public Model create() {
-
-        /*
-         * TODO: Not really possible without a URI. Should we throw an
-         * exception?
-         */
-
-        return super.create();
-    }
-
-    @SuppressWarnings("unchecked")
-    @Override
-    public Model create(Model requestor) {
-
-        /*
-         * TODO: Design proposal - A POST request using the requestor Model's
-         * (Collection's) id?
-         */
-
-        return create(((Collection<Document>) requestor).getId(), requestor);
-    }
-
-    @Override
-    public Model create(URI id) {
-
-        /*
-         * TODO: HTTP POST to a collection
-         */
-
+    public Object create(Model referrer) {
+        // TODO Auto-generated method stub
         return null;
     }
 
-    public Model create(URI id, Model requestor) {
-
-        /*
-         * TODO: HTTP POST to a collection
-         */
-
-        return null;
-    }
 
     @Override
-    public Set<java.util.Map.Entry<URI, Model>> entrySet() {
+    public Set<java.util.Map.Entry<URI, Object>> entrySet() {
 
         /*
          * TODO: Not really possible without a URI. Should we throw an
@@ -131,27 +93,7 @@ public class WebClient extends AbstractExecutableService {
     }
 
     @Override
-    public Model execute(URI id) {
-
-        /*
-         * TODO: HTTP POST
-         */
-
-        return super.execute(id);
-    }
-
-    @Override
-    public Model execute(URI id, Action action) {
-
-        /*
-         * TODO: HTTP POST an action. Note that the Action should be built by
-         * model framework's Link clicking
-         */
-
-        return super.execute(id, action);
-    }
-
-    public Model execute(URI id, Action action, Model requestor) {
+    public Object execute(URI id, Action action, Model referrer) {
 
         /*
          * TODO: HTTP POST an action
@@ -160,49 +102,7 @@ public class WebClient extends AbstractExecutableService {
         return null;
     }
 
-    @Override
-    public Model execute(URI id, Model requestor) {
-
-        /*
-         * TODO: HTTP POST
-         */
-
-        return super.execute(id, requestor);
-    }
-
-    @Override
-    public Model get(Object key) {
-
-        /*
-         * TODO: HTTP GET
-         */
-
-        /*
-         * try {
-         * HttpGet httpget = new HttpGet("http://www.google.com/");
-         * 
-         * System.out.println("executing request " + httpget.getURI());
-         * 
-         * // Create a response handler
-         * ResponseHandler<String> responseHandler = new BasicResponseHandler();
-         * String responseBody = httpclient.execute(httpget, responseHandler);
-         * System.out.println("----------------------------------------");
-         * System.out.println(responseBody);
-         * System.out.println("----------------------------------------");
-         * 
-         * }
-         * finally {
-         * // When HttpClient instance is no longer needed,
-         * // shut down the connection manager to ensure
-         * // immediate deallocation of all system resources
-         * httpclient.getConnectionManager().shutdown();
-         * }
-         */
-        // TODO Auto-generated method stub
-        return super.get(key);
-    }
-
-    public Model get(URI id, Model requestor) {
+    public Object get(URI id, Model referrer) {
 
         /*
          * TODO: HTTP GET
@@ -240,25 +140,16 @@ public class WebClient extends AbstractExecutableService {
         return super.keySet();
     }
 
-    @Override
-    public Model put(URI documentId, Model document) {
-
+    public Object put(URI id, Object requestEntity, Model referrer) {
         /*
          * TODO: HTTP PUT
          */
 
-        return super.put(documentId, document);
-    }
-
-    public Model put(URI id, Model modelToSave, Model requestor) {
-        /*
-         * TODO: HTTP PUT
-         */
         return null;
     }
 
     @Override
-    public void putAll(Map<? extends URI, ? extends Model> map) {
+    public void putAll(Map<? extends URI, ? extends Object> map) {
 
         /*
          * TODO: HTTP PUT (batch/transactional?)
@@ -267,15 +158,7 @@ public class WebClient extends AbstractExecutableService {
         super.putAll(map);
     }
 
-    @Override
-    public Model remove(Object key) {
-        /*
-         * TODO: HTTP DELETE
-         */
-        return super.remove(key);
-    }
-
-    public Model remove(URI id, Model requestor) {
+    public Object remove(URI id, Model referrer) {
         /*
          * TODO: HTTP DELETE
          */
@@ -292,7 +175,7 @@ public class WebClient extends AbstractExecutableService {
     }
 
     @Override
-    public java.util.Collection<Model> values() {
+    public java.util.Collection<Object> values() {
         /*
          * TODO: Not really possible without a URI. Should we throw an
          * exception?

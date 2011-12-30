@@ -18,6 +18,7 @@ package org.wrml.model;
 
 import org.wrml.Model;
 
+
 // Generated from a Web Resource Schema
 public interface Descriptive extends Model {
 

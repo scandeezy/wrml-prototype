@@ -19,10 +19,10 @@ package org.wrml.service;
 import java.net.URI;
 import java.util.Map;
 
-import org.wrml.Context;
 import org.wrml.Model;
 import org.wrml.model.Document;
-import org.wrml.util.ObservableMap;
+import org.wrml.runtime.Context;
+import org.wrml.util.observable.ObservableMap;
 
 public class CachingService extends ProxyService {
 
@@ -34,29 +34,29 @@ public class CachingService extends ProxyService {
      * cache and go to the origin.
      */
 
-    private final ObservableMap<URI, Model> _Cache;
+    private final ObservableMap<URI, Object> _Cache;
 
-    public CachingService(Context context, Service originService, ObservableMap<URI, Model> cache) {
+    public CachingService(Context context, Service originService, ObservableMap<URI, Object> cache) {
         super(context, originService);
         _Cache = cache;
     }
 
-    public ObservableMap<URI, Model> getCache() {
+    public ObservableMap<URI, Object> getCache() {
         return _Cache;
     }
 
     @Override
-    public Model get(URI id, Model requestor) {
+    public Object get(URI id, Model referrer) {
 
         if (id == null) {
             throw new NullPointerException("id (URI) cannot be null");
         }
 
-        System.out.println("CachingService.get - id: " + id + " requestor: " + requestor);
+        System.out.println("CachingService.get - id: " + id + " referrer: " + referrer);
 
-        Map<URI, Model> cache = getCache();
+        Map<URI, Object> cache = getCache();
 
-        boolean isRefresh = (requestor != null && requestor instanceof Document && id.equals(((Document) requestor)
+        boolean isRefresh = (referrer != null && referrer instanceof Document && id.equals(((Document) referrer)
                 .getId()));
 
         if (!isRefresh) {
@@ -65,13 +65,16 @@ public class CachingService extends ProxyService {
             }
         }
 
-        Model model = super.get(id, requestor);
+        Object responseEntity = super.get(id, referrer);
+
+        // TODO: Consider a composite key for the cache map to consider response type attributes (like a good HTTP cache would)
+        // TODO: Honor TTL and Etags etc
 
         if (!isRefresh) {
-            cache.put(id, model);
+            cache.put(id, responseEntity);
         }
 
-        return model;
+        return responseEntity;
     }
 
     @Override

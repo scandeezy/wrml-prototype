@@ -19,8 +19,8 @@ package org.wrml.service;
 import java.net.URI;
 
 import org.wrml.Model;
-import org.wrml.util.MapEvent;
-import org.wrml.util.ObservableMap;
+import org.wrml.util.observable.MapEvent;
+import org.wrml.util.observable.ObservableMap;
 
 public class ServiceEvent<M extends Model> extends MapEvent<URI, M> {
 

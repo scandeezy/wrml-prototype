@@ -18,8 +18,8 @@ package org.wrml.service;
 
 import java.util.List;
 
-import org.wrml.Context;
-import org.wrml.util.DelegatingObservableList;
+import org.wrml.runtime.Context;
+import org.wrml.util.observable.DelegatingObservableList;
 
 /**
  * TODO: Make this a useful base class for various types of multiproxies (load

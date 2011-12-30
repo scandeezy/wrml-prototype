@@ -16,10 +16,8 @@
 
 package org.wrml.util;
 
-public interface Factory<I, T> {
+public interface Factory<T> {
 
     public T create();
-
-    public T create(I id);
 
 }

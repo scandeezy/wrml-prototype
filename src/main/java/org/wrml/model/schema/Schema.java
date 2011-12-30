@@ -22,8 +22,8 @@ import org.wrml.model.Descriptive;
 import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Versioned;
-import org.wrml.util.ObservableList;
-import org.wrml.util.ObservableMap;
+import org.wrml.util.observable.ObservableList;
+import org.wrml.util.observable.ObservableMap;
 
 /**
  * Schemas are one of WRML's main ideas. Like Java's generics, schemas add

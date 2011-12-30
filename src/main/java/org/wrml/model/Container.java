@@ -16,7 +16,7 @@
 
 package org.wrml.model;
 
-import org.wrml.util.ObservableList;
+import org.wrml.util.observable.ObservableList;
 
 // Generated from a Web Resource Schema
 public interface Container<D extends Document> extends Document {

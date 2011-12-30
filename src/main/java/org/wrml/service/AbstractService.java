@@ -21,8 +21,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.wrml.Context;
-import org.wrml.Model;
+import org.wrml.runtime.Context;
 
 /**
  * A base service class that provides some helpful reusable implementations of
@@ -53,23 +52,15 @@ public abstract class AbstractService implements Service {
         return false;
     }
 
-    public Model create() {
-        return create(null, null);
+    public Object create() {
+        return create(null);
     }
 
-    public Model create(Model requestor) {
-        return create(null, requestor);
-    }
-
-    public Model create(URI id) {
-        return create(id, null);
-    }
-
-    public Set<java.util.Map.Entry<URI, Model>> entrySet() {
+    public Set<java.util.Map.Entry<URI, Object>> entrySet() {
         return null;
     }
 
-    public Model get(Object key) {
+    public Object get(Object key) {
         return get((URI) key, null);
     }
 
@@ -85,15 +76,15 @@ public abstract class AbstractService implements Service {
         return null;
     }
 
-    public Model put(URI documentId, Model document) {
-        return put(documentId, document, null);
+    public Object put(URI id, Object requestEntity) {
+        return put(id, requestEntity, null);
     }
 
-    public void putAll(Map<? extends URI, ? extends Model> map) {
+    public void putAll(Map<? extends URI, ? extends Object> map) {
         // TODO ? Loop?        
     }
 
-    public Model remove(Object key) {
+    public Object remove(Object key) {
         return remove((URI) key, null);
     }
 
@@ -101,7 +92,7 @@ public abstract class AbstractService implements Service {
         return -1;
     }
 
-    public Collection<Model> values() {
+    public Collection<Object> values() {
         return null;
     }
 

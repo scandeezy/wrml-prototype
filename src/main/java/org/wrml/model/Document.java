@@ -20,6 +20,7 @@ import java.net.URI;
 
 import org.wrml.Model;
 
+
 /**
  * A resource archetype used to model a singular concept.
  */
@@ -76,10 +77,6 @@ public interface Document extends Model {
     //     Name: parentId 
     //     Flags: ReadOnly
     public URI getParentId();
-
-    public ResourceTemplate getResourceTemplate();
-
-    public URI getResourceTemplateId();
 
     public Long getSecondsToLive();
 

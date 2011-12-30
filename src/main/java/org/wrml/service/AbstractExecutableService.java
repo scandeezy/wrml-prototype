@@ -18,9 +18,9 @@ package org.wrml.service;
 
 import java.net.URI;
 
-import org.wrml.Context;
 import org.wrml.Model;
 import org.wrml.model.Action;
+import org.wrml.runtime.Context;
 
 public abstract class AbstractExecutableService extends AbstractService implements ExecutableService {
 
@@ -28,16 +28,9 @@ public abstract class AbstractExecutableService extends AbstractService implemen
         super(context);
     }
 
-    public Model execute(URI id) {
-        return execute(id, null, null);
-    }
-
-    public Model execute(URI id, Action action) {
+    public Object execute(URI id, Action action) {
         return execute(id, action, null);
     }
 
-    public Model execute(URI id, Model requestor) {
-        return execute(id, null, requestor);
-    }
-
+    public abstract Object execute(URI id, Action action, Model referrer);
 }

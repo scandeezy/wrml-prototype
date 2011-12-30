@@ -19,9 +19,10 @@ package org.wrml;
 import java.net.URI;
 
 import org.wrml.model.relation.LinkRelation;
+import org.wrml.runtime.Context;
 import org.wrml.service.AbstractService;
 import org.wrml.service.Service;
-import org.wrml.util.UriTransformer;
+import org.wrml.util.transformer.UriTransformer;
 
 /**
  * Greetings Program! http://www.moviesounds.com/tron/grtprgrm.wav
@@ -45,7 +46,7 @@ public class App {
         URI modelId = URI.create("http://api.relations.wrml.org/common/self");
 
         Service fetchedTitleService = context.getService(linkRelationClass);
-        Model dynamicModel = fetchedTitleService.get(modelId, null);
+        Model dynamicModel = (Model) fetchedTitleService.get(modelId, null);
 
         dynamicModel.setFieldValue("title", title);
 
@@ -65,7 +66,11 @@ public class App {
             super(context);
         }
 
-        public Model create(URI documentId, Model requestor) {
+        public Object get(URI id, Model referrer) {
+            return getContext().instantiateModel(LinkRelation.class, null);
+        }
+
+        public Object create(Model referrer) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -75,18 +80,14 @@ public class App {
             return null;
         }
 
-        public Model put(URI documentId, Model document, Model requestor) {
+        public Object put(URI id, Object requestEntity, Model referrer) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public Model remove(URI documentId, Model requestor) {
+        public Object remove(URI id, Model referrer) {
             // TODO Auto-generated method stub
             return null;
-        }
-
-        public Model get(URI documentId, Model requestor) {
-            return getContext().instantiateModel(LinkRelation.class);
         }
 
     }

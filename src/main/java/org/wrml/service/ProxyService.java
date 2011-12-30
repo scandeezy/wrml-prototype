@@ -19,12 +19,12 @@ package org.wrml.service;
 import java.net.URI;
 import java.util.Map;
 
-import org.wrml.Context;
 import org.wrml.Model;
-import org.wrml.util.DelegatingObservableMap;
-import org.wrml.util.UriTransformer;
+import org.wrml.runtime.Context;
+import org.wrml.util.observable.DelegatingObservableMap;
+import org.wrml.util.transformer.UriTransformer;
 
-public class ProxyService extends DelegatingObservableMap<URI, Model> implements DelegatingService<Map<URI, Model>> {
+public class ProxyService extends DelegatingObservableMap<URI, Object> implements DelegatingService<Map<URI, Object>> {
 
     // TODO: Add service event handler add/remove and event firing logic
 
@@ -47,32 +47,24 @@ public class ProxyService extends DelegatingObservableMap<URI, Model> implements
         return (Service) super.getDelegate();
     }
 
-    public Model create(Model requestor) {
-        return getOriginService().create(requestor);
+    public Object create(Model referrer) {
+        return getOriginService().create(referrer);
     }
 
-    public Model create(URI modelId, Model requestor) {
-        return getOriginService().create(modelId, requestor);
+    public Object get(URI id, Model referrer) {
+        return getOriginService().get(id, referrer);
     }
 
-    public Model get(URI modelId, Model requestor) {
-        return getOriginService().get(modelId, requestor);
+    public Object put(URI id, Object requestEntity, Model referrer) {
+        return getOriginService().put(id, requestEntity, referrer);
     }
 
-    public Model put(URI documentId, Model document, Model requestor) {
-        return getOriginService().put(documentId, document, requestor);
+    public Object remove(URI id, Model referrer) {
+        return getOriginService().remove(id, referrer);
     }
 
-    public Model remove(URI modelId, Model requestor) {
-        return getOriginService().remove(modelId, requestor);
-    }
-
-    public Model create() {
+    public Object create() {
         return getOriginService().create();
-    }
-
-    public Model create(URI id) {
-        return getOriginService().create(id);
     }
 
 }

@@ -20,7 +20,7 @@ import java.net.URI;
 
 public interface SchemaConstraint extends Constraint {
 
-    public Schema Schema();
+    public Schema getSchema();
 
     public URI getSchemaId();
 

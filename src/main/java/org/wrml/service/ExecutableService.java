@@ -28,11 +28,8 @@ public interface ExecutableService extends Service {
     // TODO: Need to package up an Action as an input 
     // that references a model and some other things?
 
-    public Model execute(URI id);
+    public Object execute(URI id, Action action);
 
-    public Model execute(URI id, Action action);
-
-    public Model execute(URI id, Action action, Model requestor);
-
-    public Model execute(URI id, Model requestor);
+    public Object execute(URI id, Action action, Model referrer);
+    
 }

@@ -18,7 +18,7 @@ package org.wrml.service;
 
 import java.util.List;
 
-import org.wrml.Context;
+import org.wrml.runtime.Context;
 
 /*
  * TODO: Create A base Model AggregatorService (http://en.wikipedia.org/wiki/Aggregator)

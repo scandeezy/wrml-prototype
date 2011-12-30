@@ -19,7 +19,7 @@ package org.wrml.model.schema;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
-import org.wrml.util.ObservableList;
+import org.wrml.util.observable.ObservableList;
 
 /**
  * A web resource schema's field. Conceptually a field is a typed data slot,

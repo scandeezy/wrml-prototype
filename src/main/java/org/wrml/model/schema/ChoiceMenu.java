@@ -20,7 +20,7 @@ import org.wrml.model.Descriptive;
 import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Versioned;
-import org.wrml.util.ObservableList;
+import org.wrml.util.observable.ObservableList;
 
 // Generated from a Web Resource Schema
 public interface ChoiceMenu extends Named, Versioned, Descriptive, Document {
