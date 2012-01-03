@@ -18,7 +18,7 @@ package org.wrml.runtime;
 
 import org.wrml.Model;
 
-final class FieldAccessor {
+final class FieldPrototype {
 
     public enum AccessType {
         GET,
@@ -28,7 +28,7 @@ final class FieldAccessor {
     private final String _FieldName;
     private final AccessType _AccessType;
 
-    public FieldAccessor(final String fieldName, final AccessType accessType) {
+    public FieldPrototype(final String fieldName, final AccessType accessType) {
         _FieldName = fieldName;
         _AccessType = accessType;
     }

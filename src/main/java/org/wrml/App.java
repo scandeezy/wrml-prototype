@@ -18,11 +18,12 @@ package org.wrml;
 
 import java.net.URI;
 
+import org.wrml.model.communication.MediaType;
 import org.wrml.model.relation.LinkRelation;
 import org.wrml.runtime.Context;
 import org.wrml.service.AbstractService;
 import org.wrml.service.Service;
-import org.wrml.util.transformer.UriTransformer;
+import org.wrml.util.transformer.Transformer;
 
 /**
  * Greetings Program! http://www.moviesounds.com/tron/grtprgrm.wav
@@ -36,17 +37,14 @@ public class App {
 
         Context context = new Context();
 
-        Class<?> linkRelationClass = LinkRelation.class;
-
-        final URI linkRelationSchemaId = context.getSchemaId(linkRelationClass);
-
+        MediaType linkRelationMediaType = context.getMediaTypeToClassTransformer().bToA(LinkRelation.class);        
         Service linkRelationService = context.instantiateCachingService(new LinkRelationService(context));
-        context.getServiceMap().put(linkRelationSchemaId, linkRelationService);
+        context.getServices().put(linkRelationMediaType, linkRelationService);
 
         URI modelId = URI.create("http://api.relations.wrml.org/common/self");
 
-        Service fetchedTitleService = context.getService(linkRelationClass);
-        Model dynamicModel = (Model) fetchedTitleService.get(modelId, null);
+        Service service = context.getService(linkRelationMediaType);
+        Model dynamicModel = (Model) service.get(modelId, linkRelationMediaType, null);
 
         dynamicModel.setFieldValue("title", title);
 
@@ -66,29 +64,30 @@ public class App {
             super(context);
         }
 
-        public Object get(URI id, Model referrer) {
-            return getContext().instantiateModel(LinkRelation.class, null);
-        }
-
-        public Object create(Model referrer) {
+        public Object create(URI collectionId, Object requestEntity, MediaType responseType, Model referrer) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public UriTransformer<?> getIdTransformer() {
+        public Object get(URI resourceId, MediaType responseType, Model referrer) {
+            return getContext().instantiateModel(responseType, null, resourceId);
+        }
+
+        public Object put(URI resourceId, Object requestEntity, MediaType responseType, Model referrer) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public Object put(URI id, Object requestEntity, Model referrer) {
+        public Object remove(URI resourceId, MediaType responseType, Model referrer) {
             // TODO Auto-generated method stub
             return null;
         }
 
-        public Object remove(URI id, Model referrer) {
+        public Transformer<URI, ?> getIdTransformer() {
             // TODO Auto-generated method stub
             return null;
         }
+
 
     }
 

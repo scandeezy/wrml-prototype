@@ -21,36 +21,20 @@ import java.net.URI;
 import org.wrml.runtime.Context;
 import org.wrml.service.ProxyService;
 import org.wrml.service.Service;
-import org.wrml.util.transformer.UriTransformer;
+import org.wrml.util.transformer.Transformer;
 
 /**
  * The WRML equivalent of the SystemClassLoader
  */
-public class SystemSchemaService extends ProxyService implements SchemaService {
-
-    public static final URI DEFAULT_SCHEMA_API_DOCROOT = URI.create("http://api.schemas.wrml.org/");
-
-    private UriTransformer<String> _UriTransformer;
+public class SystemSchemaService extends ProxyService implements Service {
 
     public SystemSchemaService(Context context, Service originService) {
         super(context, originService);
     }
 
     @Override
-    public final UriTransformer<String> getIdTransformer() {
-        if (_UriTransformer == null) {
-            _UriTransformer = createIdTransformer();
-        }
-        return _UriTransformer;
-    }
-
-    public ClassLoader getSchemaInterfaceLoader() {
-        //TODO: Replace with auto-generation class loader 
-        return getClass().getClassLoader();
-    }
-
-    protected UriTransformer<String> createIdTransformer() {
-        return new SchemaClassNameUriTransformer(DEFAULT_SCHEMA_API_DOCROOT);
+    public final Transformer<URI, String> getIdTransformer() {
+        return getContext().getSchemaIdToClassNameTransformer();
     }
 
 }

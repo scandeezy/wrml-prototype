@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime.service;
+package org.wrml.util.transformer;
 
 import java.net.URI;
 
-import org.wrml.util.transformer.UriTransformer;
+import org.wrml.runtime.Context;
 
-public class SchemaClassNameUriTransformer implements UriTransformer<String> {
+public class SchemaIdToClassNameTransformer extends AbstractTransformer<URI, String> {
 
     public final URI _BaseUri;
 
-    public SchemaClassNameUriTransformer(URI baseUri) {
+    public SchemaIdToClassNameTransformer(Context context, URI baseUri) {
+        super(context);
         _BaseUri = baseUri;
     }
 
@@ -38,14 +39,6 @@ public class SchemaClassNameUriTransformer implements UriTransformer<String> {
 
     public URI getBaseUri() {
         return _BaseUri;
-    }
-
-    public Class<URI> getA() {
-        return URI.class;
-    }
-
-    public Class<String> getB() {
-        return String.class;
     }
 
 }

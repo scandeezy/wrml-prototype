@@ -20,9 +20,10 @@ import java.net.URI;
 import java.util.Map;
 
 import org.wrml.Model;
+import org.wrml.model.communication.MediaType;
 import org.wrml.runtime.Context;
 import org.wrml.util.observable.DelegatingObservableMap;
-import org.wrml.util.transformer.UriTransformer;
+import org.wrml.util.transformer.Transformer;
 
 public class ProxyService extends DelegatingObservableMap<URI, Object> implements DelegatingService<Map<URI, Object>> {
 
@@ -39,7 +40,7 @@ public class ProxyService extends DelegatingObservableMap<URI, Object> implement
         return _Context;
     }
 
-    public UriTransformer<?> getIdTransformer() {
+    public Transformer<URI, ?> getIdTransformer() {
         return getOriginService().getIdTransformer();
     }
 
@@ -47,24 +48,20 @@ public class ProxyService extends DelegatingObservableMap<URI, Object> implement
         return (Service) super.getDelegate();
     }
 
-    public Object create(Model referrer) {
-        return getOriginService().create(referrer);
+    public Object create(URI collectionId, Object requestEntity, MediaType responseType, Model referrer) {
+        return getOriginService().create(collectionId, requestEntity, responseType, referrer);
     }
 
-    public Object get(URI id, Model referrer) {
-        return getOriginService().get(id, referrer);
+    public Object get(URI resourceId, MediaType responseType, Model referrer) {
+        return getOriginService().get(resourceId, responseType, referrer);
     }
 
-    public Object put(URI id, Object requestEntity, Model referrer) {
-        return getOriginService().put(id, requestEntity, referrer);
+    public Object put(URI resourceId, Object requestEntity, MediaType responseType, Model referrer) {
+        return getOriginService().put(resourceId, requestEntity, responseType, referrer);
     }
 
-    public Object remove(URI id, Model referrer) {
-        return getOriginService().remove(id, referrer);
-    }
-
-    public Object create() {
-        return getOriginService().create();
+    public Object remove(URI resourceId, MediaType responseType, Model referrer) {
+        return getOriginService().remove(resourceId, responseType, referrer);
     }
 
 }

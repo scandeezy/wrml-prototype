@@ -22,12 +22,12 @@ import java.util.Map;
 import org.wrml.Model;
 import org.wrml.model.communication.MediaType;
 
-final class LinkClicker {
+final class LinkPrototype {
 
     private final URI _Rel;
     private final MediaType _ResponseMediaType;
 
-    public LinkClicker(final URI rel, final MediaType responseMediaType) {
+    public LinkPrototype(final URI rel, final MediaType responseMediaType) {
         _Rel = rel;
         _ResponseMediaType = responseMediaType;
     }

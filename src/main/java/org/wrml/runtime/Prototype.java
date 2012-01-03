@@ -36,7 +36,7 @@ import org.wrml.model.schema.Constraint;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Link;
 import org.wrml.model.schema.Schema;
-import org.wrml.runtime.FieldAccessor.AccessType;
+import org.wrml.runtime.FieldPrototype.AccessType;
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.util.observable.Observables;
 import org.wrml.util.transformer.Transformer;
@@ -60,8 +60,8 @@ final class Prototype {
     private ObservableMap<URI, Link> _LinksByRel;
     private ObservableMap<String, Link> _LinksByName;
 
-    private ObservableMap<String, FieldAccessor> _FieldAccessors;
-    private ObservableMap<String, LinkClicker> _LinkClickers;
+    private ObservableMap<String, FieldPrototype> _FieldPrototypes;
+    private ObservableMap<String, LinkPrototype> _LinkPrototypes;
 
     public Prototype(Context context, URI blueprintSchemaId) {
         _Context = context;
@@ -236,20 +236,20 @@ final class Prototype {
         return _Context;
     }
 
-    public FieldAccessor getFieldAccessor(String methodKey, String methodName) {
+    public FieldPrototype getFieldPrototype(String methodKey, String methodName) {
 
-        if (_FieldAccessors == null) {
-            _FieldAccessors = Observables.observableMap(new TreeMap<String, FieldAccessor>());
+        if (_FieldPrototypes == null) {
+            _FieldPrototypes = Observables.observableMap(new TreeMap<String, FieldPrototype>());
         }
 
-        FieldAccessor fieldAccessor = null;
-        if (_FieldAccessors.containsKey(methodKey)) {
-            fieldAccessor = _FieldAccessors.get(methodKey);
+        FieldPrototype fieldPrototype = null;
+        if (_FieldPrototypes.containsKey(methodKey)) {
+            fieldPrototype = _FieldPrototypes.get(methodKey);
         }
         else {
 
             String fieldName = null;
-            FieldAccessor.AccessType accessType = AccessType.GET;
+            FieldPrototype.AccessType accessType = AccessType.GET;
             if (methodName.startsWith("get")) {
                 fieldName = methodName.substring(3);
             }
@@ -268,14 +268,14 @@ final class Prototype {
                 Field prototypeField = (prototypeFields != null) ? prototypeFields.get(fieldName) : null;
 
                 if (prototypeField != null) {
-                    fieldAccessor = new FieldAccessor(fieldName, accessType);
+                    fieldPrototype = new FieldPrototype(fieldName, accessType);
                 }
             }
 
-            _FieldAccessors.put(methodKey, fieldAccessor);
+            _FieldPrototypes.put(methodKey, fieldPrototype);
         }
 
-        return fieldAccessor;
+        return fieldPrototype;
     }
 
     public ObservableMap<String, Field> getFields() {
@@ -288,14 +288,14 @@ final class Prototype {
 
     }
 
-    public LinkClicker getLinkClicker(String methodKey, String methodName, Class<?> returnType) {
-        if (_LinkClickers == null) {
-            _LinkClickers = Observables.observableMap(new TreeMap<String, LinkClicker>());
+    public LinkPrototype getLinkPrototype(String methodKey, String methodName, Class<?> returnType) {
+        if (_LinkPrototypes == null) {
+            _LinkPrototypes = Observables.observableMap(new TreeMap<String, LinkPrototype>());
         }
 
-        LinkClicker linkClicker = null;
-        if (_LinkClickers.containsKey(methodKey)) {
-            linkClicker = _LinkClickers.get(methodKey);
+        LinkPrototype linkPrototype = null;
+        if (_LinkPrototypes.containsKey(methodKey)) {
+            linkPrototype = _LinkPrototypes.get(methodKey);
         }
         else {
 
@@ -330,14 +330,14 @@ final class Prototype {
                 if (link != null) {
                     Transformer<MediaType, Class<?>> mediaTypeToClassTransformer = getContext()
                             .getMediaTypeToClassTransformer();
-                    linkClicker = new LinkClicker(link.getRelId(), mediaTypeToClassTransformer.bToA(returnType));
+                    linkPrototype = new LinkPrototype(link.getRelId(), mediaTypeToClassTransformer.bToA(returnType));
                 }
             }
 
-            _LinkClickers.put(methodKey, linkClicker);
+            _LinkPrototypes.put(methodKey, linkPrototype);
         }
 
-        return linkClicker;
+        return linkPrototype;
 
     }
 
@@ -460,16 +460,17 @@ final class Prototype {
 
     private void initConstraints(final SortedMap<URI, Constraint> allYourConstraints, final Schema baseSchema) {
         new PrototypicalExtension<URI, Constraint>(allYourConstraints, baseSchema.getConstraints(), getContext()
-                .getSchemaId(Constraint.class));
+                .getSchemaIdToClassTransformer().bToA(Constraint.class));
     }
 
     private void initFields(final SortedMap<String, Field> allYourFields, final Schema baseSchema) {
-        new PrototypicalExtension<String, Field>(allYourFields, baseSchema.getFields(), getContext().getSchemaId(
-                Field.class));
+        new PrototypicalExtension<String, Field>(allYourFields, baseSchema.getFields(), getContext()
+                .getSchemaIdToClassTransformer().bToA(Field.class));
     }
 
     private void initLinks(final SortedMap<URI, Link> allYourLinks, final Schema baseSchema) {
-        new PrototypicalExtension<URI, Link>(allYourLinks, baseSchema.getLinks(), getContext().getSchemaId(Link.class));
+        new PrototypicalExtension<URI, Link>(allYourLinks, baseSchema.getLinks(), getContext()
+                .getSchemaIdToClassTransformer().bToA(Link.class));
     }
 
     private class PrototypicalExtension<K, M extends Model> {
@@ -503,7 +504,7 @@ final class Prototype {
             final Context context = getContext();
             M model = allModels.get(modelKey);
             if (model == null) {
-                model = (M) context.instantiateModel(schemaId, null).getStaticInterface();
+                model = (M) context.instantiateModel(schemaId, null, null).getStaticInterface();
                 allModels.put(modelKey, model);
             }
 

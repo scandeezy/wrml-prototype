@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.wrml.Model;
 import org.wrml.model.Document;
+import org.wrml.model.communication.MediaType;
 import org.wrml.runtime.Context;
 import org.wrml.util.observable.ObservableMap;
 
@@ -46,32 +47,32 @@ public class CachingService extends ProxyService {
     }
 
     @Override
-    public Object get(URI id, Model referrer) {
+    public Object get(URI resourceId, MediaType responseType, Model referrer) {
 
-        if (id == null) {
-            throw new NullPointerException("id (URI) cannot be null");
+        if (resourceId == null) {
+            throw new NullPointerException("Resource ID (URI) cannot be null");
         }
 
-        System.out.println("CachingService.get - id: " + id + " referrer: " + referrer);
+        System.out.println("CachingService.get - id: " + resourceId + " referrer: " + referrer);
 
         Map<URI, Object> cache = getCache();
 
-        boolean isRefresh = (referrer != null && referrer instanceof Document && id.equals(((Document) referrer)
+        boolean isRefresh = (referrer != null && referrer instanceof Document && resourceId.equals(((Document) referrer)
                 .getId()));
 
         if (!isRefresh) {
-            if (cache.containsKey(id) && !isRefresh) {
-                return cache.get(id);
+            if (cache.containsKey(resourceId) && !isRefresh) {
+                return cache.get(resourceId);
             }
         }
 
-        Object responseEntity = super.get(id, referrer);
+        Object responseEntity = super.get(resourceId, responseType, referrer);
 
         // TODO: Consider a composite key for the cache map to consider response type attributes (like a good HTTP cache would)
         // TODO: Honor TTL and Etags etc
 
         if (!isRefresh) {
-            cache.put(id, responseEntity);
+            cache.put(resourceId, responseEntity);
         }
 
         return responseEntity;

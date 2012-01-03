@@ -22,9 +22,4 @@ public interface Transformer<A, B> {
 
     public A bToA(B bValue);
 
-    /*
-    public Class<A> getA();
-
-    public Class<B> getB();
-*/
 }

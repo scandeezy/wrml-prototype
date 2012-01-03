@@ -308,7 +308,7 @@ final class RuntimeModel implements Model {
     private final List<URI> _EmbeddedLinkRelationIds;
 
     private ObservableMap<String, Object> _FieldMap;
-    private ObservableMap<URI, LinkInstance> _LinkMap;
+    private ObservableMap<URI, HyperLink> _LinkMap;
 
     private transient List<ModelEventListener> _EventListeners;
     private transient Map<String, List<FieldEventListener>> _FieldEventListeners;
@@ -375,8 +375,8 @@ final class RuntimeModel implements Model {
     }
 
     public Object clickLink(URI rel, MediaType responseType, Object requestEntity, Map<String, String> hrefParams) {
-        LinkInstance linkInstance = getLinkInstance(rel);
-        return linkInstance.click(responseType, requestEntity, hrefParams);
+        HyperLink hyperLink = getHyperLink(rel);
+        return hyperLink.click(responseType, requestEntity, hrefParams);
     }
 
     public void die() {
@@ -513,24 +513,11 @@ final class RuntimeModel implements Model {
         URI schemaId = getSchemaId();
         Context context = getContext();
 
-        String className = context.getClassName(schemaId);
-        System.out.println("Loading schema class: " + className);
-        ClassLoader schemaInterfaceLoader = context.getSchemaService().getSchemaInterfaceLoader();
-        Class<?> schemaInterface = null;
-        try {
-
-            schemaInterface = schemaInterfaceLoader.loadClass(className);
-        }
-        catch (Throwable t) {
-            // TODO Auto-generated catch block
-            t.printStackTrace();
-        }
-
+        Class<?> schemaInterface = context.getSchemaIdToClassTransformer().aToB(schemaId);
         Class<?>[] schemaInterfaceArray = new Class<?>[] { schemaInterface };
         StaticModelHandler invocationHandler = new StaticModelHandler(this);
 
-        _StaticInterface = (Model) Proxy.newProxyInstance(schemaInterfaceLoader, schemaInterfaceArray,
-                invocationHandler);
+        _StaticInterface = (Model) Proxy.newProxyInstance(context, schemaInterfaceArray, invocationHandler);
 
         return _StaticInterface;
     }
@@ -693,14 +680,14 @@ final class RuntimeModel implements Model {
         }
     }
 
-    private LinkInstance getLinkInstance(URI rel) {
+    private HyperLink getHyperLink(URI rel) {
 
         if (_LinkMap == null) {
             initLinkMap();
         }
 
         if (!_LinkMap.containsKey(rel)) {
-            LinkInstance link = new LinkInstance(rel);
+            HyperLink link = new HyperLink(rel);
             _LinkMap.put(rel, link);
         }
 
@@ -719,7 +706,7 @@ final class RuntimeModel implements Model {
     }
 
     private void initLinkMap() {
-        _LinkMap = Observables.observableMap(new HashMap<URI, LinkInstance>());
+        _LinkMap = Observables.observableMap(new HashMap<URI, HyperLink>());
     }
 
     private class FieldMapEventListener implements MapEventListener<String, Object> {
@@ -787,7 +774,7 @@ final class RuntimeModel implements Model {
      * LinkFormula
      * relies upon.
      */
-    private class LinkInstance implements Serializable {
+    private class HyperLink implements Serializable {
 
         private static final long serialVersionUID = -6235652220661484935L;
 
@@ -795,7 +782,7 @@ final class RuntimeModel implements Model {
         private URI _Href;
         private boolean _Enabled;
 
-        public LinkInstance(URI rel) {
+        public HyperLink(URI rel) {
             _Rel = rel;
         }
 
@@ -931,7 +918,7 @@ final class RuntimeModel implements Model {
 
             // Check to see if this link is currently enabled before proceeding
             if (!isEnabled()) {
-                // Null represents a disconnected or disabled link
+                // TODO: Should null represent a disconnected or disabled link?
                 return null;
             }
 
@@ -955,8 +942,8 @@ final class RuntimeModel implements Model {
              * application/json maps to the json Format) }
              */
 
-            final RuntimeModel model = getModel();
-            final Context context = model.getContext();
+            final RuntimeModel referrer = getReferrer();
+            final Context context = referrer.getContext();
 
             if (responseType != null && !isGeneratableResponseType(responseType)) {
                 // TODO: Preemptively throw "406 Not Acceptable" exception
@@ -997,15 +984,15 @@ final class RuntimeModel implements Model {
             // TODO: Handle collections here?
 
             case GET:
-                responseEntity = responseTypeService.get(href, model);
+                responseEntity = responseTypeService.get(href, responseType, referrer);
                 break;
 
             case PUT:
-                responseEntity = responseTypeService.put(href, requestEntity, model);
+                responseEntity = responseTypeService.put(href, requestEntity, responseType, referrer);
                 break;
 
             case DELETE:
-                responseEntity = responseTypeService.remove(href, model);
+                responseEntity = responseTypeService.remove(href, responseType, referrer);
                 break;
 
             case POST:
@@ -1016,12 +1003,12 @@ final class RuntimeModel implements Model {
 
             case HEAD:
                 // TODO:
-                responseEntity = responseTypeService.get(href, model);
+                responseEntity = responseTypeService.get(href, responseType, referrer);
                 break;
 
             case OPTIONS:
                 // TODO:
-                responseEntity = responseTypeService.get(href, model);
+                responseEntity = responseTypeService.get(href, responseType, referrer);
                 break;
 
             default:
@@ -1047,18 +1034,20 @@ final class RuntimeModel implements Model {
         }
 
         public Link getLink() {
-            final RuntimeModel model = getModel();
-            final Prototype prototype = model.getPrototype();
+            final RuntimeModel referrer = getReferrer();
+            final Prototype prototype = referrer.getPrototype();
             ObservableMap<URI, Link> links = prototype.getLinksByRel();
             URI rel = getLinkRelationId();
             return (links != null && links.containsKey(rel)) ? links.get(rel) : null;
         }
 
         public LinkRelation getLinkRelation() {
-            final Model model = getModel();
-            Context context = model.getContext();
-            Service service = context.getService(LinkRelation.class);
-            return (LinkRelation) service.get(getLinkRelationId(), model);
+            final Model referrer = getReferrer();
+            Context context = referrer.getContext();
+            MediaType linkRelationMediaType = context.getMediaTypeToClassTransformer().bToA(LinkRelation.class);
+            Service service = context.getService(linkRelationMediaType);
+            return (LinkRelation) ((Model) service.get(getLinkRelationId(), linkRelationMediaType, referrer))
+                    .getStaticInterface();
         }
 
         public URI getLinkRelationId() {
@@ -1091,7 +1080,7 @@ final class RuntimeModel implements Model {
 
         }
 
-        public RuntimeModel getModel() {
+        public RuntimeModel getReferrer() {
             return RuntimeModel.this;
         }
 
@@ -1152,24 +1141,24 @@ final class RuntimeModel implements Model {
                 return super.subInvoke(proxy, method, args);
             }
 
-            RuntimeModel model = getDyanmicModel();
+            RuntimeModel referrer = getDyanmicModel();
 
-            Prototype prototype = model.getPrototype();
+            Prototype prototype = referrer.getPrototype();
 
             String methodKey = getMethodKey(method);
             String methodName = method.getName();
 
-            FieldAccessor fieldAccessor = prototype.getFieldAccessor(methodKey, methodName);
-            if (fieldAccessor != null) {
+            FieldPrototype fieldPrototype = prototype.getFieldPrototype(methodKey, methodName);
+            if (fieldPrototype != null) {
                 Object fieldValue = null;
-                if (fieldAccessor.getAccessType() == FieldAccessor.AccessType.SET && args != null && args.length > 0) {
+                if (fieldPrototype.getAccessType() == FieldPrototype.AccessType.SET && args != null && args.length > 0) {
                     fieldValue = args[0];
                 }
-                return fieldAccessor.accessField(model, fieldValue);
+                return fieldPrototype.accessField(referrer, fieldValue);
             }
 
-            LinkClicker linkClicker = prototype.getLinkClicker(methodKey, methodName, method.getReturnType());
-            if (linkClicker != null) {
+            LinkPrototype linkPrototype = prototype.getLinkPrototype(methodKey, methodName, method.getReturnType());
+            if (linkPrototype != null) {
 
                 Object requestEntity = (args != null && args.length > 0) ? args[0] : null;
 
@@ -1178,10 +1167,8 @@ final class RuntimeModel implements Model {
                 Map<String, String> hrefArgs = (Map<String, String>) ((args != null && args.length > 1) ? args[1]
                         : null);
 
-                return linkClicker.clickLink(model, requestEntity, hrefArgs);
+                return linkPrototype.clickLink(referrer, requestEntity, hrefArgs);
             }
-
-            // TODO: Support "native" methods by delgating to some other class that is mapped from a Schema ID?
 
             return null;
         }

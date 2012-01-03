@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package org.wrml.service;
+package org.wrml.util.transformer;
 
-import java.net.URI;
-
-import org.wrml.Model;
-import org.wrml.model.Action;
 import org.wrml.runtime.Context;
 
-public abstract class AbstractExecutableService extends AbstractService implements ExecutableService {
+public abstract class AbstractTransformer<A, B> implements Transformer<A, B> {
 
-    public AbstractExecutableService(Context context) {
-        super(context);
+    private final Context _Context;
+
+    public AbstractTransformer(final Context context) {
+        _Context = context;
     }
 
-    public Object execute(URI id, Action action) {
-        return execute(id, action, null);
+    public final Context getContext() {
+        return _Context;
     }
 
-    public abstract Object execute(URI id, Action action, Model referrer);
 }

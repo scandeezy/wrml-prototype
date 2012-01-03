@@ -20,9 +20,9 @@ import java.net.URI;
 import java.util.Map;
 
 import org.wrml.Model;
+import org.wrml.model.communication.MediaType;
 import org.wrml.runtime.Context;
-import org.wrml.util.Factory;
-import org.wrml.util.transformer.UriTransformer;
+import org.wrml.util.transformer.Transformer;
 
 /**
  * This is the (still-evolving) core "backend connection" CRUD interface that is
@@ -32,20 +32,21 @@ import org.wrml.util.transformer.UriTransformer;
  * @param <T>
  *            the Model subtype the is serviced here.
  */
-public interface Service extends Factory<Object>, Map<URI, Object> {
+public interface Service extends Map<URI, Object> {
 
     public Context getContext();
 
-    public Object create(Model referrer);
-
-    public Object get(URI id, Model referrer);
-
-    public UriTransformer<?> getIdTransformer();
-
-    public Object put(URI id, Object requestEntity, Model referrer);
-
-    public Object remove(URI id, Model referrer);
-
+    public Object create(URI collectionId, Object requestEntity, MediaType responseType, Model referrer);
+    public Object get(URI resourceId, MediaType responseType, Model referrer);
+    public Object put(URI resourceId, Object requestEntity, MediaType responseType, Model referrer);
+    public Object remove(URI resourceId, MediaType responseType, Model referrer);
+    
+    public Transformer<URI, ?> getIdTransformer();       
+    
+    // TODO: Provide "first class" support for Container resources in the Service Java API
+    // Need to figure out how to pass pagination and query by example params 
+    //public Container<Document> getContainer(URI containerId, MediaType responseType, Model referrer, Options options);
+    
     // TODO: Support non-model input/output with I/O Streams?
 
     // TODO: Support model search? Fuzzy matching? Query by example?

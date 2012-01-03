@@ -52,16 +52,12 @@ public abstract class AbstractService implements Service {
         return false;
     }
 
-    public Object create() {
-        return create(null);
-    }
-
     public Set<java.util.Map.Entry<URI, Object>> entrySet() {
         return null;
     }
 
-    public Object get(Object key) {
-        return get((URI) key, null);
+    public Object get(Object resourceId) {
+        return get((URI) resourceId, null, null);
     }
 
     public final Context getContext() {
@@ -76,16 +72,16 @@ public abstract class AbstractService implements Service {
         return null;
     }
 
-    public Object put(URI id, Object requestEntity) {
-        return put(id, requestEntity, null);
+    public Object put(URI resourceId, Object requestEntity) {
+        return put(resourceId, requestEntity, null, null);
     }
 
     public void putAll(Map<? extends URI, ? extends Object> map) {
         // TODO ? Loop?        
     }
 
-    public Object remove(Object key) {
-        return remove((URI) key, null);
+    public Object remove(Object resourceId) {
+        return remove((URI) resourceId, null, null);
     }
 
     public int size() {

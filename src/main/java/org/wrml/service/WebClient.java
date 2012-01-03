@@ -24,18 +24,21 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import org.wrml.Model;
-import org.wrml.model.Action;
+import org.wrml.model.communication.MediaType;
 import org.wrml.runtime.Context;
-import org.wrml.util.transformer.UriTransformer;
+import org.wrml.util.transformer.PassthroughTransformer;
+import org.wrml.util.transformer.Transformer;
 
 /*
  * Implements the service interface with a REST API client.
  * 
  * TODO: This is all still very "alpha" - optimize at will.
  */
-public class WebClient extends AbstractExecutableService {
+public class WebClient extends AbstractService {
 
     private HttpClient _HttpClient;
+
+    public final static PassthroughTransformer<URI> ID_TRANSFORMER = new PassthroughTransformer<URI>();
 
     public WebClient(Context context) {
         super(context);
@@ -75,11 +78,10 @@ public class WebClient extends AbstractExecutableService {
         return super.containsValue(value);
     }
 
-    public Object create(Model referrer) {
+    public Object create(URI collectionId, Object requestEntity, MediaType responseType, Model referrer) {
         // TODO Auto-generated method stub
         return null;
     }
-
 
     @Override
     public Set<java.util.Map.Entry<URI, Object>> entrySet() {
@@ -92,17 +94,7 @@ public class WebClient extends AbstractExecutableService {
         return super.entrySet();
     }
 
-    @Override
-    public Object execute(URI id, Action action, Model referrer) {
-
-        /*
-         * TODO: HTTP POST an action
-         */
-
-        return null;
-    }
-
-    public Object get(URI id, Model referrer) {
+    public Object get(URI resourceId, MediaType responseType, Model referrer) {
 
         /*
          * TODO: HTTP GET
@@ -111,11 +103,8 @@ public class WebClient extends AbstractExecutableService {
         return null;
     }
 
-    public UriTransformer<URI> getIdTransformer() {
-        // By default, this service treat's URIs as native identifiers, 
-        // therefore we can use a passthrough transformer.
-
-        return PassthroughUriTransformer.Instance;
+    public Transformer<URI, URI> getIdTransformer() {
+        return ID_TRANSFORMER;
     }
 
     @Override
@@ -140,7 +129,7 @@ public class WebClient extends AbstractExecutableService {
         return super.keySet();
     }
 
-    public Object put(URI id, Object requestEntity, Model referrer) {
+    public Object put(URI resourceId, Object requestEntity, MediaType responseType, Model referrer) {
         /*
          * TODO: HTTP PUT
          */
@@ -158,7 +147,7 @@ public class WebClient extends AbstractExecutableService {
         super.putAll(map);
     }
 
-    public Object remove(URI id, Model referrer) {
+    public Object remove(URI resourceId, MediaType responseType, Model referrer) {
         /*
          * TODO: HTTP DELETE
          */
@@ -192,28 +181,6 @@ public class WebClient extends AbstractExecutableService {
         _HttpClient.getConnectionManager().shutdown();
 
         super.finalize();
-    }
-
-    public static class PassthroughUriTransformer implements UriTransformer<URI> {
-
-        public static final PassthroughUriTransformer Instance = new PassthroughUriTransformer();
-
-        public URI aToB(URI aValue) {
-            return aValue;
-        }
-
-        public URI bToA(URI bValue) {
-            return bValue;
-        }
-
-        public Class<URI> getA() {
-            return URI.class;
-        }
-
-        public Class<URI> getB() {
-            return URI.class;
-        }
-
     }
 
 }

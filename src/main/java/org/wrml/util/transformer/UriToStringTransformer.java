@@ -18,6 +18,17 @@ package org.wrml.util.transformer;
 
 import java.net.URI;
 
-public interface UriTransformer<B> extends Transformer<URI, B> {
+public class UriToStringTransformer implements Transformer<URI, String> {
+
+    public String aToB(URI aValue) {
+        if (aValue == null) {
+            return null;
+        }
+        return String.valueOf(aValue.normalize());
+    }
+
+    public URI bToA(String bValue) {
+        return URI.create(bValue).normalize();
+    }
 
 }

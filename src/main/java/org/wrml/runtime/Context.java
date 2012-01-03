@@ -16,23 +16,16 @@
 
 package org.wrml.runtime;
 
-import java.lang.reflect.TypeVariable;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.wrml.Model;
 import org.wrml.model.Container;
 import org.wrml.model.Document;
 import org.wrml.model.communication.MediaType;
 import org.wrml.model.schema.Schema;
-import org.wrml.model.schema.TextSyntaxConstraint;
-import org.wrml.runtime.service.SchemaService;
 import org.wrml.runtime.service.SystemSchemaService;
 import org.wrml.service.CachingService;
 import org.wrml.service.Service;
@@ -41,9 +34,13 @@ import org.wrml.util.observable.DelegatingObservableMap;
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.util.observable.Observables;
 import org.wrml.util.transformer.CachingTransformer;
-import org.wrml.util.transformer.StringTransformer;
+import org.wrml.util.transformer.MediaTypeToClassTransformer;
+import org.wrml.util.transformer.MediaTypeToStringTransformer;
+import org.wrml.util.transformer.SchemaIdToClassNameTransformer;
+import org.wrml.util.transformer.SchemaIdToClassTransformer;
+import org.wrml.util.transformer.SchemaIdToMediaTypeTransformer;
 import org.wrml.util.transformer.Transformer;
-import org.wrml.util.transformer.UriTransformer;
+import org.wrml.util.transformer.UriToStringTransformer;
 
 /**
  * 
@@ -121,55 +118,74 @@ import org.wrml.util.transformer.UriTransformer;
  * This Proxy approach may prove to be the final solution or we may decide
  * to auto-generate impl classes via our own code generation.
  */
-public class Context {
+public class Context extends ClassLoader {
 
-    private static final String TYPE_APPLICATION = "application";
-    private static final String SUBTYPE_WRML = "wrml";
+    public static final URI DEFAULT_SCHEMA_API_DOCROOT = URI.create("http://api.schemas.wrml.org/");
+    public static final String FIELD_NAME_ID = "id";
 
-    private static final String MEDIA_TYPE_STRING_WRML = TYPE_APPLICATION + '/' + SUBTYPE_WRML;
+    private final ObservableMap<MediaType, Service> _Services;
+    private Transformer<MediaType, String> _MediaTypeToStringTransformer;
+    private Transformer<MediaType, Class<?>> _MediaTypeToClassTransformer;
 
-    private static final String MEDIA_TYPE_REGEX_STRING = "^" + "([a-zA-Z0-9!#$%^&\\*_\\-\\+{}\\|'.`~]+)/"
-            + "([a-zA-Z0-9!#$%^&\\*_\\-\\+{}\\|'.`~]+)( +" + "([a-zA-Z0-9!#$%^&\\*_\\-\\+{}\\|'.`~]+)=\"([^\"]*)\";)*$";
+    private Transformer<URI, MediaType> _SchemaIdToMediaTypeTransformer;
+    private Transformer<URI, Class<?>> _SchemaIdToClassTransformer;
+    private Transformer<URI, String> _SchemaIdToClassNameTransformer;
+    private Transformer<URI, String> _UriToStringTransformer;
 
-    private static final Pattern MEDIA_TYPE_REGEX_PATTERN = Pattern.compile(MEDIA_TYPE_REGEX_STRING);
+    private Service _SchemaService;
+    private CachingService _SchemaCachingService;
 
-    private final ObservableMap<URI, Service> _ServiceMap;
     private final ObservableMap<URI, Prototype> _Prototypes;
     private final ObservableMap<URI, HypermediaEngine> _HypermediaEngines;
 
-    private SchemaService _SchemaService;
-    private CachingService _SchemaCachingService;
-
-    private Transformer<MediaType, String> _MediaTypeToStringTransformer;
-    private Transformer<MediaType, Class<?>> _MediaTypeToClassTransformer;
-    private Transformer<MediaType, URI> _MediaTypeToSchemaIdTransformer;
-
     public Context() {
-        _ServiceMap = Observables.observableMap(new HashMap<URI, Service>());
+        this(getSystemClassLoader());
+    }
+
+    public Context(ClassLoader parent) {
+        super(parent);
+
+        _Services = Observables.observableMap(new HashMap<MediaType, Service>());
+
         _Prototypes = Observables.observableMap(new HashMap<URI, Prototype>());
         _HypermediaEngines = Observables.observableMap(new HashMap<URI, HypermediaEngine>());
 
-        SchemaService schemaService = new SystemSchemaService(this, new WebClient(this));
-        setSchemaService(schemaService);
+        Transformer<URI, String> uriToStringTransformer = new CachingTransformer<URI, String, Transformer<URI, String>>(
+                new UriToStringTransformer());
+
+        setUriToStringTransformer(uriToStringTransformer);
 
         Transformer<MediaType, String> mediaTypeToStringTransformer = new CachingTransformer<MediaType, String, Transformer<MediaType, String>>(
-                new MediaTypeToStringTransformer());
+                new MediaTypeToStringTransformer(this));
         setMediaTypeToStringTransformer(mediaTypeToStringTransformer);
 
         Transformer<MediaType, Class<?>> mediaTypeToClassTransformer = new CachingTransformer<MediaType, Class<?>, Transformer<MediaType, Class<?>>>(
-                new MediaTypeToClassTransformer());
+                new MediaTypeToClassTransformer(this));
 
         setMediaTypeToClassTransformer(mediaTypeToClassTransformer);
 
-        Transformer<MediaType, URI> mediaTypeToSchemaIdTransformer = new CachingTransformer<MediaType, URI, Transformer<MediaType, URI>>(
-                new MediaTypeToSchemaIdTransformer());
+        Transformer<URI, MediaType> schemaIdToMediaTypeTransformer = new CachingTransformer<URI, MediaType, Transformer<URI, MediaType>>(
+                new SchemaIdToMediaTypeTransformer(this));
 
-        setMediaTypeToSchemaIdTransformer(mediaTypeToSchemaIdTransformer);
+        setSchemaIdToMediaTypeTransformer(schemaIdToMediaTypeTransformer);
+
+        Transformer<URI, String> schemaIdToClassNameTransformer = new CachingTransformer<URI, String, Transformer<URI, String>>(
+                new SchemaIdToClassNameTransformer(this, DEFAULT_SCHEMA_API_DOCROOT));
+
+        setSchemaIdToClassNameTransformer(schemaIdToClassNameTransformer);
+
+        Transformer<URI, Class<?>> schemaIdToClassTransformer = new CachingTransformer<URI, Class<?>, Transformer<URI, Class<?>>>(
+                new SchemaIdToClassTransformer(this));
+
+        setSchemaIdToClassTransformer(schemaIdToClassTransformer);
+        
+        Service schemaService = new SystemSchemaService(this, new WebClient(this));
+        setSchemaService(schemaService);
     }
 
-    public final String getClassName(URI schemaId) {
-        UriTransformer<?> schemaIdTransformer = _SchemaService.getIdTransformer();
-        return (String) schemaIdTransformer.aToB(schemaId);
+    public final void fetchAllDocuments(Container<? extends Document> documents, List<? extends Document> allDocuments) {
+        // TODO: Page through container filling allDocuments
+
     }
 
     /*
@@ -178,15 +194,20 @@ public class Context {
      * bootstrapping of the WRML runtime "app".
      */
 
-    public final Transformer<MediaType, Class<?>> getMediaTypeToClassTransformer() {
+    public final HypermediaEngine getHypermediaEngine(URI apiId) {
+        if (!_HypermediaEngines.containsKey(apiId)) {
+            HypermediaEngine hypermediaEngine = new HypermediaEngine(this, apiId);
+            _HypermediaEngines.put(apiId, hypermediaEngine);
+        }
+
+        return _HypermediaEngines.get(apiId);
+    }
+
+    public Transformer<MediaType, Class<?>> getMediaTypeToClassTransformer() {
         return _MediaTypeToClassTransformer;
     }
 
-    public final Transformer<MediaType, URI> getMediaTypeToSchemaIdTransformer() {
-        return _MediaTypeToSchemaIdTransformer;
-    }
-
-    public final Transformer<MediaType, String> getMediaTypeToStringTransformer() {
+    public Transformer<MediaType, String> getMediaTypeToStringTransformer() {
         return _MediaTypeToStringTransformer;
     }
 
@@ -205,36 +226,38 @@ public class Context {
         return (Schema) schemaService.get(schemaId);
     }
 
-    public final URI getSchemaId(Class<?> clazz) {
-        return getSchemaId(clazz.getCanonicalName());
+    public Transformer<URI, String> getSchemaIdToClassNameTransformer() {
+        return _SchemaIdToClassNameTransformer;
     }
 
-    public final URI getSchemaId(String className) {
-        @SuppressWarnings("unchecked")
-        UriTransformer<String> schemaIdTransformer = (UriTransformer<String>) _SchemaService.getIdTransformer();
-        return schemaIdTransformer.bToA(className);
+    public Transformer<URI, Class<?>> getSchemaIdToClassTransformer() {
+        return _SchemaIdToClassTransformer;
     }
 
-    public final SchemaService getSchemaService() {
+    public Transformer<URI, MediaType> getSchemaIdToMediaTypeTransformer() {
+        return _SchemaIdToMediaTypeTransformer;
+    }
+
+    public final Service getSchemaService() {
         return _SchemaService;
     }
 
+    /*
+     * public final StringTransformer<?>
+     * getStringTransformer(TextSyntaxConstraint textSyntaxConstraint) {
+     * // TODO: Implement this mapping with configuration-based mapping falling
+     * back to code on demand
+     * return null;
+     * 
+     * }
+     */
+
     public final Service getService(Class<?> clazz) {
-        URI schemaId = getSchemaId(clazz);
+        URI schemaId = getSchemaIdToClassTransformer().bToA(clazz);
         return getService(schemaId);
     }
 
-    public final Service getService(String className) {
-        URI schemaId = getSchemaId(className);
-        return getService(schemaId);
-    }
-
-    public final void fetchAllDocuments(Container<? extends Document> documents, List<? extends Document> allDocuments) {
-        // TODO: Page through container filling allDocuments
-        
-    }
-
-    public final Service getService(URI schemaId) {
+    public final Service getService(MediaType mediaType) {
 
         /*
          * TODO: Allow for more complex mapping of schemas to services
@@ -242,17 +265,24 @@ public class Context {
          * sub-services or a uri pattern match.
          */
 
-        return _ServiceMap.get(schemaId);
+        return _Services.get(mediaType);
     }
 
-    public final ObservableMap<URI, Service> getServiceMap() {
-        return _ServiceMap;
+    public final Service getService(String className) {
+        URI schemaId = getSchemaIdToClassNameTransformer().bToA(className);
+        return getService(schemaId);
     }
 
-    public final StringTransformer<?> getStringTransformer(TextSyntaxConstraint textSyntaxConstraint) {
-        // TODO: Implement this mapping with configuration-based mapping falling back to code on demand
-        return null;
+    public final Service getService(URI schemaId) {
+        return getService(getSchemaIdToMediaTypeTransformer().aToB(schemaId));
+    }
 
+    public ObservableMap<MediaType, Service> getServices() {
+        return _Services;
+    }
+
+    public Transformer<URI, String> getUriToStringTransformer() {
+        return _UriToStringTransformer;
     }
 
     public final CachingService instantiateCachingService(Service originService) {
@@ -261,186 +291,59 @@ public class Context {
         return new CachingService(this, originService, observableModelCache);
     }
 
-    public final Model instantiateModel(Class<?> schemaClass, URI resourceTemplateId) {
-        final URI schemaId = getSchemaId(schemaClass);
-        return instantiateModel(schemaId, resourceTemplateId);
+    public final Model instantiateModel(Class<?> schemaClass, URI resourceTemplateId, URI resourceId) {
+        return instantiateModel(getSchemaIdToClassTransformer().bToA(schemaClass), resourceTemplateId, resourceId);
     }
 
-    public final Model instantiateModel(URI schemaId, URI resourceTemplateId) {
+    public final Model instantiateModel(MediaType schemaMediaType, URI resourceTemplateId, URI resourceId) {
+        return instantiateModel(getSchemaIdToMediaTypeTransformer().bToA(schemaMediaType), resourceTemplateId,
+                resourceId);
+    }
+
+    public final Model instantiateModel(URI schemaId, URI resourceTemplateId, URI resourceId) {
         RuntimeModel model = new RuntimeModel(this, schemaId, resourceTemplateId);
+        if (resourceId != null) {
+            model.setFieldValue(FIELD_NAME_ID, resourceId);
+        }
         return model;
     }
 
-    public final void setMediaTypeToClassTransformer(Transformer<MediaType, Class<?>> mediaTypeToClassTransformer) {
+    public void setMediaTypeToClassTransformer(Transformer<MediaType, Class<?>> mediaTypeToClassTransformer) {
         _MediaTypeToClassTransformer = mediaTypeToClassTransformer;
     }
 
-    public final void setMediaTypeToSchemaIdTransformer(Transformer<MediaType, URI> mediaTypeToSchemaIdTransformer) {
-        _MediaTypeToSchemaIdTransformer = mediaTypeToSchemaIdTransformer;
-    }
-
-    public final void setMediaTypeToStringTransformer(Transformer<MediaType, String> mediaTypeToStringTransformer) {
+    public void setMediaTypeToStringTransformer(Transformer<MediaType, String> mediaTypeToStringTransformer) {
         _MediaTypeToStringTransformer = mediaTypeToStringTransformer;
     }
 
-    public final HypermediaEngine getHypermediaEngine(URI apiId) {
-        if (!_HypermediaEngines.containsKey(apiId)) {
-            HypermediaEngine hypermediaEngine = new HypermediaEngine(this, apiId);
-            _HypermediaEngines.put(apiId, hypermediaEngine);
-        }
-
-        return _HypermediaEngines.get(apiId);
+    public void setSchemaIdToClassNameTransformer(Transformer<URI, String> schemaIdToClassNameTransformer) {
+        _SchemaIdToClassNameTransformer = schemaIdToClassNameTransformer;
     }
 
-    public final void setSchemaService(SchemaService schemaService) {
+    public void setSchemaIdToClassTransformer(Transformer<URI, Class<?>> schemaIdToClassTransformer) {
+        _SchemaIdToClassTransformer = schemaIdToClassTransformer;
+    }
+
+    public void setSchemaIdToMediaTypeTransformer(Transformer<URI, MediaType> schemaIdToMediaTypeTransformer) {
+        _SchemaIdToMediaTypeTransformer = schemaIdToMediaTypeTransformer;
+    }
+
+    public final void setSchemaService(Service schemaService) {
 
         _SchemaService = schemaService;
         _SchemaCachingService = instantiateCachingService(schemaService);
-        URI schemaSchemaId = getSchemaId(Schema.class);
-        _ServiceMap.put(schemaSchemaId, _SchemaCachingService);
+        MediaType schemaMediaType = getMediaTypeToClassTransformer().bToA(Schema.class);
+        _Services.put(schemaMediaType, _SchemaCachingService);
     }
 
-    private final class MediaTypeToClassTransformer extends MediaTypeTransformer<Class<?>> {
-
-        public Class<?> aToB(MediaType bValue) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public MediaType bToA(Class<?> clazz) {
-
-            if (clazz == null) {
-                return null;
-            }
-
-            MediaType mediaType = null;
-            Transformer<MediaType, String> mediaTypeToStringTransformer = getContext()
-                    .getMediaTypeToStringTransformer();
-
-            if (clazz.isAssignableFrom(Model.class)) {
-
-                if (clazz.equals(Model.class)) {
-
-                    // Return the vanilla application/wrml type for base models                    
-                    return mediaTypeToStringTransformer.bToA(MEDIA_TYPE_STRING_WRML);
-                }
-                else {
-                    // Return the application/wrml with schema param for derived models
-                    URI schemaId = getSchemaId(clazz);
-
-                    // TODO: Allow for parameterized types via Constraints
-                    SortedMap<String, String> parameters = null;
-
-                    /*
-                     * Use reflection to determine if the type is parameterized.
-                     * Ultimately
-                     * looking to get a map of type parameter name (aka Schema
-                     * Constraint Name)
-                     * to schema Id. Get the name (keys) from the Java generics
-                     * reflection API.
-                     * Get the URI values using Java class name to Schema URI
-                     * transform.
-                     * 
-                     * TODO: Need to figure out how to get a Java generic
-                     * interface's
-                     * parameterized type names and actual types (as a Model
-                     * subclass)
-                     * 
-                     * http://www.artima.com/weblogs/viewpost.jsp?thread=208860
-                     */
-
-                    TypeVariable<?>[] typeParameters = clazz.getTypeParameters();
-                    if (typeParameters != null) {
-                        parameters = new TreeMap<String, String>();
-                        for (TypeVariable<?> typeParam : typeParameters) {
-                            String name = typeParam.getName();
-
-                            Class<?> typeParamSchemaClass = null;
-                            URI typeParamSchemaId = getSchemaId(typeParamSchemaClass);
-                            parameters.put(name, String.valueOf(typeParamSchemaId));
-                        }
-                    }
-
-                    String mediaTypeString = createMediaTypeString(TYPE_APPLICATION, SUBTYPE_WRML, parameters);
-                    return mediaTypeToStringTransformer.bToA(mediaTypeString);
-                }
-            }
-            else {
-                // TODO: Get MediaType associated with non-WRML class
-            }
-
-            return mediaType;
-        }
-
-        public Context getContext() {
-            return Context.this;
-        }
+    public void setUriToStringTransformer(Transformer<URI, String> uriToStringTransformer) {
+        _UriToStringTransformer = uriToStringTransformer;
     }
 
-    private final class MediaTypeToSchemaIdTransformer extends MediaTypeTransformer<URI> {
-
-        public URI aToB(MediaType aValue) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        public MediaType bToA(URI bValue) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-    }
-
-    private final class MediaTypeToStringTransformer extends MediaTypeTransformer<String> {
-
-        public String aToB(MediaType bValue) {
-            return createMediaTypeString(bValue.getType(), bValue.getSubtype(), bValue.getParameters());
-        }
-
-        public MediaType bToA(String aValue) {
-
-            final Matcher matcher = MEDIA_TYPE_REGEX_PATTERN.matcher(aValue);
-
-            final String type = matcher.group(0);
-            final String subtype = matcher.group(1);
-
-            // TODO: Finish regex parsing for parameters
-
-            final SortedMap<String, String> parameters = null;
-            return createMediaType(type, subtype, parameters);
-        }
-
-        private MediaType createMediaType(final String type, final String subtype,
-                final SortedMap<String, String> parameters) {
-
-            MediaType mediaType = (MediaType) getContext().instantiateModel(MediaType.class, null).getStaticInterface();
-            mediaType.setFieldValue("type", type);
-            mediaType.setFieldValue("subtype", subtype);
-            mediaType.setFieldValue("parameters", (parameters != null) ? Observables.observableMap(parameters) : null);
-
-            return mediaType;
-        }
-    }
-
-    private abstract class MediaTypeTransformer<B> implements Transformer<MediaType, B> {
-
-        public Context getContext() {
-            return Context.this;
-        }
-
-        protected String createMediaTypeString(final String type, final String subtype,
-                final Map<String, String> parameters) {
-            final StringBuilder sb = new StringBuilder();
-            sb.append(type.trim()).append('/').append(subtype.trim());
-
-            for (String parameterName : parameters.keySet()) {
-                sb.append("; ").append(parameterName.trim()).append('=').append('\"')
-                        .append(parameters.get(parameterName).trim()).append('\"');
-            }
-
-            return sb.toString();
-        }
-
+    @Override
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
+        // TODO Auto-generated method stub
+        return super.findClass(name);
     }
 
 }
