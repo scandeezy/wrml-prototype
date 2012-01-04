@@ -20,8 +20,8 @@ import java.net.URI;
 import java.util.Map;
 
 import org.wrml.Model;
-import org.wrml.model.communication.MediaType;
 import org.wrml.runtime.Context;
+import org.wrml.util.MediaType;
 import org.wrml.util.observable.DelegatingObservableMap;
 import org.wrml.util.transformer.Transformer;
 

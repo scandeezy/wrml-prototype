@@ -30,10 +30,18 @@ public class SchemaIdToClassNameTransformer extends AbstractTransformer<URI, Str
     }
 
     public String aToB(URI aValue) {
+        if (aValue == null) {
+            return null;
+        }
+        
         return getBaseUri().relativize(aValue).toString().replace('/', '.');
     }
 
     public URI bToA(String bValue) {
+        if (bValue == null) {
+            return null;
+        }
+
         return getBaseUri().resolve(bValue.toString().replace('.', '/'));
     }
 

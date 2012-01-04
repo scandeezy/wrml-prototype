@@ -36,6 +36,10 @@ final class Resource {
         _ResourceTemplateId = resourceTemplateId;
     }
 
+    public HypermediaEngine getHypermediaEngine() {
+        return _HypermediaEngine;
+    }
+
     public SortedMap<URI, LinkTemplate> getLinks() {
 
         if (_Links == null) {
@@ -73,9 +77,5 @@ final class Resource {
 
     public URI getResourceTemplateId() {
         return _ResourceTemplateId;
-    }
-
-    public HypermediaEngine getHypermediaEngine() {
-        return _HypermediaEngine;
     }
 }

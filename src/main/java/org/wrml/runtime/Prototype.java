@@ -30,13 +30,13 @@ import java.util.TreeMap;
 
 import org.wrml.Model;
 import org.wrml.model.Document;
-import org.wrml.model.communication.MediaType;
 import org.wrml.model.communication.http.Method;
 import org.wrml.model.schema.Constraint;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Link;
 import org.wrml.model.schema.Schema;
 import org.wrml.runtime.FieldPrototype.AccessType;
+import org.wrml.util.MediaType;
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.util.observable.Observables;
 import org.wrml.util.transformer.Transformer;
@@ -63,7 +63,19 @@ final class Prototype {
     private ObservableMap<String, FieldPrototype> _FieldPrototypes;
     private ObservableMap<String, LinkPrototype> _LinkPrototypes;
 
+    private boolean _Initialized;
+
     public Prototype(Context context, URI blueprintSchemaId) {
+        if (context == null) {
+            throw new NullPointerException("Context cannot be null");
+        }
+
+        System.out.println("A prototype has been created for " + blueprintSchemaId);
+
+        if (blueprintSchemaId == null) {
+            throw new NullPointerException("Blueprint schema ID cannot be null");
+        }
+
         _Context = context;
         _BlueprintSchemaId = blueprintSchemaId;
     }
@@ -341,14 +353,6 @@ final class Prototype {
 
     }
 
-    public ObservableMap<URI, Link> getLinksByRel() {
-        if (_LinksByRel == null) {
-            init();
-        }
-
-        return _LinksByRel;
-    }
-
     public ObservableMap<String, Link> getLinksByName() {
 
         if (_LinksByName == null) {
@@ -363,6 +367,14 @@ final class Prototype {
         }
 
         return _LinksByName;
+    }
+
+    public ObservableMap<URI, Link> getLinksByRel() {
+        if (_LinksByRel == null) {
+            init();
+        }
+
+        return _LinksByRel;
     }
 
     /**
@@ -413,6 +425,12 @@ final class Prototype {
     }
 
     private void init() {
+
+        if (_Initialized) {
+            return;
+        }
+
+        _Initialized = true;
 
         List<URI> baseIds = null;
         final ObservableMap<URI, Schema> allYourBase = getAllBaseSchemas();
@@ -477,26 +495,28 @@ final class Prototype {
 
         @SuppressWarnings("unchecked")
         public PrototypicalExtension(final Map<K, M> allModels, final List<M> extensionModels, URI schemaId) {
-            for (final M extensionModel : extensionModels) {
-                K modelKey = (K) ((Document) extensionModel).getId();
-                extend(allModels, modelKey, extensionModel, schemaId);
+            if (extensionModels != null) {
+                for (final M extensionModel : extensionModels) {
+                    K modelKey = (K) ((Document) extensionModel).getId();
+                    extend(allModels, modelKey, extensionModel, schemaId);
+                }
             }
         }
 
         public PrototypicalExtension(final Map<K, M> allModels, final Map<K, M> extensionModels, URI schemaId) {
 
-            for (final K modelKey : extensionModels.keySet()) {
+            if (extensionModels != null) {
+                for (final K modelKey : extensionModels.keySet()) {
 
-                final M extensionModel = extensionModels.get(modelKey);
+                    final M extensionModel = extensionModels.get(modelKey);
 
-                if (extensionModel == null) {
-                    continue;
+                    if (extensionModel == null) {
+                        continue;
+                    }
+
+                    extend(allModels, modelKey, extensionModel, schemaId);
                 }
-
-                extend(allModels, modelKey, extensionModel, schemaId);
-
             }
-
         }
 
         @SuppressWarnings("unchecked")

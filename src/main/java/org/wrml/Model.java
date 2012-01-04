@@ -25,9 +25,9 @@ import org.wrml.event.FieldEventListener;
 import org.wrml.event.LinkEventListener;
 import org.wrml.event.ModelEventListener;
 import org.wrml.model.api.ResourceTemplate;
-import org.wrml.model.communication.MediaType;
 import org.wrml.model.schema.Schema;
 import org.wrml.runtime.Context;
+import org.wrml.util.MediaType;
 
 /**
  * The base interface for all web resource schema instances.

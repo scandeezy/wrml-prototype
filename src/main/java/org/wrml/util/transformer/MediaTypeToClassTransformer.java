@@ -25,8 +25,8 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.wrml.Model;
-import org.wrml.model.communication.MediaType;
 import org.wrml.runtime.Context;
+import org.wrml.util.MediaType;
 
 public class MediaTypeToClassTransformer extends AbstractTransformer<MediaType, Class<?>> {
 

@@ -20,7 +20,7 @@ import java.net.URI;
 import java.util.Map;
 
 import org.wrml.Model;
-import org.wrml.model.communication.MediaType;
+import org.wrml.util.MediaType;
 
 final class LinkPrototype {
 

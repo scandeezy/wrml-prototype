@@ -24,8 +24,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import org.wrml.Model;
-import org.wrml.model.communication.MediaType;
 import org.wrml.runtime.Context;
+import org.wrml.util.MediaType;
 import org.wrml.util.transformer.PassthroughTransformer;
 import org.wrml.util.transformer.Transformer;
 
@@ -100,7 +100,10 @@ public class WebClient extends AbstractService {
          * TODO: HTTP GET
          */
 
-        return null;
+        System.out.println("A GET request for: " + resourceId + " as: " + responseType);
+        
+        // TODO: Temporary
+        return getContext().instantiateModel(responseType, null, resourceId);
     }
 
     public Transformer<URI, URI> getIdTransformer() {

@@ -21,8 +21,8 @@ import java.util.Map;
 
 import org.wrml.Model;
 import org.wrml.model.Document;
-import org.wrml.model.communication.MediaType;
 import org.wrml.runtime.Context;
+import org.wrml.util.MediaType;
 import org.wrml.util.observable.ObservableMap;
 
 public class CachingService extends ProxyService {
@@ -53,27 +53,25 @@ public class CachingService extends ProxyService {
             throw new NullPointerException("Resource ID (URI) cannot be null");
         }
 
-        System.out.println("CachingService.get - id: " + resourceId + " referrer: " + referrer);
+        System.out.println("A cache request for: " + resourceId + " as: " + responseType);
 
         Map<URI, Object> cache = getCache();
+        Object responseEntity = null;
+        boolean isRefresh = (referrer != null && referrer instanceof Document && resourceId
+                .equals(((Document) referrer).getId()));
 
-        boolean isRefresh = (referrer != null && referrer instanceof Document && resourceId.equals(((Document) referrer)
-                .getId()));
-
-        if (!isRefresh) {
-            if (cache.containsKey(resourceId) && !isRefresh) {
-                return cache.get(resourceId);
-            }
+        if (cache.containsKey(resourceId) && !isRefresh) {            
+            responseEntity = cache.get(resourceId);
+            System.out.println(resourceId + " was already cached as: " + String.valueOf(responseEntity));
         }
-
-        Object responseEntity = super.get(resourceId, responseType, referrer);
+        else {
+            responseEntity = super.get(resourceId, responseType, referrer);
+            cache.put(resourceId, responseEntity);
+            System.out.println(resourceId + " is now cached as: " + String.valueOf(responseEntity));
+        }
 
         // TODO: Consider a composite key for the cache map to consider response type attributes (like a good HTTP cache would)
-        // TODO: Honor TTL and Etags etc
-
-        if (!isRefresh) {
-            cache.put(resourceId, responseEntity);
-        }
+        // TODO: Honor TTL and Etags etc                
 
         return responseEntity;
     }

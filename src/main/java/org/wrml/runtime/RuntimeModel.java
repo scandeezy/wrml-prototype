@@ -33,7 +33,6 @@ import org.wrml.event.LinkEventListener;
 import org.wrml.event.ModelEventListener;
 import org.wrml.model.api.LinkTemplate;
 import org.wrml.model.api.ResourceTemplate;
-import org.wrml.model.communication.MediaType;
 import org.wrml.model.relation.LinkRelation;
 import org.wrml.model.schema.Constraint;
 import org.wrml.model.schema.Field;
@@ -43,6 +42,7 @@ import org.wrml.model.schema.Type;
 import org.wrml.service.ProxyService;
 import org.wrml.service.Service;
 import org.wrml.util.DelegatingInvocationHandler;
+import org.wrml.util.MediaType;
 import org.wrml.util.observable.MapEvent;
 import org.wrml.util.observable.MapEventListener;
 import org.wrml.util.observable.ObservableList;
@@ -294,7 +294,7 @@ import org.wrml.util.transformer.Transformer;
  * </p>
  * 
  */
-final class RuntimeModel implements Model {
+public final class RuntimeModel implements Model {
 
     private Model _StaticInterface;
 
@@ -324,6 +324,15 @@ final class RuntimeModel implements Model {
     }
 
     public RuntimeModel(Context context, URI schemaId, URI resourceTemplateId, List<URI> embeddedLinkRelationIds) {
+
+        if (context == null) {
+            throw new NullPointerException("Context cannot be null");
+        }
+
+        if (schemaId == null) {
+            throw new NullPointerException("Schema ID cannot be null");
+        }
+
         _Context = context;
         _SchemaId = schemaId;
         _ResourceTemplateId = resourceTemplateId;
@@ -390,7 +399,7 @@ final class RuntimeModel implements Model {
     }
 
     @Override
-    public final boolean equals(Object obj) {
+    public boolean equals(Object obj) {
         return super.equals(obj);
     }
 
@@ -400,15 +409,15 @@ final class RuntimeModel implements Model {
 
     }
 
-    public final Context getContext() {
+    public Context getContext() {
         return _Context;
     }
 
-    public final List<URI> getEmbeddedLinkRelationIds() {
+    public List<URI> getEmbeddedLinkRelationIds() {
         return _EmbeddedLinkRelationIds;
     }
 
-    public final Object getFieldValue(String fieldName) {
+    public Object getFieldValue(String fieldName) {
 
         Object rawValue = isFieldValueSet(fieldName) ? _FieldMap.get(fieldName) : null;
         Object fieldValue = rawValue;
@@ -430,7 +439,7 @@ final class RuntimeModel implements Model {
 
     }
 
-    public final HypermediaEngine getHypermediaEngine() {
+    public HypermediaEngine getHypermediaEngine() {
         ResourceTemplate resourceTemplate = getResourceTemplate();
         if (resourceTemplate == null) {
             return null;
@@ -457,15 +466,15 @@ final class RuntimeModel implements Model {
         return myService;
     }
 
-    public final Prototype getPrototype() {
+    public Prototype getPrototype() {
         return getContext().getPrototype(getSchemaId());
     }
 
-    public final Resource getResource() {
+    public Resource getResource() {
         return getHypermediaEngine().getResource(getResourceTemplateId());
     }
 
-    public final ResourceTemplate getResourceTemplate() {
+    public ResourceTemplate getResourceTemplate() {
         URI id = getResourceTemplateId();
         if (id == null) {
             return null;
@@ -475,12 +484,14 @@ final class RuntimeModel implements Model {
         return (ResourceTemplate) resourceTemplateService.get(id);
     }
 
-    public final URI getResourceTemplateId() {
+    public URI getResourceTemplateId() {
         return _ResourceTemplateId;
     }
 
-    public final Schema getSchema() {
-        return getContext().getSchema(getSchemaId());
+    public Schema getSchema() {
+        Context context = getContext();
+        URI schemaId = getSchemaId();
+        return context.getSchema(schemaId);
     }
 
     /*
@@ -496,11 +507,11 @@ final class RuntimeModel implements Model {
      * }
      */
 
-    public final URI getSchemaId() {
+    public URI getSchemaId() {
         return _SchemaId;
     }
 
-    public final Model getStaticInterface() {
+    public Model getStaticInterface() {
 
         if (Proxy.isProxyClass(this.getClass())) {
             return this;
@@ -523,11 +534,11 @@ final class RuntimeModel implements Model {
     }
 
     @Override
-    public final int hashCode() {
+    public int hashCode() {
         return super.hashCode();
     }
 
-    public final boolean isFieldValueSet(String fieldName) {
+    public boolean isFieldValueSet(String fieldName) {
         return (_FieldMap != null) && _FieldMap.containsKey(fieldName);
     }
 
@@ -571,7 +582,7 @@ final class RuntimeModel implements Model {
 
     }
 
-    public final void setAllFieldsToDefaultValue() {
+    public void setAllFieldsToDefaultValue() {
 
         final Prototype prototype = getPrototype();
 
@@ -584,7 +595,7 @@ final class RuntimeModel implements Model {
         }
     }
 
-    public final void setFieldToDefaultValue(String fieldName) {
+    public void setFieldToDefaultValue(String fieldName) {
 
         final Prototype prototype = getPrototype();
         final Map<String, Field> prototypeFields = prototype.getFields();
@@ -594,7 +605,7 @@ final class RuntimeModel implements Model {
         }
     }
 
-    public final Object setFieldValue(String fieldName, Object fieldValue) {
+    public Object setFieldValue(String fieldName, Object fieldValue) {
 
         Prototype prototype = getPrototype();
         ObservableMap<String, Field> prototypeFields = prototype.getFields();
@@ -636,11 +647,9 @@ final class RuntimeModel implements Model {
         return oldValue;
     }
 
-    /**
-     * Called to initialize the Model.
-     */
-    protected void init() {
-        setAllFieldsToDefaultValue();
+    @Override
+    public String toString() {
+        return getClass().getName() + "[Schema=" + _SchemaId + ", ResourceTemplate=" + _ResourceTemplateId + "]";
     }
 
     private void fireConstraintViolated(final FieldEvent event) {
@@ -697,6 +706,13 @@ final class RuntimeModel implements Model {
     private Class<?> getMediaTypeClass(MediaType responseType) {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    /**
+     * Called to initialize the Model.
+     */
+    private void init() {
+        setAllFieldsToDefaultValue();
     }
 
     private void initFieldMap() {

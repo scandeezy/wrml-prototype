@@ -20,8 +20,8 @@ import java.net.URI;
 import java.util.Map;
 
 import org.wrml.Model;
-import org.wrml.model.communication.MediaType;
 import org.wrml.runtime.Context;
+import org.wrml.util.MediaType;
 import org.wrml.util.transformer.Transformer;
 
 /**
@@ -34,14 +34,17 @@ import org.wrml.util.transformer.Transformer;
  */
 public interface Service extends Map<URI, Object> {
 
-    public Context getContext();
-
     public Object create(URI collectionId, Object requestEntity, MediaType responseType, Model referrer);
+
     public Object get(URI resourceId, MediaType responseType, Model referrer);
-    public Object put(URI resourceId, Object requestEntity, MediaType responseType, Model referrer);
-    public Object remove(URI resourceId, MediaType responseType, Model referrer);
     
-    public Transformer<URI, ?> getIdTransformer();       
+    public Context getContext();
+    
+    public Transformer<URI, ?> getIdTransformer();
+    
+    public Object put(URI resourceId, Object requestEntity, MediaType responseType, Model referrer);
+    
+    public Object remove(URI resourceId, MediaType responseType, Model referrer);       
     
     // TODO: Provide "first class" support for Container resources in the Service Java API
     // Need to figure out how to pass pagination and query by example params 

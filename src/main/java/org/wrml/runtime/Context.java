@@ -24,12 +24,12 @@ import java.util.Map;
 import org.wrml.Model;
 import org.wrml.model.Container;
 import org.wrml.model.Document;
-import org.wrml.model.communication.MediaType;
 import org.wrml.model.schema.Schema;
 import org.wrml.runtime.service.SystemSchemaService;
 import org.wrml.service.CachingService;
 import org.wrml.service.Service;
 import org.wrml.service.WebClient;
+import org.wrml.util.MediaType;
 import org.wrml.util.observable.DelegatingObservableMap;
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.util.observable.Observables;
@@ -132,8 +132,7 @@ public class Context extends ClassLoader {
     private Transformer<URI, String> _SchemaIdToClassNameTransformer;
     private Transformer<URI, String> _UriToStringTransformer;
 
-    private Service _SchemaService;
-    private CachingService _SchemaCachingService;
+    private Service _DefaultService;
 
     private final ObservableMap<URI, Prototype> _Prototypes;
     private final ObservableMap<URI, HypermediaEngine> _HypermediaEngines;
@@ -178,8 +177,13 @@ public class Context extends ClassLoader {
                 new SchemaIdToClassTransformer(this));
 
         setSchemaIdToClassTransformer(schemaIdToClassTransformer);
-        
-        Service schemaService = new SystemSchemaService(this, new WebClient(this));
+
+        Service www = new WebClient(this);
+
+        Service defaultService = instantiateCachingService(www);
+        setDefaultService(defaultService);
+
+        Service schemaService = new SystemSchemaService(this, www);
         setSchemaService(schemaService);
     }
 
@@ -193,6 +197,10 @@ public class Context extends ClassLoader {
      * Keep this class more universally useful to all apss - not just the
      * bootstrapping of the WRML runtime "app".
      */
+
+    public Service getDefaultService() {
+        return _DefaultService;
+    }
 
     public final HypermediaEngine getHypermediaEngine(URI apiId) {
         if (!_HypermediaEngines.containsKey(apiId)) {
@@ -222,8 +230,9 @@ public class Context extends ClassLoader {
     }
 
     public final Schema getSchema(URI schemaId) {
-        Service schemaService = getService(Schema.class);
-        return (Schema) schemaService.get(schemaId);
+        MediaType schemaMediaType = getMediaTypeToClassTransformer().bToA(Schema.class);
+        Service schemaService = getService(schemaMediaType);
+        return (Schema) ((Model) schemaService.get(schemaId, schemaMediaType, null)).getStaticInterface();
     }
 
     public Transformer<URI, String> getSchemaIdToClassNameTransformer() {
@@ -232,14 +241,6 @@ public class Context extends ClassLoader {
 
     public Transformer<URI, Class<?>> getSchemaIdToClassTransformer() {
         return _SchemaIdToClassTransformer;
-    }
-
-    public Transformer<URI, MediaType> getSchemaIdToMediaTypeTransformer() {
-        return _SchemaIdToMediaTypeTransformer;
-    }
-
-    public final Service getSchemaService() {
-        return _SchemaService;
     }
 
     /*
@@ -251,6 +252,10 @@ public class Context extends ClassLoader {
      * 
      * }
      */
+
+    public Transformer<URI, MediaType> getSchemaIdToMediaTypeTransformer() {
+        return _SchemaIdToMediaTypeTransformer;
+    }
 
     public final Service getService(Class<?> clazz) {
         URI schemaId = getSchemaIdToClassTransformer().bToA(clazz);
@@ -265,7 +270,13 @@ public class Context extends ClassLoader {
          * sub-services or a uri pattern match.
          */
 
-        return _Services.get(mediaType);
+        Service service = _Services.get(mediaType);
+
+        if (service != null) {
+            return service;
+        }
+
+        return getDefaultService();
     }
 
     public final Service getService(String className) {
@@ -308,6 +319,10 @@ public class Context extends ClassLoader {
         return model;
     }
 
+    public void setDefaultService(Service defaultService) {
+        _DefaultService = defaultService;
+    }
+
     public void setMediaTypeToClassTransformer(Transformer<MediaType, Class<?>> mediaTypeToClassTransformer) {
         _MediaTypeToClassTransformer = mediaTypeToClassTransformer;
     }
@@ -330,10 +345,12 @@ public class Context extends ClassLoader {
 
     public final void setSchemaService(Service schemaService) {
 
-        _SchemaService = schemaService;
-        _SchemaCachingService = instantiateCachingService(schemaService);
+        if (!(schemaService instanceof CachingService)) {
+            schemaService = instantiateCachingService(schemaService);
+        }
         MediaType schemaMediaType = getMediaTypeToClassTransformer().bToA(Schema.class);
-        _Services.put(schemaMediaType, _SchemaCachingService);
+        _Services.put(schemaMediaType, schemaService);
+        
     }
 
     public void setUriToStringTransformer(Transformer<URI, String> uriToStringTransformer) {

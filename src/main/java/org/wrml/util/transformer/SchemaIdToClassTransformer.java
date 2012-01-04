@@ -33,9 +33,15 @@ public class SchemaIdToClassTransformer extends AbstractTransformer<URI, Class<?
         String className = context.getSchemaIdToClassNameTransformer().aToB(aValue);
 
         System.out.println("Loading schema class: " + className);
+        if (className == null) {
+            return null;
+        }
+        
         Class<?> schemaInterface = null;
         try {
             schemaInterface = context.loadClass(className);
+            
+            System.out.println("Loaded schema class: " + schemaInterface);
         }
         catch (Throwable t) {
             // TODO Auto-generated catch block
