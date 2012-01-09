@@ -19,9 +19,9 @@ package org.wrml.model.communication.http;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-import static org.wrml.model.communication.http.HttpVersion.HTTP_1_0;
-import static org.wrml.model.communication.http.HttpVersion.HTTP_1_1;
-import static org.wrml.model.communication.http.HttpVersion.fromString;
+import static org.wrml.util.http.HttpVersion.HTTP_1_0;
+import static org.wrml.util.http.HttpVersion.HTTP_1_1;
+import static org.wrml.util.http.HttpVersion.fromString;
 
 import org.junit.Test;
 

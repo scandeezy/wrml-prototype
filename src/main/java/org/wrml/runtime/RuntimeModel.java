@@ -16,14 +16,11 @@
 
 package org.wrml.runtime;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.wrml.Model;
@@ -31,24 +28,18 @@ import org.wrml.event.FieldEvent;
 import org.wrml.event.FieldEventListener;
 import org.wrml.event.LinkEventListener;
 import org.wrml.event.ModelEventListener;
-import org.wrml.model.api.LinkTemplate;
+import org.wrml.model.Document;
+import org.wrml.model.DocumentMetadata;
+import org.wrml.model.DocumentOptions;
 import org.wrml.model.api.ResourceTemplate;
-import org.wrml.model.relation.LinkRelation;
-import org.wrml.model.schema.Constraint;
-import org.wrml.model.schema.Field;
-import org.wrml.model.schema.Link;
 import org.wrml.model.schema.Schema;
-import org.wrml.model.schema.Type;
 import org.wrml.service.ProxyService;
 import org.wrml.service.Service;
-import org.wrml.util.DelegatingInvocationHandler;
 import org.wrml.util.MediaType;
 import org.wrml.util.observable.MapEvent;
 import org.wrml.util.observable.MapEventListener;
-import org.wrml.util.observable.ObservableList;
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.util.observable.Observables;
-import org.wrml.util.transformer.Transformer;
 
 /**
  * <pre>
@@ -300,30 +291,23 @@ public final class RuntimeModel implements Model {
 
     private static final long serialVersionUID = -7696720779481780624L;
 
-    private final transient Context _Context;
-
-    private final URI _SchemaId;
-    private final URI _ResourceTemplateId;
-
-    private final List<URI> _EmbeddedLinkRelationIds;
-
-    private ObservableMap<String, Object> _FieldMap;
-    private ObservableMap<URI, HyperLink> _LinkMap;
-
-    private transient List<ModelEventListener> _EventListeners;
-    private transient Map<String, List<FieldEventListener>> _FieldEventListeners;
+    private final ObservableMap<String, Object> _Fields;
+    private final ObservableMap<URI, HyperLink> _Links;
 
     private transient FieldMapEventListener _FieldMapEventListener;
 
-    public RuntimeModel(Context context, URI schemaId) {
-        this(context, schemaId, null);
-    }
+    private final transient Context _Context;
 
-    public RuntimeModel(Context context, URI schemaId, URI resourceTemplateId) {
-        this(context, schemaId, resourceTemplateId, null);
-    }
+    private final URI _SchemaId;
 
-    public RuntimeModel(Context context, URI schemaId, URI resourceTemplateId, List<URI> embeddedLinkRelationIds) {
+    private URI _ResourceTemplateId;
+
+    private final List<URI> _EmbeddedLinkRelationIds;
+    private transient List<ModelEventListener> _EventListeners;
+    private transient Map<String, List<FieldEventListener>> _FieldEventListeners;
+
+    RuntimeModel(Context context, URI schemaId, List<URI> embeddedLinkRelationIds, FieldMap fieldMap,
+            Map<URI, HyperLink> linkMap) {
 
         if (context == null) {
             throw new NullPointerException("Context cannot be null");
@@ -335,9 +319,24 @@ public final class RuntimeModel implements Model {
 
         _Context = context;
         _SchemaId = schemaId;
-        _ResourceTemplateId = resourceTemplateId;
         _EmbeddedLinkRelationIds = embeddedLinkRelationIds;
+
+        _Fields = Observables.observableMap(fieldMap);
+        _FieldMapEventListener = new FieldMapEventListener();
+        _Fields.addMapEventListener(_FieldMapEventListener);
+
+        _Links = Observables.observableMap(linkMap);
+
         init();
+
+        // TODO: Self-register for ID changes so that we can figure out where we are in the API.
+        // Use the Context to gain access to the configured APIs which will then tell you which 
+        // API you match.
+
+        // Look up the API and initialize the hypermedia engine.
+
+        // This should be helpful on both client and server-side.
+
     }
 
     public void addEventListener(ModelEventListener listener) {
@@ -373,7 +372,7 @@ public final class RuntimeModel implements Model {
      * final Service myOriginService = getMyOriginService();
      * final Model newThis = myOriginService.remove(id, this);
      * 
-     * // TODO: Do we need to vanish here or can an event trigger
+     * // TODO: Do we need to die here or can an event trigger
      * // that from somewhere else?
      * }
      */
@@ -385,6 +384,12 @@ public final class RuntimeModel implements Model {
 
     public Object clickLink(URI rel, MediaType responseType, Object requestEntity, Map<String, String> hrefParams) {
         HyperLink hyperLink = getHyperLink(rel);
+
+        if (hyperLink == null) {
+            // TODO: Error here instead?
+            return null;
+        }
+
         return hyperLink.click(responseType, requestEntity, hrefParams);
     }
 
@@ -405,41 +410,37 @@ public final class RuntimeModel implements Model {
 
     public void extend(Model modelToExtend, Model... additionalModelsToExtend) {
 
-        // TODO: Set all fields (copy from extends)
+        RuntimeModel modelToExtendDynamicInterface = (RuntimeModel) modelToExtend.getDynamicInterface();
+        _Fields.putAll(modelToExtendDynamicInterface._Fields);
+
+        for (Model additionalModelToExtend : additionalModelsToExtend) {
+
+            RuntimeModel additionalModelToExtendDynamicInterface = (RuntimeModel) additionalModelToExtend
+                    .getDynamicInterface();
+            _Fields.putAll(additionalModelToExtendDynamicInterface._Fields);
+
+            // Copy any other state?
+        }
 
     }
 
-    public Context getContext() {
+    public final Context getContext() {
         return _Context;
     }
 
-    public List<URI> getEmbeddedLinkRelationIds() {
+    public Model getDynamicInterface() {
+        return this;
+    }
+
+    public final List<URI> getEmbeddedLinkRelationIds() {
         return _EmbeddedLinkRelationIds;
     }
 
     public Object getFieldValue(String fieldName) {
-
-        Object rawValue = isFieldValueSet(fieldName) ? _FieldMap.get(fieldName) : null;
-        Object fieldValue = rawValue;
-
-        Prototype prototype = getPrototype();
-
-        ObservableMap<String, Field> prototypeFields = prototype.getFields();
-        Field prototypeField = (prototypeFields != null) ? prototypeFields.get(fieldName) : null;
-
-        if (prototypeField != null) {
-            Type type = prototypeField.getType();
-            if (type == Type.Boolean) {
-                Boolean booleanFieldValue = (Boolean) fieldValue;
-                fieldValue = (booleanFieldValue != null) ? booleanFieldValue.booleanValue() : false;
-            }
-        }
-
-        return fieldValue;
-
+        return _Fields.get(fieldName);
     }
 
-    public HypermediaEngine getHypermediaEngine() {
+    public final HypermediaEngine getHypermediaEngine() {
         ResourceTemplate resourceTemplate = getResourceTemplate();
         if (resourceTemplate == null) {
             return null;
@@ -449,7 +450,16 @@ public final class RuntimeModel implements Model {
         return getContext().getHypermediaEngine(apiId);
     }
 
-    public Service getMyOriginService() {
+    public ObservableMap<URI, HyperLink> getLinkMap() {
+        return _Links;
+    }
+
+    public DocumentMetadata getMetadata() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public final Service getMyOriginService() {
 
         Service myService = getMyService();
         while ((myService != null) && (myService instanceof ProxyService)) {
@@ -459,22 +469,45 @@ public final class RuntimeModel implements Model {
         return myService;
     }
 
-    public Service getMyService() {
+    public final Service getMyService() {
         final URI schemaId = getSchemaId();
         final Context context = getContext();
         final Service myService = context.getService(schemaId);
         return myService;
     }
 
-    public Prototype getPrototype() {
-        return getContext().getPrototype(getSchemaId());
+    public DocumentOptions getOptions() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
-    public Resource getResource() {
+    public Document getParent() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public URI getParentId() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    /*
+     * public final boolean isMetaSchema() {
+     * return getSchemaId().equals(getFieldValue("id"));
+     * }
+     */
+
+    /*
+     * public Prototype getPrototype() {
+     * return getContext().getPrototype(getSchemaId());
+     * }
+     */
+
+    public final Resource getResource() {
         return getHypermediaEngine().getResource(getResourceTemplateId());
     }
 
-    public ResourceTemplate getResourceTemplate() {
+    public final ResourceTemplate getResourceTemplate() {
         URI id = getResourceTemplateId();
         if (id == null) {
             return null;
@@ -484,30 +517,25 @@ public final class RuntimeModel implements Model {
         return (ResourceTemplate) resourceTemplateService.get(id);
     }
 
-    public URI getResourceTemplateId() {
+    public final URI getResourceTemplateId() {
         return _ResourceTemplateId;
     }
 
-    public Schema getSchema() {
+    public final Schema getSchema() {
+
         Context context = getContext();
         URI schemaId = getSchemaId();
+
+        /*
+         * if (isMetaSchema()) {
+         * return Schema.class.cast(this);
+         * }
+         */
+
         return context.getSchema(schemaId);
     }
 
-    /*
-     * public void save() {
-     * 
-     * final Service myService = getMyService();
-     * myService.put(getId(), this, this);
-     * 
-     * // TODO: Assume write through caches on self-save (on all saves)?
-     * 
-     * // TODO: Assume that model update events will trigger any refresh that is
-     * needed?
-     * }
-     */
-
-    public URI getSchemaId() {
+    public final URI getSchemaId() {
         return _SchemaId;
     }
 
@@ -526,9 +554,9 @@ public final class RuntimeModel implements Model {
 
         Class<?> schemaInterface = context.getSchemaIdToClassTransformer().aToB(schemaId);
         Class<?>[] schemaInterfaceArray = new Class<?>[] { schemaInterface };
-        StaticModelHandler invocationHandler = new StaticModelHandler(this);
+        StaticInterfaceFacade facade = new StaticInterfaceFacade(this);
 
-        _StaticInterface = (Model) Proxy.newProxyInstance(context, schemaInterfaceArray, invocationHandler);
+        _StaticInterface = (Model) Proxy.newProxyInstance(context, schemaInterfaceArray, facade);
 
         return _StaticInterface;
     }
@@ -539,7 +567,78 @@ public final class RuntimeModel implements Model {
     }
 
     public boolean isFieldValueSet(String fieldName) {
-        return (_FieldMap != null) && _FieldMap.containsKey(fieldName);
+        return (_Fields != null) && _Fields.containsKey(fieldName);
+    }
+
+    public final void removeEventListener(ModelEventListener listener) {
+        if (_EventListeners == null) {
+            return;
+        }
+
+        _EventListeners.remove(listener);
+    }
+
+    public final void removeFieldEventListener(String fieldName, FieldEventListener listener) {
+        if (_FieldEventListeners == null) {
+            return;
+        }
+
+        final List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
+        if (fieldEventListenerList == null) {
+            return;
+        }
+
+        fieldEventListenerList.remove(listener);
+    }
+
+    /*
+     * public void save() {
+     * 
+     * final Service myService = getMyService();
+     * myService.put(getId(), this, this);
+     * 
+     * // TODO: Assume write through caches on self-save (on all saves)?
+     * 
+     * // TODO: Assume that model update events will trigger any refresh that is
+     * needed?
+     * }
+     */
+
+    public final void removeLinkEventListener(URI linkRelationId, LinkEventListener listener) {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void setAllFieldsToDefaultValue() {
+
+        _Fields.clear();
+
+        /*
+         * final Prototype prototype = getPrototype();
+         * 
+         * final Map<String, Field> prototypeFields = prototype.getFields();
+         * if (prototypeFields != null) {
+         * final Set<String> fieldNames = prototypeFields.keySet();
+         * for (final String fieldName : fieldNames) {
+         * setFieldToDefaultValue(fieldName);
+         * }
+         * }
+         */
+    }
+
+    public void setFieldToDefaultValue(String fieldName) {
+        _Fields.put(fieldName, null);
+
+        /*
+         * final Prototype prototype = getPrototype();
+         * final Map<String, Field> prototypeFields = prototype.getFields();
+         * 
+         * if ((prototypeFields != null) &&
+         * prototypeFields.containsKey(fieldName)) {
+         * setFieldValue(fieldName,
+         * prototypeFields.get(fieldName).getDefaultValue());
+         * }
+         */
     }
 
     /*
@@ -556,100 +655,64 @@ public final class RuntimeModel implements Model {
      * become(newThis, atomic);
      * }
      */
-    public void removeEventListener(ModelEventListener listener) {
-        if (_EventListeners == null) {
-            return;
-        }
-
-        _EventListeners.remove(listener);
-    }
-
-    public void removeFieldEventListener(String fieldName, FieldEventListener listener) {
-        if (_FieldEventListeners == null) {
-            return;
-        }
-
-        final List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
-        if (fieldEventListenerList == null) {
-            return;
-        }
-
-        fieldEventListenerList.remove(listener);
-    }
-
-    public void removeLinkEventListener(URI linkRelationId, LinkEventListener listener) {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void setAllFieldsToDefaultValue() {
-
-        final Prototype prototype = getPrototype();
-
-        final Map<String, Field> prototypeFields = prototype.getFields();
-        if (prototypeFields != null) {
-            final Set<String> fieldNames = prototypeFields.keySet();
-            for (final String fieldName : fieldNames) {
-                setFieldToDefaultValue(fieldName);
-            }
-        }
-    }
-
-    public void setFieldToDefaultValue(String fieldName) {
-
-        final Prototype prototype = getPrototype();
-        final Map<String, Field> prototypeFields = prototype.getFields();
-
-        if ((prototypeFields != null) && prototypeFields.containsKey(fieldName)) {
-            setFieldValue(fieldName, prototypeFields.get(fieldName).getDefaultValue());
-        }
-    }
 
     public Object setFieldValue(String fieldName, Object fieldValue) {
 
-        Prototype prototype = getPrototype();
-        ObservableMap<String, Field> prototypeFields = prototype.getFields();
+        return _Fields.put(fieldName, fieldValue);
 
-        Field prototypeField = (prototypeFields != null) ? prototypeFields.get(fieldName) : null;
-        if (prototypeField != null) {
-            if (prototypeField.isReadOnly()) {
-                throw new IllegalAccessError("Field \"" + fieldName + "\" is read only in \""
-                        + prototype.getBlueprintSchemaId() + "\"");
-            }
-
-            if (prototypeField.isRequired() && fieldValue == null) {
-                throw new NullPointerException("Field \"" + fieldName + "\" is requires a value in \""
-                        + prototype.getBlueprintSchemaId() + "\"");
-            }
-
-            Type type = prototypeField.getType();
-            if (type == Type.Boolean) {
-                Boolean booleanFieldValue = (Boolean) fieldValue;
-                fieldValue = (booleanFieldValue != null && booleanFieldValue.booleanValue() ? Boolean.TRUE
-                        : Boolean.FALSE);
-            }
-
-            ObservableList<Constraint> constraints = prototypeField.getConstraints();
-            if (constraints != null && constraints.size() > 0) {
-                // MSMTODO: Validate constraints
-            }
-
-        }
-
-        if (_FieldMap == null) {
-            initFieldMap();
-        }
-
-        Object oldValue = getFieldValue(fieldName);
-
-        _FieldMap.put(fieldName, fieldValue);
-
-        return oldValue;
+        /*
+         * Prototype prototype = getPrototype();
+         * ObservableMap<String, Field> prototypeFields = prototype.getFields();
+         * 
+         * Field prototypeField = (prototypeFields != null) ?
+         * prototypeFields.get(fieldName) : null;
+         * if (prototypeField != null) {
+         * if (prototypeField.isReadOnly()) {
+         * throw new IllegalAccessError("Field \"" + fieldName +
+         * "\" is read only in \""
+         * + prototype.getBlueprintSchemaId() + "\"");
+         * }
+         * 
+         * if (prototypeField.isRequired() && fieldValue == null) {
+         * throw new NullPointerException("Field \"" + fieldName +
+         * "\" is requires a value in \""
+         * + prototype.getBlueprintSchemaId() + "\"");
+         * }
+         * 
+         * Type type = prototypeField.getType();
+         * if (type == Type.Boolean) {
+         * Boolean booleanFieldValue = (Boolean) fieldValue;
+         * fieldValue = (booleanFieldValue != null &&
+         * booleanFieldValue.booleanValue() ? Boolean.TRUE
+         * : Boolean.FALSE);
+         * }
+         * 
+         * ObservableList<Constraint> constraints =
+         * prototypeField.getConstraints();
+         * if (constraints != null && constraints.size() > 0) {
+         * // MSMTODO: Validate constraints
+         * }
+         * 
+         * }
+         * 
+         * Object oldValue = getFieldValue(fieldName);
+         * 
+         * _Fields.put(fieldName, fieldValue);
+         * 
+         * return oldValue;
+         */
     }
 
     @Override
     public String toString() {
         return getClass().getName() + "[Schema=" + _SchemaId + ", ResourceTemplate=" + _ResourceTemplateId + "]";
+    }
+
+    /**
+     * Called to initialize the Model.
+     */
+    protected void init() {
+        setAllFieldsToDefaultValue();
     }
 
     private void fireConstraintViolated(final FieldEvent event) {
@@ -691,38 +754,12 @@ public final class RuntimeModel implements Model {
 
     private HyperLink getHyperLink(URI rel) {
 
-        if (_LinkMap == null) {
-            initLinkMap();
+        if (!_Links.containsKey(rel)) {
+            HyperLink link = new HyperLink(this, rel);
+            _Links.put(rel, link);
         }
 
-        if (!_LinkMap.containsKey(rel)) {
-            HyperLink link = new HyperLink(rel);
-            _LinkMap.put(rel, link);
-        }
-
-        return _LinkMap.get(rel);
-    }
-
-    private Class<?> getMediaTypeClass(MediaType responseType) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /**
-     * Called to initialize the Model.
-     */
-    private void init() {
-        setAllFieldsToDefaultValue();
-    }
-
-    private void initFieldMap() {
-        _FieldMap = Observables.observableMap(new HashMap<String, Object>());
-        _FieldMapEventListener = new FieldMapEventListener();
-        _FieldMap.addMapEventListener(_FieldMapEventListener);
-    }
-
-    private void initLinkMap() {
-        _LinkMap = Observables.observableMap(new HashMap<URI, HyperLink>());
+        return _Links.get(rel);
     }
 
     private class FieldMapEventListener implements MapEventListener<String, Object> {
@@ -773,424 +810,6 @@ public final class RuntimeModel implements Model {
         public void updatingEntry(MapEvent<String, Object> event) {
             // TODO Auto-generated method stub
 
-        }
-
-    }
-
-    /**
-     * A Model instance's Link. This class represents a link "instance", that is
-     * a
-     * link with a fully qualified href URI value that can be used to interact.
-     * 
-     * A link is enabled if the Model's schema's associated link formula
-     * evaluates
-     * to true. Instances of this class are responsible for managing their
-     * enabled
-     * state changes by listening to events from the fields that their
-     * LinkFormula
-     * relies upon.
-     */
-    private class HyperLink implements Serializable {
-
-        private static final long serialVersionUID = -6235652220661484935L;
-
-        private final URI _Rel;
-        private URI _Href;
-        private boolean _Enabled;
-
-        public HyperLink(URI rel) {
-            _Rel = rel;
-        }
-
-        public void addEventListener(LinkEventListener listener) {
-            // TODO Add an event listener
-        }
-
-        // TODO: All Service methods need to take a URI responseModelSchemaId param, it is needed to determine the requested model response type 
-        public Object click(MediaType responseType, Object requestEntity, Map<String, String> hrefParams) {
-
-            // TODO: Fire the pre-Click Event
-
-            /*
-             * Autogenerated subclasses of Model can have an generated method
-             * for
-             * each combination of link relation and request/response Schema.
-             * Sort
-             * of like Hibernate for the Web.
-             * 
-             * For example, this approach would imply that subclasses that
-             * "implement" WRML's Document schema would have a getSelf() method
-             * in
-             * Java, which under the covers would click a link to return the
-             * latest
-             * version of the object.
-             * ...Okay perhaps and odd example to start with.
-             * 
-             * This method is made possible because of the metadata provided by
-             * the
-             * LinkRelation, which details the name, the possible return types
-             * (as
-             * schema ids within response media types), and optional request
-             * types
-             * (as schema ids within request media types). This information can
-             * be
-             * used at class generation time to produce methods that have names
-             * like
-             * save or save(Story story) and getAuthor(). JavaBean method names
-             * are
-             * generated from concat of link rel's method, name, and return
-             * schema
-             * (if needed to disambiguate). For example WRML's:
-             * 
-             * "GET author com/example/Author"
-             * 
-             * turns into Java's:
-             * 
-             * "public Author getAuthor()".
-             * 
-             * 
-             * Other methods might look like:
-             * 
-             * 
-             * The LinkRelation specified two (or more) response schema types,
-             * "Writer" being one of them. Java doesn't allow overloading the
-             * return
-             * type of methods, so we need to alter the name too.
-             * 
-             * public Writer getAuthorAsWriter();
-             * 
-             * See bad first example above public Story getSelf();
-             * 
-             * This could be an interesting way of representing Web collections
-             * ...
-             * 
-             * public org.wrml.Collection<Story> getParent();
-             * 
-             * In cases where the LinkRelation accepts a request schema type
-             * that
-             * this schema instance implements, the code generation should
-             * provide a
-             * no-arg version of the method that internally passes this Model
-             * (the
-             * Link's owner). This would allow the JavaBean interface to have
-             * methods like save() which internally "PUT" the Model to its
-             * corresponding service and return the origin's version for model
-             * syncing.
-             * 
-             * public Story save();
-             * 
-             * Is it possible to determine the URI template vars names that are
-             * left
-             * over after the source schema fills in params with field values?
-             * It
-             * would be cool if they could be used to generate clean params
-             * names
-             * for Java methods that need to result in a client-controlled
-             * resource
-             * name (with initial PUT)
-             * 
-             * public Story save(String name);
-             * 
-             * A self destruct button
-             * 
-             * public void delete();
-             * 
-             * An "unsafe" action (aka controller) method that was generated
-             * from a
-             * link rel that uses POST.
-             * 
-             * public void makeRocketGoNow();
-             * 
-             * These methods further extend the data available to clients using
-             * the
-             * JavaBean interface of Models by providing access to linked data
-             * via
-             * simple get methods. This simplified access to the resource model
-             * would be really slick in a dynamic language like groovy talking
-             * directly to a REST API via WRML, with object caching in the JVM
-             * of
-             * course.
-             * 
-             * At Link.click time, under the covers, these generated methods
-             * traverse the linkage using the very same metadata to make the
-             * appropriate request to the appropriate service. This is RESTful.
-             * 
-             * Finally, the role of the service is to be the beginning of both
-             * the
-             * client-side API and the Service interface. By making the
-             * services available for look-up based on schema id, context
-             * implementations can choose to register one service per type or
-             * services that support several different types. This design allows
-             * for
-             * the same context interface to work for both client and server
-             * side
-             * uses of this class. On the client side, the context is perhaps an
-             * abstraction over some HTTP client making REST API calls. On the
-             * server side, the context may talk to a storage subsystem to CRUD
-             * wrml
-             * objects (backend connection). Its WRML's equivalent of the Web's
-             * uniform interface.
-             */
-
-            // Check to see if this link is currently enabled before proceeding
-            if (!isEnabled()) {
-                // TODO: Should null represent a disconnected or disabled link?
-                return null;
-            }
-
-            /*
-             * TODO: Handle non-WRML model Links to exchange raw input/output
-             * streams. Use the MediaType to look up a stream handler that is
-             * configured in the Context (like services or possibly just use
-             * services)
-             * 
-             * MediaType requestMediaType = null;
-             * 
-             * if (requestModel != null) { // TODO: // Determine default media
-             * type
-             * by looking at the link template and // then the link relation. //
-             * Go
-             * through each list comparing the requestModel's schema URI to //
-             * the
-             * wrml media type's schema parameter, or if a non wrml media //
-             * type is
-             * used then look up a Format using the "raw" media type // (e.g.
-             * application/json maps to the json Format) }
-             */
-
-            final RuntimeModel referrer = getReferrer();
-            final Context context = referrer.getContext();
-
-            if (responseType != null && !isGeneratableResponseType(responseType)) {
-                // TODO: Preemptively throw "406 Not Acceptable" exception
-
-                // TODO: Give the alert an ID?
-                //Alert alert = context.createModel(Alert.class, null, );
-
-                return null;
-            }
-
-            MediaType requestType = null;
-
-            if (requestEntity != null) {
-
-                Transformer<MediaType, Class<?>> mediaTypeToClassTransformer = context.getMediaTypeToClassTransformer();
-                requestType = mediaTypeToClassTransformer.bToA(requestEntity.getClass());
-
-                if (requestType != null && !isSupportedRequestType(requestType)) {
-                    // TODO: Preemptively throw "415 Unsupported Media Type" exception
-                    return null;
-                }
-            }
-
-            Class<?> responseTypeClass = getMediaTypeClass(responseType);
-            Service responseTypeService = context.getService(responseTypeClass);
-
-            // TODO: The last minute hrefParams is a possibly half-baked way to fill
-            // in any remaining URI Template params, such as the client-assigned
-            // "name" of a first time stored (PUT) resource.
-            final URI href = getHref(hrefParams);
-
-            Object responseEntity = null;
-
-            final LinkRelation rel = getLinkRelation();
-            final org.wrml.model.communication.http.Method method = rel.getMethod();
-            switch (method) {
-
-            // TODO: Handle collections here?
-
-            case GET:
-                responseEntity = responseTypeService.get(href, responseType, referrer);
-                break;
-
-            case PUT:
-                responseEntity = responseTypeService.put(href, requestEntity, responseType, referrer);
-                break;
-
-            case DELETE:
-                responseEntity = responseTypeService.remove(href, responseType, referrer);
-                break;
-
-            case POST:
-                // TODO: Create or Execute? 
-                // Look at params to decide? Look at endpoint's resource archetype?
-
-                break;
-
-            case HEAD:
-                // TODO:
-                responseEntity = responseTypeService.get(href, responseType, referrer);
-                break;
-
-            case OPTIONS:
-                // TODO:
-                responseEntity = responseTypeService.get(href, responseType, referrer);
-                break;
-
-            default:
-
-                /*
-                 * TODO: Throw "405 Method Not Allowed"
-                 */
-
-                break;
-            }
-
-            // TODO: Fire the post-Click Event
-
-            return responseEntity;
-        }
-
-        public void fireHrefChangedEvent() {
-
-        }
-
-        public URI getHref() {
-            return _Href;
-        }
-
-        public Link getLink() {
-            final RuntimeModel referrer = getReferrer();
-            final Prototype prototype = referrer.getPrototype();
-            ObservableMap<URI, Link> links = prototype.getLinksByRel();
-            URI rel = getLinkRelationId();
-            return (links != null && links.containsKey(rel)) ? links.get(rel) : null;
-        }
-
-        public LinkRelation getLinkRelation() {
-            final Model referrer = getReferrer();
-            Context context = referrer.getContext();
-            MediaType linkRelationMediaType = context.getMediaTypeToClassTransformer().bToA(LinkRelation.class);
-            Service service = context.getService(linkRelationMediaType);
-            return (LinkRelation) ((Model) service.get(getLinkRelationId(), linkRelationMediaType, referrer))
-                    .getStaticInterface();
-        }
-
-        public URI getLinkRelationId() {
-            return _Rel;
-        }
-
-        public LinkTemplate getLinkTemplate() {
-
-            return null;
-
-            // TODO
-
-            //        final Model owner = getOwner();
-            //
-            //        if (!(owner instanceof Document)) {
-            //            return null;
-            //        }
-            //
-            //        final Document document = (Document) owner;
-            //        final ResourceTemplate resourceTemplate = document.getResourceTemplate();
-            //
-            //        final ObservableMap<URI, URI> hereToThereLinkRelationIdToLinkTemplateIdMap = resourceTemplate
-            //                .getEndPointLinkRelationIdToLinkTemplateIdMap();
-            //
-            //        final URI linkTemplateId = hereToThereLinkRelationIdToLinkTemplateIdMap.get(getLinkRelationId());
-            //
-            //        Context context = owner.getContext();
-            //        Service service = context.getService(LinkTemplate.class);
-            //        return (LinkTemplate) service.get(linkTemplateId, document);
-
-        }
-
-        public RuntimeModel getReferrer() {
-            return RuntimeModel.this;
-        }
-
-        public boolean isEnabled() {
-            return _Enabled;
-        }
-
-        /**
-         * 
-         * @param hrefParams
-         *            The unfinished URI template params for HTTP methods like
-         *            PUT
-         *            which have path segments that are known only during save
-         *            operations
-         * @return
-         */
-        private URI getHref(Map<String, String> hrefParams) {
-            // TODO: Get HREF
-            return null;
-        }
-
-        private boolean isGeneratableResponseType(MediaType responseType) {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        private boolean isSupportedRequestType(MediaType requestType) {
-            // TODO Auto-generated method stub
-            return false;
-        }
-
-        /*
-         * public void hrefFieldValueChanged(FieldEvent event) { updateHref(); }
-         * public void setHref (String href) { if (_Href !.equal href) { final _
-         * Href = href; fireHrefChangedEvent(); } }
-         * 
-         * public void updateHref() { final LinkTemplate linkTemplate =
-         * getLinkTemplate(); final ResourceTemplate destination =
-         * linkTemplate.getDestination(); final UriTemplate uriTemplate =
-         * destination.getUriTemplate(); setHref(uriTemplate.execute(this)); }
-         */
-
-    }
-
-    private static class StaticModelHandler extends DelegatingInvocationHandler {
-
-        public StaticModelHandler(RuntimeModel delegate) {
-            super(delegate);
-        }
-
-        @Override
-        protected Object subInvoke(Object proxy, Method method, Object[] args) throws Throwable {
-
-            Class<?> declaringClass = method.getDeclaringClass();
-
-            // If the method was declared in Model or one of its ancestors, delegate the call.
-            if (declaringClass.isAssignableFrom(Model.class)) {
-                return super.subInvoke(proxy, method, args);
-            }
-
-            RuntimeModel referrer = getDyanmicModel();
-
-            Prototype prototype = referrer.getPrototype();
-
-            String methodKey = getMethodKey(method);
-            String methodName = method.getName();
-
-            FieldPrototype fieldPrototype = prototype.getFieldPrototype(methodKey, methodName);
-            if (fieldPrototype != null) {
-                Object fieldValue = null;
-                if (fieldPrototype.getAccessType() == FieldPrototype.AccessType.SET && args != null && args.length > 0) {
-                    fieldValue = args[0];
-                }
-                return fieldPrototype.accessField(referrer, fieldValue);
-            }
-
-            LinkPrototype linkPrototype = prototype.getLinkPrototype(methodKey, methodName, method.getReturnType());
-            if (linkPrototype != null) {
-
-                Object requestEntity = (args != null && args.length > 0) ? args[0] : null;
-
-                // TODO: Deal with additional params
-                @SuppressWarnings("unchecked")
-                Map<String, String> hrefArgs = (Map<String, String>) ((args != null && args.length > 1) ? args[1]
-                        : null);
-
-                return linkPrototype.clickLink(referrer, requestEntity, hrefArgs);
-            }
-
-            return null;
-        }
-
-        private RuntimeModel getDyanmicModel() {
-            return (RuntimeModel) getDelegate();
         }
 
     }

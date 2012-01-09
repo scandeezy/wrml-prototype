@@ -28,7 +28,7 @@ import org.wrml.model.api.LinkTemplate;
 
 final class HypermediaEngine {
 
-    private final Context _Context;
+    private final transient Context _Context;
     private final URI _ApiId;
     private final Map<URI, Resource> _Resources;
 

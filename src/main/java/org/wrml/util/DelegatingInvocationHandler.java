@@ -17,7 +17,6 @@
 package org.wrml.util;
 
 import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
@@ -42,11 +41,14 @@ public class DelegatingInvocationHandler implements Delegating<Object>, Invocati
      * @return The method signature {@link String}.
      */
     public static String baseGetMethodKey(Method method) {
+        return baseGetMethodKey(method.getName(), method.getParameterTypes());
+    }
+
+    public static String baseGetMethodKey(final String methodName, final Class<?>[] params) {
         final StringBuilder sb = new StringBuilder(50);
 
-        sb.append(method.getName() + "(");
+        sb.append(methodName + "(");
 
-        final Class<?>[] params = method.getParameterTypes();
         for (int i = 0; i < params.length; i++) {
             sb.append(params[i].getName());
             if (i < (params.length - 1)) {
@@ -88,7 +90,8 @@ public class DelegatingInvocationHandler implements Delegating<Object>, Invocati
     }
 
     /**
-     * Returns the delegate methods.
+     * Returns the delegate methods, keyed with method keys (call
+     * getMethodKey(method) to transform).
      * 
      * @return The delegate methods
      */
@@ -107,15 +110,14 @@ public class DelegatingInvocationHandler implements Delegating<Object>, Invocati
                 }
                 return false;
             }
-            else
-                if (methodName.equals("hashCode")) {
-                    return hashCode();
+            else if (methodName.equals("hashCode")) {
+                return hashCode();
+            }
+            else {
+                if (methodName.equals("toString")) {
+                    return toString();
                 }
-                else {
-                    if (methodName.equals("toString")) {
-                        return toString();
-                    }
-                }
+            }
         }
 
         return subInvoke(proxy, method, args);
@@ -185,19 +187,7 @@ public class DelegatingInvocationHandler implements Delegating<Object>, Invocati
     protected final Object baseInvoke(Object proxy, Method method, Object[] args) throws Throwable {
 
         final String methodKey = getMethodKey(method);
-        Object result = null;
-        try {
-            result = _DelegateMethods.get(methodKey).invoke(_Delegate, args);
-        }
-        catch (final InvocationTargetException e) {
-            System.err.println(e);
-            e.getCause().printStackTrace();
-        }
-        catch (final Throwable t) {
-            System.err.println(t);
-            t.printStackTrace();
-        }
-        return result;
+        return _DelegateMethods.get(methodKey).invoke(_Delegate, args);
     }
 
     /**

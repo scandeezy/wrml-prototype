@@ -25,7 +25,7 @@ import org.wrml.util.observable.DelegatingObservableList;
  * TODO: Make this a useful base class for various types of multiproxies (load
  * balancers, aggregators, and other cluster-oriented operators).
  */
-public abstract class MultiProxyService extends AbstractService implements DelegatingService<List<Service>> {
+public abstract class MultiProxyService extends ServiceMap implements DelegatingService<List<Service>> {
 
     private final DelegatingObservableList<Service> _Services;
 

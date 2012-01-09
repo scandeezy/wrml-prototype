@@ -24,8 +24,8 @@ import java.util.Map;
 import org.wrml.Model;
 import org.wrml.model.Container;
 import org.wrml.model.Document;
+import org.wrml.model.format.Format;
 import org.wrml.model.schema.Schema;
-import org.wrml.runtime.service.SystemSchemaService;
 import org.wrml.service.CachingService;
 import org.wrml.service.Service;
 import org.wrml.service.WebClient;
@@ -34,7 +34,9 @@ import org.wrml.util.observable.DelegatingObservableMap;
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.util.observable.Observables;
 import org.wrml.util.transformer.CachingTransformer;
+import org.wrml.util.transformer.FormatIdToMediaTypeTransformer;
 import org.wrml.util.transformer.MediaTypeToClassTransformer;
+import org.wrml.util.transformer.MediaTypeToFormatTransformer;
 import org.wrml.util.transformer.MediaTypeToStringTransformer;
 import org.wrml.util.transformer.SchemaIdToClassNameTransformer;
 import org.wrml.util.transformer.SchemaIdToClassTransformer;
@@ -79,11 +81,10 @@ import org.wrml.util.transformer.UriToStringTransformer;
  * overriding certain methods (and obviously by implementing the absract
  * ones).
  * 
- * TODO: Eventually need to figure out how to make LinkRelation and other
- * core types extend Model. This is the dog food that WRML must eat in
- * order to use itself to make itself (bootstrap).
+ * LinkRelation and other core types extend Model. This is the dog food
+ * that WRML must eat in order to use itself to make itself (bootstrap).
  * 
- * This will allow WRML to treat these core type instance "loadings" just
+ * This allows WRML to treat these core type instance "loadings" just
  * like any other application using WRML. Meaning that there is an
  * associated service class for each core type. This association can be
  * formed at program start-up (via config/wiring) which results in a
@@ -121,21 +122,26 @@ import org.wrml.util.transformer.UriToStringTransformer;
 public class Context extends ClassLoader {
 
     public static final URI DEFAULT_SCHEMA_API_DOCROOT = URI.create("http://api.schemas.wrml.org/");
+    public static final URI DEFAULT_FORMAT_API_DOCROOT = URI.create("http://api.formats.wrml.org/");
+
     public static final String FIELD_NAME_ID = "id";
 
     private final ObservableMap<MediaType, Service> _Services;
     private Transformer<MediaType, String> _MediaTypeToStringTransformer;
     private Transformer<MediaType, Class<?>> _MediaTypeToClassTransformer;
-
     private Transformer<URI, MediaType> _SchemaIdToMediaTypeTransformer;
     private Transformer<URI, Class<?>> _SchemaIdToClassTransformer;
     private Transformer<URI, String> _SchemaIdToClassNameTransformer;
     private Transformer<URI, String> _UriToStringTransformer;
+    private Transformer<URI, MediaType> _FormatIdToMediaTypeTransformer;
+    private Transformer<MediaType, Format> _MediaTypeToFormatTransformer;
 
     private Service _DefaultService;
 
     private final ObservableMap<URI, Prototype> _Prototypes;
     private final ObservableMap<URI, HypermediaEngine> _HypermediaEngines;
+    private final SystemSchemaService _SystemSchemaService;
+    Prototype _MetaPrototype;
 
     public Context() {
         this(getSystemClassLoader());
@@ -173,18 +179,28 @@ public class Context extends ClassLoader {
 
         setSchemaIdToClassNameTransformer(schemaIdToClassNameTransformer);
 
+        Transformer<URI, MediaType> formatIdToMediaTypeTransformer = new CachingTransformer<URI, MediaType, Transformer<URI, MediaType>>(
+                new FormatIdToMediaTypeTransformer(this, DEFAULT_FORMAT_API_DOCROOT));
+
+        setFormatIdToMediaTypeTransformer(formatIdToMediaTypeTransformer);
+
         Transformer<URI, Class<?>> schemaIdToClassTransformer = new CachingTransformer<URI, Class<?>, Transformer<URI, Class<?>>>(
                 new SchemaIdToClassTransformer(this));
 
         setSchemaIdToClassTransformer(schemaIdToClassTransformer);
+
+        Transformer<MediaType, Format> mediaTypeToFormatTransformer = new CachingTransformer<MediaType, Format, Transformer<MediaType, Format>>(
+                new MediaTypeToFormatTransformer(this));
+
+        setMediaTypeToFormatTransformer(mediaTypeToFormatTransformer);
 
         Service www = new WebClient(this);
 
         Service defaultService = instantiateCachingService(www);
         setDefaultService(defaultService);
 
-        Service schemaService = new SystemSchemaService(this, www);
-        setSchemaService(schemaService);
+        _SystemSchemaService = new SystemSchemaService(this, www);
+        setSchemaService(_SystemSchemaService);
     }
 
     public final void fetchAllDocuments(Container<? extends Document> documents, List<? extends Document> allDocuments) {
@@ -202,6 +218,10 @@ public class Context extends ClassLoader {
         return _DefaultService;
     }
 
+    public Transformer<URI, MediaType> getFormatIdToMediaTypeTransformer() {
+        return _FormatIdToMediaTypeTransformer;
+    }
+
     public final HypermediaEngine getHypermediaEngine(URI apiId) {
         if (!_HypermediaEngines.containsKey(apiId)) {
             HypermediaEngine hypermediaEngine = new HypermediaEngine(this, apiId);
@@ -215,32 +235,49 @@ public class Context extends ClassLoader {
         return _MediaTypeToClassTransformer;
     }
 
+    public Transformer<MediaType, Format> getMediaTypeToFormatTransformer() {
+        return _MediaTypeToFormatTransformer;
+    }
+
     public Transformer<MediaType, String> getMediaTypeToStringTransformer() {
         return _MediaTypeToStringTransformer;
     }
 
-    public final Prototype getPrototype(URI blueprintSchemaId) {
+    public URI getMetaSchemaId() {
+        return getSchemaIdToClassTransformer().bToA(Schema.class);
+    }
 
-        if (!_Prototypes.containsKey(blueprintSchemaId)) {
-            Prototype prototype = new Prototype(this, blueprintSchemaId);
-            _Prototypes.put(blueprintSchemaId, prototype);
+    /*
+     * private Prototype getMetaPrototype() {
+     * 
+     * if (_MetaPrototype == null) {
+     * _MetaPrototype = new Prototype(this, getMetaSchemaId(), true);
+     * }
+     * 
+     * return _MetaPrototype;
+     * }
+     */
+
+    public final Prototype getPrototype(URI schemaId) {
+
+        if (schemaId.equals(getMetaSchemaId())) {
+            if (_MetaPrototype == null) {
+                _MetaPrototype = new Prototype(this, schemaId);
+            }
+            return _MetaPrototype;
+        }
+        else if (!_Prototypes.containsKey(schemaId)) {
+            Prototype prototype = new Prototype(this, schemaId);
+            _Prototypes.put(schemaId, prototype);
         }
 
-        return _Prototypes.get(blueprintSchemaId);
+        return _Prototypes.get(schemaId);
     }
 
     public final Schema getSchema(URI schemaId) {
         MediaType schemaMediaType = getMediaTypeToClassTransformer().bToA(Schema.class);
         Service schemaService = getService(schemaMediaType);
-        return (Schema) ((Model) schemaService.get(schemaId, schemaMediaType, null)).getStaticInterface();
-    }
-
-    public Transformer<URI, String> getSchemaIdToClassNameTransformer() {
-        return _SchemaIdToClassNameTransformer;
-    }
-
-    public Transformer<URI, Class<?>> getSchemaIdToClassTransformer() {
-        return _SchemaIdToClassTransformer;
+        return (Schema) ((Model) schemaService.get(schemaId, null, schemaMediaType, null)).getStaticInterface();
     }
 
     /*
@@ -252,6 +289,14 @@ public class Context extends ClassLoader {
      * 
      * }
      */
+
+    public Transformer<URI, String> getSchemaIdToClassNameTransformer() {
+        return _SchemaIdToClassNameTransformer;
+    }
+
+    public Transformer<URI, Class<?>> getSchemaIdToClassTransformer() {
+        return _SchemaIdToClassTransformer;
+    }
 
     public Transformer<URI, MediaType> getSchemaIdToMediaTypeTransformer() {
         return _SchemaIdToMediaTypeTransformer;
@@ -302,20 +347,22 @@ public class Context extends ClassLoader {
         return new CachingService(this, originService, observableModelCache);
     }
 
-    public final Model instantiateModel(Class<?> schemaClass, URI resourceTemplateId, URI resourceId) {
-        return instantiateModel(getSchemaIdToClassTransformer().bToA(schemaClass), resourceTemplateId, resourceId);
+    public final Model instantiateModel(Class<?> schemaClass) {
+        return instantiateModel(getSchemaIdToClassTransformer().bToA(schemaClass));
     }
 
-    public final Model instantiateModel(MediaType schemaMediaType, URI resourceTemplateId, URI resourceId) {
-        return instantiateModel(getSchemaIdToMediaTypeTransformer().bToA(schemaMediaType), resourceTemplateId,
-                resourceId);
+    public final Model instantiateModel(MediaType schemaMediaType) {
+        return instantiateModel(getSchemaIdToMediaTypeTransformer().bToA(schemaMediaType));
     }
 
-    public final Model instantiateModel(URI schemaId, URI resourceTemplateId, URI resourceId) {
-        RuntimeModel model = new RuntimeModel(this, schemaId, resourceTemplateId);
-        if (resourceId != null) {
-            model.setFieldValue(FIELD_NAME_ID, resourceId);
-        }
+    public final Model instantiateModel(URI schemaId) {
+        return instantiateModel(schemaId, null, new ModelFieldMap(this, schemaId, new HashMap<String, Object>()),
+                new HashMap<URI, HyperLink>());
+    }
+
+    public final Model instantiateModel(URI schemaId, List<URI> embeddedLinkRelationIds, FieldMap fieldMap,
+            Map<URI, HyperLink> linkMap) {
+        RuntimeModel model = new RuntimeModel(this, schemaId, embeddedLinkRelationIds, fieldMap, linkMap);
         return model;
     }
 
@@ -323,8 +370,16 @@ public class Context extends ClassLoader {
         _DefaultService = defaultService;
     }
 
+    public void setFormatIdToMediaTypeTransformer(Transformer<URI, MediaType> formatIdToMediaTypeTransformer) {
+        _FormatIdToMediaTypeTransformer = formatIdToMediaTypeTransformer;
+    }
+
     public void setMediaTypeToClassTransformer(Transformer<MediaType, Class<?>> mediaTypeToClassTransformer) {
         _MediaTypeToClassTransformer = mediaTypeToClassTransformer;
+    }
+
+    public void setMediaTypeToFormatTransformer(Transformer<MediaType, Format> mediaTypeToFormatTransformer) {
+        _MediaTypeToFormatTransformer = mediaTypeToFormatTransformer;
     }
 
     public void setMediaTypeToStringTransformer(Transformer<MediaType, String> mediaTypeToStringTransformer) {
@@ -350,7 +405,7 @@ public class Context extends ClassLoader {
         }
         MediaType schemaMediaType = getMediaTypeToClassTransformer().bToA(Schema.class);
         _Services.put(schemaMediaType, schemaService);
-        
+
     }
 
     public void setUriToStringTransformer(Transformer<URI, String> uriToStringTransformer) {

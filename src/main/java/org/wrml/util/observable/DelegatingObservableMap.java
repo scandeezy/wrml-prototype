@@ -66,6 +66,11 @@ public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> i
     }
 
     @Override
+    public String toString() {
+        return getClass().getName() + " [" + (_Delegate != null ? "Delegate=" + _Delegate : "") + "]";
+    }
+
+    @Override
     public int hashCode() {
         return _Delegate.hashCode();
     }

@@ -20,7 +20,7 @@ import org.wrml.runtime.Context;
 
 public abstract class AbstractTransformer<A, B> implements Transformer<A, B> {
 
-    private final Context _Context;
+    private final transient Context _Context;
 
     public AbstractTransformer(final Context context) {
         _Context = context;

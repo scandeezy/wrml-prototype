@@ -31,9 +31,6 @@ import org.wrml.util.MediaType;
 
 /**
  * The base interface for all web resource schema instances.
- * 
- * TODO: Consider refactoring some/all of this interface into a true WRML
- * schema-driven model.
  */
 public interface Model extends Serializable {
 
@@ -53,6 +50,8 @@ public interface Model extends Serializable {
     public void extend(Model modelToExtend, Model... additionalModelsToExtend);
 
     public Context getContext();
+
+    public Model getDynamicInterface();
 
     public List<URI> getEmbeddedLinkRelationIds();
 

@@ -18,8 +18,8 @@ package org.wrml.util.transformer;
 
 import java.util.HashMap;
 
-import org.wrml.util.observable.DelegatingObservableMap;
 import org.wrml.util.observable.ObservableMap;
+import org.wrml.util.observable.Observables;
 
 public class CachingTransformer<A, B, T extends Transformer<A, B>> extends DelegatingTransformer<A, B, T> {
 
@@ -27,8 +27,7 @@ public class CachingTransformer<A, B, T extends Transformer<A, B>> extends Deleg
     private final ObservableMap<B, A> _BaCache;
 
     public CachingTransformer(T delegate) {
-        this(delegate, new DelegatingObservableMap<A, B>(new HashMap<A, B>()), new DelegatingObservableMap<B, A>(
-                new HashMap<B, A>()));
+        this(delegate, Observables.observableMap(new HashMap<A, B>()), Observables.observableMap(new HashMap<B, A>()));
     }
 
     public CachingTransformer(T delegate, ObservableMap<A, B> abCache, ObservableMap<B, A> baCache) {

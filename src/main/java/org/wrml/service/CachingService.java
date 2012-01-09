@@ -47,7 +47,7 @@ public class CachingService extends ProxyService {
     }
 
     @Override
-    public Object get(URI resourceId, MediaType responseType, Model referrer) {
+    public Object get(URI resourceId, Object cachedEntity, MediaType responseType, Model referrer) {
 
         if (resourceId == null) {
             throw new NullPointerException("Resource ID (URI) cannot be null");
@@ -60,12 +60,13 @@ public class CachingService extends ProxyService {
         boolean isRefresh = (referrer != null && referrer instanceof Document && resourceId
                 .equals(((Document) referrer).getId()));
 
-        if (cache.containsKey(resourceId) && !isRefresh) {            
+        if (cache.containsKey(resourceId) && !isRefresh) {
             responseEntity = cache.get(resourceId);
             System.out.println(resourceId + " was already cached as: " + String.valueOf(responseEntity));
         }
         else {
-            responseEntity = super.get(resourceId, responseType, referrer);
+            // TODO: Pass the cached entity?
+            responseEntity = super.get(resourceId, null, responseType, referrer);
             cache.put(resourceId, responseEntity);
             System.out.println(resourceId + " is now cached as: " + String.valueOf(responseEntity));
         }

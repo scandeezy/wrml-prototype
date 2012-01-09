@@ -158,4 +158,8 @@ public class DelegatingObservableList<E> extends AbstractObservableList<E> imple
     public <T> T[] toArray(T[] ts) {
         return _Delegate.toArray(ts);
     }
-}
+
+    @Override
+    public String toString() {
+        return getClass().getName() + " [" + (_Delegate != null ? "Delegate=" + _Delegate : "") + "]";
+    }}

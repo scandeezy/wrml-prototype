@@ -18,8 +18,6 @@ package org.wrml.util.transformer;
 
 import java.lang.reflect.TypeVariable;
 import java.net.URI;
-import java.text.MessageFormat;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -29,32 +27,6 @@ import org.wrml.runtime.Context;
 import org.wrml.util.MediaType;
 
 public class MediaTypeToClassTransformer extends AbstractTransformer<MediaType, Class<?>> {
-
-    public static final String TYPE_APPLICATION = "application";
-    public static final String SUBTYPE_WRML = "wrml";
-    public static final String MEDIA_TYPE_STRING_WRML = TYPE_APPLICATION + '/' + SUBTYPE_WRML;
-    public static final String PARAMETER_NAME_SCHEMA = "schema";
-
-    private static final MessageFormat WRML_MEDIA_TYPE_MESSAGE_FORMAT;
-
-    static {
-        Map<String, String> parameters = new HashMap<String, String>();
-        parameters.put(PARAMETER_NAME_SCHEMA, "{0}");
-        String formatString = MediaTypeToStringTransformer.createMediaTypeString(TYPE_APPLICATION, SUBTYPE_WRML,
-                parameters);
-        WRML_MEDIA_TYPE_MESSAGE_FORMAT = new MessageFormat(formatString);
-    }
-
-    public static String createWrmlMediaTypeString(final String schemaIdString, final Map<String, String> parameters) {
-
-        String mediaTypeString = WRML_MEDIA_TYPE_MESSAGE_FORMAT.format(new Object[] { schemaIdString });
-        if (parameters != null) {
-            final StringBuilder sb = new StringBuilder(mediaTypeString);
-            MediaTypeToStringTransformer.appendParameters(sb, parameters);
-            mediaTypeString = sb.toString();
-        }
-        return mediaTypeString;
-    }
 
     public MediaTypeToClassTransformer(Context context) {
         super(context);
@@ -85,7 +57,7 @@ public class MediaTypeToClassTransformer extends AbstractTransformer<MediaType, 
 
             if (clazz.equals(Model.class)) {
                 // Return the vanilla application/wrml type for base models                    
-                mediaTypeString = MEDIA_TYPE_STRING_WRML;
+                mediaTypeString = MediaType.MEDIA_TYPE_STRING_WRML;
             }
             else {
                 // Return the application/wrml with schema param for derived models
@@ -142,7 +114,7 @@ public class MediaTypeToClassTransformer extends AbstractTransformer<MediaType, 
     }
 
     public String createWrmlMediaTypeString(final URI schemaId, final Map<String, String> parameters) {
-        return createWrmlMediaTypeString(getContext().getUriToStringTransformer().aToB(schemaId), parameters);
+        return MediaType.createWrmlMediaTypeString(getContext().getUriToStringTransformer().aToB(schemaId), parameters);
     }
 
 }

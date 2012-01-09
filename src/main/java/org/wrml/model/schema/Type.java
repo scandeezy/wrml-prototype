@@ -63,6 +63,12 @@ public enum Type {
     Long("Long"),
 
     /**
+     * In Java, maps to: org.wrml.util.ObservableMap<K,V>, where "param" type
+     * is determined by TypeConstraints.
+     */
+    Map("Map"),
+    
+    /**
      * In Java, maps to: org.wrml.Model or a subclass T determined by
      * SchemaConstraint's Schema class.
      */

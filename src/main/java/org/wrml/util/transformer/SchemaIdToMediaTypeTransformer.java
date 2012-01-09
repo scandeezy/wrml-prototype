@@ -17,7 +17,6 @@
 package org.wrml.util.transformer;
 
 import java.net.URI;
-import java.util.Map;
 
 import org.wrml.runtime.Context;
 import org.wrml.util.MediaType;
@@ -34,7 +33,7 @@ public class SchemaIdToMediaTypeTransformer extends AbstractTransformer<URI, Med
         }
 
         String schemaIdString = getContext().getUriToStringTransformer().aToB(aValue);
-        String mediaTypeString = MediaTypeToClassTransformer.createWrmlMediaTypeString(schemaIdString, null);
+        String mediaTypeString = MediaType.createWrmlMediaTypeString(schemaIdString, null);
         return getContext().getMediaTypeToStringTransformer().bToA(mediaTypeString);
     }
 
@@ -43,17 +42,7 @@ public class SchemaIdToMediaTypeTransformer extends AbstractTransformer<URI, Med
             return null;
         }
 
-        Map<String, String> parameters = bValue.getParameters();
-        if (parameters == null) {
-            return null;
-        }
-        
-        String uriString = parameters.get(MediaTypeToClassTransformer.PARAMETER_NAME_SCHEMA);
-        if (uriString == null) {
-            return null;
-        }
-        
-        return getContext().getUriToStringTransformer().bToA(uriString);
+        return getContext().getUriToStringTransformer().bToA(bValue.getSchemaIdString());
     }
 
 }

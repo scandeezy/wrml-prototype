@@ -42,14 +42,6 @@ public interface Schema extends Named, Versioned, Descriptive, Document {
 
     public ObservableList<Schema> getBaseSchemas();
 
-    // Generated from Link
-    //     Relation: constraints
-    //         Methods: GET 
-    //         ResponseSchema: Collection[Constraint]
-    //     EnabledFormula: constraintsId != null
-    //     DestinationUriTemplate: {constraintsId} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["constraintsId"]]
-    //     Href: <constraintsId>
 
     /**
      * The ability to add Constraints to Schemas can have serve a few different

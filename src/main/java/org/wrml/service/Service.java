@@ -36,7 +36,7 @@ public interface Service extends Map<URI, Object> {
 
     public Object create(URI collectionId, Object requestEntity, MediaType responseType, Model referrer);
 
-    public Object get(URI resourceId, MediaType responseType, Model referrer);
+    public Object get(URI resourceId, Object cachedEntity, MediaType responseType, Model referrer);
     
     public Context getContext();
     

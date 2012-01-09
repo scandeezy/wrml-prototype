@@ -29,7 +29,7 @@ public class ProxyService extends DelegatingObservableMap<URI, Object> implement
 
     // TODO: Add service event handler add/remove and event firing logic
 
-    private final Context _Context;
+    private final transient Context _Context;
 
     public ProxyService(Context context, Service originService) {
         super(originService);
@@ -52,8 +52,8 @@ public class ProxyService extends DelegatingObservableMap<URI, Object> implement
         return getOriginService().create(collectionId, requestEntity, responseType, referrer);
     }
 
-    public Object get(URI resourceId, MediaType responseType, Model referrer) {
-        return getOriginService().get(resourceId, responseType, referrer);
+    public Object get(URI resourceId, Object cachedEntity, MediaType responseType, Model referrer) {
+        return getOriginService().get(resourceId, cachedEntity, responseType, referrer);
     }
 
     public Object put(URI resourceId, Object requestEntity, MediaType responseType, Model referrer) {
@@ -64,4 +64,5 @@ public class ProxyService extends DelegatingObservableMap<URI, Object> implement
         return getOriginService().remove(resourceId, responseType, referrer);
     }
 
+    
 }

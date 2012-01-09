@@ -20,7 +20,6 @@ import java.net.URI;
 
 import org.wrml.Model;
 
-
 /*
  * WRML's Java framework should have a generalized design for how to
  * incorporate hooks to non-model (executable) Java code. Everything from
@@ -29,8 +28,8 @@ import org.wrml.Model;
  */
 public interface CodeOnDemand extends Named, Titled, Versioned, Descriptive, Model {
 
-    public URI getCodeLocation();
+    public URI getCodeUri();
 
-    public URI setCodeLocation(URI codeLocation);
+    public URI setCodeUri(URI uri);
 
 }

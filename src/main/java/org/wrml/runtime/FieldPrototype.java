@@ -20,15 +20,10 @@ import org.wrml.Model;
 
 final class FieldPrototype {
 
-    public enum AccessType {
-        GET,
-        SET,
-    }
-
     private final String _FieldName;
-    private final AccessType _AccessType;
+    private final FieldAccessType _AccessType;
 
-    public FieldPrototype(final String fieldName, final AccessType accessType) {
+    public FieldPrototype(final String fieldName, final FieldAccessType accessType) {
         _FieldName = fieldName;
         _AccessType = accessType;
     }
@@ -53,7 +48,7 @@ final class FieldPrototype {
         return _FieldName;
     }
 
-    public AccessType getAccessType() {
+    public FieldAccessType getAccessType() {
         return _AccessType;
     }
 }

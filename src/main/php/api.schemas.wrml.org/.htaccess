@@ -1,0 +1,11 @@
+Options +FollowSymlinks
+
+RewriteEngine on
+RewriteCond %{REQUEST_URI} !^/?WrmlServer.php$
+RewriteRule . WrmlServer.php
+
+ErrorDocument 404 /errors/404
+ErrorDocument 500 /errors/500
+
+
+

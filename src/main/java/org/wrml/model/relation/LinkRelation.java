@@ -21,8 +21,8 @@ import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
 import org.wrml.model.Versioned;
-import org.wrml.model.communication.http.Method;
 import org.wrml.util.MediaType;
+import org.wrml.util.http.Method;
 import org.wrml.util.observable.ObservableList;
 
 /**
