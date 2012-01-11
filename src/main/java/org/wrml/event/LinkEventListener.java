@@ -18,7 +18,6 @@ package org.wrml.event;
 
 import java.util.EventListener;
 
-
 /**
  * An event listener that can watch Links to follow their availability status.
  */

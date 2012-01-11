@@ -23,11 +23,11 @@ import org.wrml.util.http.Status;
 
 public interface Alert extends Named, Titled, Descriptive {
 
-    public String getType();
-
     public String getCategory();
 
     public String getDetails();
 
     public Status getStatus();
+
+    public String getType();
 }

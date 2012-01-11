@@ -18,7 +18,6 @@ package org.wrml.model;
 
 import org.wrml.Model;
 
-
 public interface UriTemplateParameter extends Model {
 
 }

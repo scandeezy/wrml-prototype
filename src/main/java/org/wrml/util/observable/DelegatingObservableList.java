@@ -162,4 +162,5 @@ public class DelegatingObservableList<E> extends AbstractObservableList<E> imple
     @Override
     public String toString() {
         return getClass().getName() + " [" + (_Delegate != null ? "Delegate=" + _Delegate : "") + "]";
-    }}
+    }
+}

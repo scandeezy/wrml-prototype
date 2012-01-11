@@ -67,7 +67,7 @@ public enum Type {
      * is determined by TypeConstraints.
      */
     Map("Map"),
-    
+
     /**
      * In Java, maps to: org.wrml.Model or a subclass T determined by
      * SchemaConstraint's Schema class.
@@ -84,7 +84,7 @@ public enum Type {
      * configuration-based mapping of TextSyntaxConstraint to
      * StringTransformer<T>
      */
-    Text("Text");     
+    Text("Text");
 
     private final String _Name;
 

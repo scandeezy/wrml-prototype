@@ -16,8 +16,11 @@
 
 package org.wrml.model.schema;
 
+import java.net.URI;
+
 import org.wrml.model.Descriptive;
 import org.wrml.model.Named;
+import org.wrml.model.Owned;
 import org.wrml.model.Titled;
 import org.wrml.util.observable.ObservableList;
 
@@ -28,35 +31,27 @@ import org.wrml.util.observable.ObservableList;
  * 
  */
 // Generated from a Web Resource Schema
-public interface Field extends Typed, Named, Titled, Descriptive, Member {
+public interface Field extends Typed, Named, Titled, Descriptive, Owned<Schema> {
 
-    // Added to Field
-    //     Name: name 
-    //     Constraints: TextSyntax - Mixed-Lower Case
+    public ObservableList<URI> getConstraintIds();
 
-    public ObservableList<Constraint> getConstraints();
-
-    // TODO: We need to figure out how to represent Object in WRML.
-    // Should it be a Type or should we use a "marker" Schema (Native)?
     public Object getDefaultValue();
 
     public boolean isHidden();
+
+    public boolean isLocal();
 
     public boolean isReadOnly();
 
     public boolean isRequired();
 
-    public boolean isTransient();
-
     public Object setDefaultValue(Object defaultValue);
 
     public boolean setHidden(boolean hidden);
 
+    public boolean setLocal(boolean local);
+
     public boolean setReadOnly(boolean readOnly);
 
     public boolean setRequired(boolean required);
-
-    // Note: Will need to be careful when generating names based on WRML data. 
-    // There may be keyword collisions (e.g. param named "transient" changed to "transientFlag") 
-    public boolean setTransient(boolean transientFlag);
 }

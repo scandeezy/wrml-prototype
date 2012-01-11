@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime;
+package org.wrml.util;
 
 import java.util.Collection;
 import java.util.Map;
@@ -22,6 +22,8 @@ import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
+
+import org.wrml.TypeSystem;
 
 public abstract class FieldMap implements Map<String, Object> {
 
@@ -83,12 +85,12 @@ public abstract class FieldMap implements Map<String, Object> {
     //
 
     protected void clearFields() {
-        Set<String> fieldNames = keySet();
+        final Set<String> fieldNames = keySet();
         if (fieldNames == null) {
             return;
         }
 
-        for (String fieldName : fieldNames) {
+        for (final String fieldName : fieldNames) {
 
             if (!isReadOnly(fieldName)) {
                 put(fieldName, getDefaultValue(fieldName));
@@ -97,44 +99,40 @@ public abstract class FieldMap implements Map<String, Object> {
 
     }
 
-    protected final Object getDefaultValue(final String fieldName) {
-        final Class<?> fieldType = getFieldType(fieldName);
-        return getDefaultValue(fieldType);
-    }
-
-    private Object getDefaultValue(Class<?> fieldType) {        
-        return TypeSystem.instance.getDefaultValue(fieldType);
+    protected final <V> V getDefaultValue(final String fieldName) {
+        final Class<V> fieldType = getFieldType(fieldName);
+        return (V) getDefaultValue(fieldType);
     }
 
     protected abstract SortedSet<String> getFieldNames();
 
     protected SortedMap<String, Object> getFields() {
-        Set<String> fieldNames = keySet();
+        final Set<String> fieldNames = keySet();
         if (fieldNames == null) {
             return null;
         }
 
-        SortedMap<String, Object> fields = new TreeMap<String, Object>();
-        for (String fieldName : fieldNames) {
+        final SortedMap<String, Object> fields = new TreeMap<String, Object>();
+        for (final String fieldName : fieldNames) {
             fields.put(fieldName, getFieldValue(fieldName));
         }
         return fields;
     }
 
-    protected abstract Class<?> getFieldType(final String fieldName);
+    protected abstract <V> Class<V> getFieldType(final String fieldName);
 
-    protected Object getFieldValue(final String fieldName) {
-        Object fieldValue = getRawFieldValue(fieldName);
+    protected <V> V getFieldValue(final String fieldName) {
+        V fieldValue = getRawFieldValue(fieldName);
 
         if (fieldValue == null) {
-            Class<?> fieldType = getFieldType(fieldName);
+            final Class<V> fieldType = getFieldType(fieldName);
             fieldValue = getDefaultValue(fieldType);
         }
 
         return fieldValue;
     }
 
-    protected abstract Object getRawFieldValue(final String fieldName);
+    protected abstract <V> V getRawFieldValue(final String fieldName);
 
     protected boolean isFieldValueSet(final String fieldName) {
         return getFieldNames().contains(fieldName);
@@ -143,38 +141,43 @@ public abstract class FieldMap implements Map<String, Object> {
     protected abstract boolean isReadOnly(final String fieldName);
 
     protected void setFields(Map<String, Object> fields) {
-        for (String fieldName : fields.keySet()) {
+        for (final String fieldName : fields.keySet()) {
             put(fieldName, fields.get(fieldName));
         }
     }
 
-    protected final Object setFieldValue(final String fieldName, final Object fieldValue) {
+    @SuppressWarnings("unchecked")
+    protected final <V> V setFieldValue(final String fieldName, final V fieldValue) {
 
-        Object oldFieldValue = getFieldValue(fieldName);
-        Object newFieldValue = fieldValue;
+        final V oldFieldValue = getFieldValue(fieldName);
+        V newFieldValue = fieldValue;
 
-        if (oldFieldValue == null && newFieldValue == null) {
+        if ((oldFieldValue == null) && (newFieldValue == null)) {
             return null;
         }
 
-        if ((oldFieldValue != null && oldFieldValue.equals(newFieldValue))
-                || (newFieldValue != null && newFieldValue.equals(oldFieldValue))) {
+        if (((oldFieldValue != null) && oldFieldValue.equals(newFieldValue))
+                || ((newFieldValue != null) && newFieldValue.equals(oldFieldValue))) {
 
             return oldFieldValue;
         }
 
         if (newFieldValue == null) {
-            Class<?> fieldType = getFieldType(fieldName);
-            newFieldValue = getDefaultValue(fieldType);
+            final Class<V> fieldType = getFieldType(fieldName);
+            newFieldValue = (V) getDefaultValue(fieldType);
         }
         else if (newFieldValue instanceof Boolean) {
-            Boolean booleanFieldValue = (Boolean) newFieldValue;
-            newFieldValue = booleanFieldValue.booleanValue() ? Boolean.TRUE : Boolean.FALSE;
+            final Boolean booleanFieldValue = (Boolean) newFieldValue;
+            newFieldValue = (V) (booleanFieldValue.booleanValue() ? Boolean.TRUE : Boolean.FALSE);
         }
 
-        return setRawFieldValue(fieldName, newFieldValue);
+        return (V) setRawFieldValue(fieldName, newFieldValue);
     }
 
-    protected abstract Object setRawFieldValue(final String fieldName, final Object fieldValue);
+    protected abstract <V> V setRawFieldValue(final String fieldName, final V fieldValue);
+
+    private <V> V getDefaultValue(Class<V> fieldType) {
+        return TypeSystem.instance.getWrmlDefaultValue(fieldType);
+    }
 
 }

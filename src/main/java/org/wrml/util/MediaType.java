@@ -52,11 +52,27 @@ public class MediaType implements Comparable<MediaType> {
     public static final Pattern MEDIA_TYPE_REGEX_PATTERN = Pattern.compile(MEDIA_TYPE_REGEX_STRING);
 
     static {
-        Map<String, String> parameters = new HashMap<String, String>();
+        final Map<String, String> parameters = new HashMap<String, String>();
         parameters.put(MediaType.PARAMETER_NAME_SCHEMA, "{0}");
-        String formatString = createMediaTypeString(MediaType.TYPE_APPLICATION, MediaType.SUBTYPE_WRML, parameters);
+        final String formatString = createMediaTypeString(MediaType.TYPE_APPLICATION, MediaType.SUBTYPE_WRML,
+                parameters);
         WRML_MEDIA_TYPE_MESSAGE_FORMAT = new MessageFormat(formatString);
     }
+
+    public static Comparator<MediaType> ALPHA_ORDER = new Comparator<MediaType>() {
+
+        public int compare(final MediaType mediaType1, final MediaType mediaType2) {
+            if (mediaType1 == mediaType2) {
+                return 0;
+            }
+
+            final String mediaTypeString1 = mediaType1.toString();
+            final String mediaTypeString2 = mediaType2.toString();
+
+            return Compare.twoInsensitiveStrings(mediaTypeString1, mediaTypeString2);
+        }
+
+    };
 
     public static MediaType create(String mediaTypeString) {
         final Matcher matcher = MEDIA_TYPE_REGEX_PATTERN.matcher(mediaTypeString);
@@ -85,26 +101,12 @@ public class MediaType implements Comparable<MediaType> {
             parameters.put(MediaType.PARAMETER_NAME_SCHEMA, schemaIdString);
         }
 
-        MediaType mediaType = new MediaType(type, subtype, (parameters != null) ? parameters : null);
+        final MediaType mediaType = new MediaType(type, subtype, (parameters != null) ? parameters : null);
 
         //System.out.println("MediaTypeToStringTransformer.bToA(" + aValue + ") returning: " + mediaType);
 
         return mediaType;
     }
-
-    public static Comparator<MediaType> ALPHA_ORDER = new Comparator<MediaType>() {
-
-        public int compare(final MediaType mediaType1, final MediaType mediaType2) {
-            if (mediaType1 == mediaType2)
-                return 0;
-
-            String mediaTypeString1 = mediaType1.toString();
-            String mediaTypeString2 = mediaType2.toString();
-
-            return Compare.twoInsensitiveStrings(mediaTypeString1, mediaTypeString2);
-        }
-
-    };
 
     public static String createMediaTypeString(final String type, final String subtype,
             final Map<String, String> parameters) {
@@ -127,11 +129,11 @@ public class MediaType implements Comparable<MediaType> {
     }
 
     private static void appendParameters(final StringBuilder sb, final Map<String, String> parameters) {
-        if (parameters == null || parameters.size() == 0) {
+        if ((parameters == null) || (parameters.size() == 0)) {
             return;
         }
 
-        for (String parameterName : parameters.keySet()) {
+        for (final String parameterName : parameters.keySet()) {
             sb.append("; ").append(parameterName.trim()).append('=').append('\"')
                     .append(parameters.get(parameterName).trim()).append('\"');
         }
@@ -141,7 +143,7 @@ public class MediaType implements Comparable<MediaType> {
     private final String _Subtype;
     private final ObservableMap<String, String> _Parameters;
     private String _String;
-    private boolean _IsWrml;
+    private final boolean _IsWrml;
 
     public MediaType(String type, String subtype) {
         this(type, subtype, null);
@@ -151,7 +153,7 @@ public class MediaType implements Comparable<MediaType> {
         _Type = type.toLowerCase();
         _Subtype = subtype.toLowerCase();
 
-        SortedMap<String, String> inner = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
+        final SortedMap<String, String> inner = new TreeMap<String, String>(String.CASE_INSENSITIVE_ORDER);
 
         if (parameters != null) {
             inner.putAll(parameters);
@@ -180,7 +182,7 @@ public class MediaType implements Comparable<MediaType> {
             return false;
         }
 
-        MediaType other = (MediaType) obj;
+        final MediaType other = (MediaType) obj;
 
         if (_Type == null) {
             if (other._Type != null) {
@@ -217,7 +219,7 @@ public class MediaType implements Comparable<MediaType> {
             return null;
         }
 
-        Map<String, String> parameters = getParameters();
+        final Map<String, String> parameters = getParameters();
         if (parameters == null) {
             return null;
         }
@@ -234,7 +236,7 @@ public class MediaType implements Comparable<MediaType> {
             return null;
         }
 
-        Map<String, String> parameters = getParameters();
+        final Map<String, String> parameters = getParameters();
         if (parameters == null) {
             return null;
         }
@@ -254,9 +256,9 @@ public class MediaType implements Comparable<MediaType> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((_Type == null) ? 0 : _Type.hashCode());
-        result = prime * result + ((_Subtype == null) ? 0 : _Subtype.hashCode());
-        result = prime * result + ((_Parameters == null) ? 0 : _Parameters.hashCode());
+        result = (prime * result) + ((_Type == null) ? 0 : _Type.hashCode());
+        result = (prime * result) + ((_Subtype == null) ? 0 : _Subtype.hashCode());
+        result = (prime * result) + ((_Parameters == null) ? 0 : _Parameters.hashCode());
         return result;
     }
 

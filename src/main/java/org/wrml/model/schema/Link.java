@@ -18,21 +18,19 @@ package org.wrml.model.schema;
 
 import java.net.URI;
 
+import org.wrml.model.Owned;
 import org.wrml.model.relation.LinkRelation;
 import org.wrml.util.MediaType;
 import org.wrml.util.observable.ObservableList;
 
-public interface Link extends Member {
+public interface Link extends Owned<Schema> {
+
+    public URI getHref();
 
     public LinkRelation getRel();
 
     public URI getRelId();
 
-    public URI getHref();
-
-    public URI setHref(URI href);
-    
-    
     // Generated from Field
     //     Name: requestTypes 
     //     Value: List[Text[MediaType]]
@@ -42,7 +40,11 @@ public interface Link extends Member {
     //     Name: responseTypes 
     //     Value: List[Text[MediaType]]    
     public ObservableList<MediaType> getResponseTypes();
-    
+
+    public String getStateExpression();
+
+    public URI setHref(URI href);
+
     /**
      * 
      * 
@@ -52,7 +54,5 @@ public interface Link extends Member {
      * @return
      */
     public String setStateExpression(String stateExpression);
-
-    public String getStateExpression();
 
 }

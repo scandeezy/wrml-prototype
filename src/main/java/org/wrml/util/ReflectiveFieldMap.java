@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime;
+package org.wrml.util;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationHandler;
@@ -28,10 +28,9 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.wrml.util.Delegating;
-import org.wrml.util.DelegatingInvocationHandler;
+import org.wrml.runtime.FieldAccessType;
 
-public class StaticFieldMap<T> extends FieldMap implements Delegating<Object>, InvocationHandler {
+public class ReflectiveFieldMap<T> extends FieldMap implements Delegating<Object>, InvocationHandler {
 
     private final Object _Delegate;
     private final Class<T> _StaticType;
@@ -43,8 +42,7 @@ public class StaticFieldMap<T> extends FieldMap implements Delegating<Object>, I
     private SortedMap<String, Method> _FieldNameToGetMethod;
     private SortedMap<String, Method> _FieldNameToSetMethod;
 
-
-    public StaticFieldMap(final Object delegate, final Class<T> staticType) {
+    public ReflectiveFieldMap(final Object delegate, final Class<T> staticType) {
         _Delegate = delegate;
         _StaticType = staticType;
         _DelegatingInvocationHandler = new DelegatingInvocationHandler(delegate);
@@ -86,14 +84,19 @@ public class StaticFieldMap<T> extends FieldMap implements Delegating<Object>, I
         return _StaticType;
     }
 
-
-
     public final Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
         return _DelegatingInvocationHandler.invoke(proxy, method, args);
     }
 
-    protected Object accessField(T staticInterface, Method method, FieldAccessType fieldAccessType, Object fieldValue) {
+    @Override
+    public String toString() {
+        return getClass().getName() + " : { delegate : " + _Delegate + "}, staticType : {" + _StaticType
+                + "}, staticInterface : {" + _StaticInterface + "}, fieldNames : {" + _FieldNames + "} }";
+    }
+
+    @SuppressWarnings("unchecked")
+    protected <V> V accessField(T staticInterface, Method method, FieldAccessType fieldAccessType, V fieldValue) {
 
         Object[] args = null;
         if (fieldAccessType == FieldAccessType.SET) {
@@ -101,17 +104,18 @@ public class StaticFieldMap<T> extends FieldMap implements Delegating<Object>, I
         }
 
         try {
-            return _DelegatingInvocationHandler.invoke(staticInterface, method, args);
+            return (V) _DelegatingInvocationHandler.invoke(staticInterface, method, args);
         }
-        catch (Throwable e) {
+        catch (final Throwable e) {
 
-            String debugMethodPrint = method.getDeclaringClass().getCanonicalName() + " - "
+            final String debugMethodPrint = method.getDeclaringClass().getCanonicalName() + " - "
                     + DelegatingInvocationHandler.baseGetMethodKey(method);
 
-            String fieldTypeString = (fieldValue != null) ? fieldValue.getClass().getCanonicalName() : "?";   
-            
-            String message = "A problem occured when trying to access a field using the method \"" + debugMethodPrint
-                    + "\" with value: \"" + fieldValue + "\" (of type: \"" + fieldTypeString + "\") invoked on the static interface: \"" + staticInterface + "\".";
+            final String fieldTypeString = (fieldValue != null) ? fieldValue.getClass().getCanonicalName() : "?";
+
+            final String message = "A problem occured when trying to access a field using the method \""
+                    + debugMethodPrint + "\" with value: \"" + fieldValue + "\" (of type: \"" + fieldTypeString
+                    + "\") invoked on the static interface: \"" + staticInterface + "\".";
 
             throw new RuntimeException(message, e);
         }
@@ -139,7 +143,7 @@ public class StaticFieldMap<T> extends FieldMap implements Delegating<Object>, I
     protected final SortedSet<String> getFieldNames() {
 
         if (_FieldNames == null) {
-            Map<String, Method> delegateMethods = getDelegatingInvocationHandler().getDelegateMethods();
+            final Map<String, Method> delegateMethods = getDelegatingInvocationHandler().getDelegateMethods();
             _FieldNames = getFieldNames(delegateMethods.values());
         }
 
@@ -149,15 +153,16 @@ public class StaticFieldMap<T> extends FieldMap implements Delegating<Object>, I
     protected final SortedSet<String> getFieldNames(Collection<Method> methods) {
         final SortedSet<String> fieldNames = new TreeSet<String>();
         if (methods != null) {
-            for (Method method : methods) {
+            for (final Method method : methods) {
 
-                String fieldName = getFieldName(method);
+                final String fieldName = getFieldName(method);
                 if (fieldName != null) {
                     fieldNames.add(fieldName);
 
                 }
                 else {
-                    System.out.println("The field name was null for method, \"" + method + "\".");
+                    // TODO: Handle this 
+                    //System.out.println("The field name was null for method, \"" + method + "\".");
                 }
 
             }
@@ -166,14 +171,15 @@ public class StaticFieldMap<T> extends FieldMap implements Delegating<Object>, I
     }
 
     @Override
-    protected final Class<?> getFieldType(String fieldName) {
+    protected final <V> Class<V> getFieldType(String fieldName) {
         final Method method = getMethod(FieldAccessType.GET, fieldName);
         if (method == null) {
             throw new NullPointerException("There is no \"getter\" for field: \"" + fieldName + "\" in delegate: "
                     + getDelegate() + "\".");
         }
 
-        final Class<?> fieldType = method.getReturnType();
+        @SuppressWarnings("unchecked")
+        final Class<V> fieldType = (Class<V>) method.getReturnType();
         return fieldType;
     }
 
@@ -218,7 +224,7 @@ public class StaticFieldMap<T> extends FieldMap implements Delegating<Object>, I
         }
         else if (fieldAccessType == FieldAccessType.SET) {
             final Set<String> methodKeys = delegateMethods.keySet();
-            for (String fullMethodKey : methodKeys) {
+            for (final String fullMethodKey : methodKeys) {
                 if (fullMethodKey.startsWith(methodName)) {
                     method = delegateMethods.get(fullMethodKey);
                     break;
@@ -235,9 +241,9 @@ public class StaticFieldMap<T> extends FieldMap implements Delegating<Object>, I
              */
 
             final Method[] staticInterfaceMethods = staticInterface.getClass().getMethods();
-            for (Method staticInterfaceMethod : staticInterfaceMethods) {
+            for (final Method staticInterfaceMethod : staticInterfaceMethods) {
 
-                String staticInterfaceMethodName = staticInterfaceMethod.getName();
+                final String staticInterfaceMethodName = staticInterfaceMethod.getName();
 
                 if (staticInterfaceMethodName.equals(methodName)
                         || staticInterfaceMethodName.equals(booleanIsMethodName)) {
@@ -248,18 +254,25 @@ public class StaticFieldMap<T> extends FieldMap implements Delegating<Object>, I
             }
         }
 
-        // TODO: This is for DEBUG only.
-        if (method == null) {
-            System.out.println("The \"" + fieldAccessType + "ter\" method for field name \"" + fieldName
-                    + "\" was NOT found in the static interface, \"" + staticInterface + "\".");
-        }
-        else {
-            String debugMethodPrint = method.getDeclaringClass().getCanonicalName() + " - "
-                    + DelegatingInvocationHandler.baseGetMethodKey(method);
-
-            System.out.println("The \"" + fieldAccessType + "ter\" method for field name \"" + fieldName
-                    + "\" was found as: \"" + debugMethodPrint + "\".");
-        }
+        /*
+         * 
+         * // TODO: This is for DEBUG only.
+         * if (method == null) {
+         * System.out.println("The \"" + fieldAccessType +
+         * "ter\" method for field name \"" + fieldName
+         * + "\" was NOT found in the static interface, \"" + staticInterface +
+         * "\".");
+         * }
+         * else {
+         * String debugMethodPrint =
+         * method.getDeclaringClass().getCanonicalName() + " - "
+         * + DelegatingInvocationHandler.baseGetMethodKey(method);
+         * 
+         * System.out.println("The \"" + fieldAccessType +
+         * "ter\" method for field name \"" + fieldName
+         * + "\" was found as: \"" + debugMethodPrint + "\".");
+         * }
+         */
 
         if (fieldAccessType == FieldAccessType.GET) {
             _FieldNameToGetMethod.put(fieldName, method);
@@ -273,7 +286,7 @@ public class StaticFieldMap<T> extends FieldMap implements Delegating<Object>, I
     }
 
     @Override
-    protected Object getRawFieldValue(String fieldName) {
+    protected <V> V getRawFieldValue(String fieldName) {
 
         final T staticInterface = getStaticInterface();
         if (staticInterface == null) {
@@ -297,7 +310,7 @@ public class StaticFieldMap<T> extends FieldMap implements Delegating<Object>, I
     }
 
     @Override
-    protected Object setRawFieldValue(String fieldName, Object fieldValue) {
+    protected <V> V setRawFieldValue(String fieldName, V fieldValue) {
 
         final T staticInterface = getStaticInterface();
         if (staticInterface == null) {

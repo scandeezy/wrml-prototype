@@ -21,9 +21,11 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.wrml.Model;
+import org.wrml.bootstrap.FieldNames;
 import org.wrml.event.FieldEvent;
 import org.wrml.event.FieldEventListener;
 import org.wrml.event.LinkEventListener;
@@ -35,6 +37,7 @@ import org.wrml.model.api.ResourceTemplate;
 import org.wrml.model.schema.Schema;
 import org.wrml.service.ProxyService;
 import org.wrml.service.Service;
+import org.wrml.util.FieldMap;
 import org.wrml.util.MediaType;
 import org.wrml.util.observable.MapEvent;
 import org.wrml.util.observable.MapEventListener;
@@ -383,7 +386,7 @@ public final class RuntimeModel implements Model {
     }
 
     public Object clickLink(URI rel, MediaType responseType, Object requestEntity, Map<String, String> hrefParams) {
-        HyperLink hyperLink = getHyperLink(rel);
+        final HyperLink hyperLink = getHyperLink(rel);
 
         if (hyperLink == null) {
             // TODO: Error here instead?
@@ -410,12 +413,12 @@ public final class RuntimeModel implements Model {
 
     public void extend(Model modelToExtend, Model... additionalModelsToExtend) {
 
-        RuntimeModel modelToExtendDynamicInterface = (RuntimeModel) modelToExtend.getDynamicInterface();
+        final RuntimeModel modelToExtendDynamicInterface = (RuntimeModel) modelToExtend.getDynamicInterface();
         _Fields.putAll(modelToExtendDynamicInterface._Fields);
 
-        for (Model additionalModelToExtend : additionalModelsToExtend) {
+        for (final Model additionalModelToExtend : additionalModelsToExtend) {
 
-            RuntimeModel additionalModelToExtendDynamicInterface = (RuntimeModel) additionalModelToExtend
+            final RuntimeModel additionalModelToExtendDynamicInterface = (RuntimeModel) additionalModelToExtend
                     .getDynamicInterface();
             _Fields.putAll(additionalModelToExtendDynamicInterface._Fields);
 
@@ -436,17 +439,18 @@ public final class RuntimeModel implements Model {
         return _EmbeddedLinkRelationIds;
     }
 
-    public Object getFieldValue(String fieldName) {
-        return _Fields.get(fieldName);
+    @SuppressWarnings("unchecked")
+    public <V> V getFieldValue(String fieldName) {
+        return (V) _Fields.get(fieldName);
     }
 
     public final HypermediaEngine getHypermediaEngine() {
-        ResourceTemplate resourceTemplate = getResourceTemplate();
+        final ResourceTemplate resourceTemplate = getResourceTemplate();
         if (resourceTemplate == null) {
             return null;
         }
 
-        URI apiId = resourceTemplate.getRoot().getId();
+        final URI apiId = resourceTemplate.getRoot().getId();
         return getContext().getHypermediaEngine(apiId);
     }
 
@@ -486,34 +490,17 @@ public final class RuntimeModel implements Model {
         return null;
     }
 
-    public URI getParentId() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * public final boolean isMetaSchema() {
-     * return getSchemaId().equals(getFieldValue("id"));
-     * }
-     */
-
-    /*
-     * public Prototype getPrototype() {
-     * return getContext().getPrototype(getSchemaId());
-     * }
-     */
-
     public final Resource getResource() {
         return getHypermediaEngine().getResource(getResourceTemplateId());
     }
 
     public final ResourceTemplate getResourceTemplate() {
-        URI id = getResourceTemplateId();
+        final URI id = getResourceTemplateId();
         if (id == null) {
             return null;
         }
 
-        Service resourceTemplateService = getContext().getService(ResourceTemplate.class);
+        final Service resourceTemplateService = getContext().getService(ResourceTemplate.class);
         return (ResourceTemplate) resourceTemplateService.get(id);
     }
 
@@ -522,16 +509,8 @@ public final class RuntimeModel implements Model {
     }
 
     public final Schema getSchema() {
-
-        Context context = getContext();
-        URI schemaId = getSchemaId();
-
-        /*
-         * if (isMetaSchema()) {
-         * return Schema.class.cast(this);
-         * }
-         */
-
+        final Context context = getContext();
+        final URI schemaId = getSchemaId();
         return context.getSchema(schemaId);
     }
 
@@ -539,26 +518,38 @@ public final class RuntimeModel implements Model {
         return _SchemaId;
     }
 
-    public Model getStaticInterface() {
+    @SuppressWarnings("unchecked")
+    public <M extends Model> M getStaticInterface() {
 
         if (Proxy.isProxyClass(this.getClass())) {
-            return this;
+
+            return (M) this;
         }
 
         if (_StaticInterface != null) {
-            return _StaticInterface;
+            return (M) _StaticInterface;
         }
 
-        URI schemaId = getSchemaId();
-        Context context = getContext();
+        final URI schemaId = getSchemaId();
+        final Context context = getContext();
 
-        Class<?> schemaInterface = context.getSchemaIdToClassTransformer().aToB(schemaId);
-        Class<?>[] schemaInterfaceArray = new Class<?>[] { schemaInterface };
-        StaticInterfaceFacade facade = new StaticInterfaceFacade(this);
+        final Class<?> schemaInterface = context.getSchemaIdToClassTransformer().aToB(schemaId);
+        //System.err.println("====== getStaticInterface() schemaId : \"" + schemaId + "\" schemaInterface : \""  + schemaInterface + "\" (" + hashCode() + ")");
 
-        _StaticInterface = (Model) Proxy.newProxyInstance(context, schemaInterfaceArray, facade);
+        if (schemaInterface.isInstance(this)) {
 
-        return _StaticInterface;
+            _StaticInterface = (Model) schemaInterface.cast(this);
+
+            //System.err.println("====== NOTE: " + this + " was ALREADY static: " + _StaticInterface);
+        }
+        else {
+            final Class<?>[] schemaInterfaceArray = new Class<?>[] { schemaInterface };
+            final StaticInterfaceFacade facade = new StaticInterfaceFacade(this);
+
+            _StaticInterface = (Model) Proxy.newProxyInstance(context, schemaInterfaceArray, facade);
+        }
+
+        return (M) _StaticInterface;
     }
 
     @Override
@@ -611,34 +602,18 @@ public final class RuntimeModel implements Model {
 
     public void setAllFieldsToDefaultValue() {
 
-        _Fields.clear();
+        // TODO: Setting default values doesn't mean clearing the fields (check the schema defaults instead).
+        //_Fields.clear();
 
-        /*
-         * final Prototype prototype = getPrototype();
-         * 
-         * final Map<String, Field> prototypeFields = prototype.getFields();
-         * if (prototypeFields != null) {
-         * final Set<String> fieldNames = prototypeFields.keySet();
-         * for (final String fieldName : fieldNames) {
-         * setFieldToDefaultValue(fieldName);
-         * }
-         * }
-         */
+        // TODO: Consider prototype default values somewhere
     }
 
     public void setFieldToDefaultValue(String fieldName) {
+
+        // TODO: Consider prototype default value somewhere
+
         _Fields.put(fieldName, null);
 
-        /*
-         * final Prototype prototype = getPrototype();
-         * final Map<String, Field> prototypeFields = prototype.getFields();
-         * 
-         * if ((prototypeFields != null) &&
-         * prototypeFields.containsKey(fieldName)) {
-         * setFieldValue(fieldName,
-         * prototypeFields.get(fieldName).getDefaultValue());
-         * }
-         */
     }
 
     /*
@@ -656,56 +631,53 @@ public final class RuntimeModel implements Model {
      * }
      */
 
-    public Object setFieldValue(String fieldName, Object fieldValue) {
-
-        return _Fields.put(fieldName, fieldValue);
-
-        /*
-         * Prototype prototype = getPrototype();
-         * ObservableMap<String, Field> prototypeFields = prototype.getFields();
-         * 
-         * Field prototypeField = (prototypeFields != null) ?
-         * prototypeFields.get(fieldName) : null;
-         * if (prototypeField != null) {
-         * if (prototypeField.isReadOnly()) {
-         * throw new IllegalAccessError("Field \"" + fieldName +
-         * "\" is read only in \""
-         * + prototype.getBlueprintSchemaId() + "\"");
-         * }
-         * 
-         * if (prototypeField.isRequired() && fieldValue == null) {
-         * throw new NullPointerException("Field \"" + fieldName +
-         * "\" is requires a value in \""
-         * + prototype.getBlueprintSchemaId() + "\"");
-         * }
-         * 
-         * Type type = prototypeField.getType();
-         * if (type == Type.Boolean) {
-         * Boolean booleanFieldValue = (Boolean) fieldValue;
-         * fieldValue = (booleanFieldValue != null &&
-         * booleanFieldValue.booleanValue() ? Boolean.TRUE
-         * : Boolean.FALSE);
-         * }
-         * 
-         * ObservableList<Constraint> constraints =
-         * prototypeField.getConstraints();
-         * if (constraints != null && constraints.size() > 0) {
-         * // MSMTODO: Validate constraints
-         * }
-         * 
-         * }
-         * 
-         * Object oldValue = getFieldValue(fieldName);
-         * 
-         * _Fields.put(fieldName, fieldValue);
-         * 
-         * return oldValue;
-         */
+    @SuppressWarnings("unchecked")
+    public <V> V setFieldValue(String fieldName, V fieldValue) {
+        return (V) _Fields.put(fieldName, fieldValue);
     }
 
     @Override
     public String toString() {
-        return getClass().getName() + "[Schema=" + _SchemaId + ", ResourceTemplate=" + _ResourceTemplateId + "]";
+
+        final String idKey = FieldNames.Document.id.toString();
+        final String nameKey = FieldNames.Named.name.toString();
+
+        final Set<String> fieldNames = _Fields.keySet();
+
+        Object id = null;
+        if (fieldNames.contains(idKey)) {
+            id = _Fields.get(idKey);
+        }
+
+        Object name = null;
+        if (fieldNames.contains(nameKey)) {
+            name = _Fields.get(nameKey);
+        }
+
+        final StringBuilder sb = new StringBuilder();
+        sb.append("\n\nModel : {\n");
+        sb.append("    hashCode : " + hashCode() + ",\n");
+        sb.append("    schemaId : " + _SchemaId + ",\n");
+        sb.append("    id : " + id + ",\n");
+        sb.append("    name : " + name + "\n");
+
+        sb.append("    fieldNames : [\n");
+        sb.append("   ");
+        for (final String fieldName : fieldNames) {
+            sb.append(fieldName);
+            sb.append(", ");
+        }
+        sb.append("\n    ],\n");
+
+        sb.append("    fields : {\n");
+        sb.append("   ");
+        sb.append(_Fields);
+        sb.append("\n    }\n");
+
+        sb.append("}\n");
+
+        return sb.toString();
+
     }
 
     /**
@@ -755,7 +727,7 @@ public final class RuntimeModel implements Model {
     private HyperLink getHyperLink(URI rel) {
 
         if (!_Links.containsKey(rel)) {
-            HyperLink link = new HyperLink(this, rel);
+            final HyperLink link = new HyperLink(this, rel);
             _Links.put(rel, link);
         }
 

@@ -34,7 +34,7 @@ public class MediaTypeToClassTransformer extends AbstractTransformer<MediaType, 
 
     public Class<?> aToB(MediaType bValue) {
         final Context context = getContext();
-        URI schemaId = context.getSchemaIdToMediaTypeTransformer().bToA(bValue);
+        final URI schemaId = context.getSchemaIdToMediaTypeTransformer().bToA(bValue);
 
         // TODO: Check for parameterized types
 
@@ -87,11 +87,11 @@ public class MediaTypeToClassTransformer extends AbstractTransformer<MediaType, 
                 final TypeVariable<?>[] typeParameters = clazz.getTypeParameters();
                 if (typeParameters != null) {
                     parameters = new TreeMap<String, String>();
-                    for (TypeVariable<?> typeParam : typeParameters) {
-                        String name = typeParam.getName();
+                    for (final TypeVariable<?> typeParam : typeParameters) {
+                        final String name = typeParam.getName();
 
-                        Class<?> typeParamSchemaClass = null;
-                        URI typeParamSchemaId = schemaIdToClassTransformer.bToA(typeParamSchemaClass);
+                        final Class<?> typeParamSchemaClass = null;
+                        final URI typeParamSchemaId = schemaIdToClassTransformer.bToA(typeParamSchemaClass);
                         parameters.put(name, String.valueOf(typeParamSchemaId));
                     }
                 }

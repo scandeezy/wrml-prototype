@@ -20,11 +20,11 @@ import java.net.URI;
 
 import org.wrml.runtime.Context;
 
-public class SchemaIdToClassNameTransformer extends AbstractTransformer<URI, String> {
+public class SchemaIdToFullNameTransformer extends AbstractTransformer<URI, String> {
 
     public final URI _BaseUri;
 
-    public SchemaIdToClassNameTransformer(Context context, URI baseUri) {
+    public SchemaIdToFullNameTransformer(Context context, URI baseUri) {
         super(context);
         _BaseUri = baseUri;
     }
@@ -33,7 +33,7 @@ public class SchemaIdToClassNameTransformer extends AbstractTransformer<URI, Str
         if (aValue == null) {
             return null;
         }
-        
+
         return getBaseUri().relativize(aValue).toString().replace('/', '.');
     }
 

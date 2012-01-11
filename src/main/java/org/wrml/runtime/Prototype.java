@@ -20,7 +20,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,8 +28,7 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.wrml.Model;
-import org.wrml.model.Document;
-import org.wrml.model.schema.Constraint;
+import org.wrml.bootstrap.FieldNames;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Link;
 import org.wrml.model.schema.Schema;
@@ -53,50 +51,39 @@ final class Prototype {
 
     private final transient Context _Context;
     private final URI _SchemaId;
-    private ObservableMap<URI, Schema> _AllBaseSchemas;
-    private ObservableMap<URI, Constraint> _Constraints;
-    private ObservableMap<String, Field> _Fields;
 
-    private ObservableMap<URI, Link> _LinksByRel;
+    private ObservableList<URI> _AllBaseSchemaIds;
+    private final ObservableList<URI> _AllConstraintIds;
+    private final ObservableMap<String, Field> _Fields;
+
+    private final ObservableMap<URI, Link> _LinksByRel;
     private ObservableMap<String, Link> _LinksByName;
 
     private ObservableMap<String, FieldPrototype> _FieldPrototypes;
     private ObservableMap<String, LinkPrototype> _LinkPrototypes;
 
-    public Prototype(Context context, URI schemaId) {
+    public Prototype(final Context context, final URI schemaId) {
+
         if (context == null) {
             throw new NullPointerException("Context cannot be null");
         }
 
+        _Context = context;
+
         if (schemaId == null) {
-            throw new NullPointerException("Schema ID cannot be null");
+            throw new NullPointerException("Schema Id cannot be null");
         }
 
-        _Context = context;
         _SchemaId = schemaId;
 
-        System.out.println(this + " is being created.");
+        final SortedMap<String, Field> allYourFields = new TreeMap<String, Field>();
+        final SortedMap<URI, Link> allYourLinks = new TreeMap<URI, Link>();
+        final List<URI> allYourConstraints = new ArrayList<URI>();
 
-        if (context.getMetaSchemaId().equals(_SchemaId)) {
-            _Context._MetaPrototype = this;
-            Schema metaSchema = _Context.getSchema(schemaId);
-            _Fields = metaSchema.getFields();
+        _Fields = Observables.observableMap(allYourFields);
+        _LinksByRel = Observables.observableMap(allYourLinks);
+        _AllConstraintIds = Observables.observableList(allYourConstraints);
 
-            final LinkedHashMap<URI, Schema> allYourBase = new LinkedHashMap<URI, Schema>();
-            _AllBaseSchemas = Observables.observableMap(allYourBase);
-            ObservableList<Schema> baseSchemas = metaSchema.getBaseSchemas();
-
-            if (baseSchemas != null) {
-                for (Schema baseSchema : baseSchemas) {
-                    _AllBaseSchemas.put(baseSchema.getId(), baseSchema);
-                }
-            }
-        }
-        else {
-            init();
-        }
-
-        System.out.println(this + " has been created.");
     }
 
     /**
@@ -155,9 +142,9 @@ final class Prototype {
      * <a href="http://en.wikipedia.org/wiki/Breadth-first_search">Wikipedia</a>
      * describes the algorithm better than I can.
      */
-    public ObservableMap<URI, Schema> getAllBaseSchemas() {
+    public ObservableList<URI> getAllBaseSchemaIds() {
 
-        if (_AllBaseSchemas == null) {
+        if (_AllBaseSchemaIds == null) {
 
             //
             // The following algorithm performs a breadth first traversal of 
@@ -176,7 +163,7 @@ final class Prototype {
              * of
              * the schema associated with our own schema id.
              */
-            final LinkedHashMap<URI, Schema> allYourBase = new LinkedHashMap<URI, Schema>();
+            final LinkedList<URI> allYourBase = new LinkedList<URI>();
 
             /*
              * This queue is used to "process" our schema's base schemas.
@@ -187,7 +174,7 @@ final class Prototype {
              * our
              * base schemas.
              */
-            final Queue<Schema> queue = new LinkedList<Schema>();
+            final Queue<URI> queue = new LinkedList<URI>();
 
             /*
              * This map retains the URIs of the schemas that have already been
@@ -208,10 +195,8 @@ final class Prototype {
             /*
              * Dequeue the first base schema and start the processing loop.
              */
-            Schema baseSchema = queue.poll();
-            while (baseSchema != null) {
-
-                final URI baseSchemaId = baseSchema.getId();
+            URI baseSchemaId = queue.poll();
+            while (baseSchemaId != null) {
 
                 /*
                  * Check to see if we have already "processed" the base schema
@@ -220,13 +205,13 @@ final class Prototype {
                  * the
                  * blueprint - that would be weird.
                  */
-                if (!allYourBase.containsKey(baseSchemaId) && !schemaId.equals(baseSchemaId)) {
+                if (!enqueuedIds.containsKey(baseSchemaId) && !schemaId.equals(baseSchemaId)) {
 
                     /*
                      * Process the base schema by adding it to our ordered
                      * collection. Enqueue its base schemas too.
                      */
-                    allYourBase.put(baseSchemaId, baseSchema);
+                    allYourBase.add(baseSchemaId);
                     enqueueBaseSchemas(queue, baseSchemaId, enqueuedIds);
                 }
 
@@ -234,31 +219,22 @@ final class Prototype {
                  * Dequeue the next base schema to prep the next iteration for
                  * processing.
                  */
-                baseSchema = queue.poll();
+                baseSchemaId = queue.poll();
             }
 
             /*
              * Create the ObservableMap wrapper and store it for future
              * reference.
              */
-            _AllBaseSchemas = Observables.observableMap(allYourBase);
+
+            _AllBaseSchemaIds = Observables.observableList(allYourBase);
         }
 
-        return _AllBaseSchemas;
+        return _AllBaseSchemaIds;
     }
 
-    public Schema getSchema() {
-        Context context = getContext();
-        URI schemaId = getSchemaId();
-        return context.getSchema(schemaId);
-    }
-
-    public URI getSchemaId() {
-        return _SchemaId;
-    }
-
-    public ObservableMap<URI, Constraint> getConstraints() {
-        return _Constraints;
+    public ObservableList<URI> getAllConstraints() {
+        return _AllConstraintIds;
     }
 
     public Context getContext() {
@@ -266,6 +242,13 @@ final class Prototype {
     }
 
     public FieldPrototype getFieldPrototype(String methodKey, String methodName) {
+
+        /*
+         * System.out.println(this +
+         * " was asked for a field prototype based on: (methodKey = \"" +
+         * methodKey
+         * + "\", methodName = \"" + methodName + "\")");
+         */
 
         if (_FieldPrototypes == null) {
             _FieldPrototypes = Observables.observableMap(new TreeMap<String, FieldPrototype>());
@@ -293,8 +276,13 @@ final class Prototype {
             if (fieldName != null) {
                 fieldName = Character.toLowerCase(fieldName.charAt(0)) + fieldName.substring(1);
 
-                ObservableMap<String, Field> prototypeFields = getFields();
-                Field prototypeField = (prototypeFields != null) ? prototypeFields.get(fieldName) : null;
+                final ObservableMap<String, Field> prototypeFields = getFields();
+
+                if (prototypeFields == null) {
+                    throw new NullPointerException(this + " has null fields");
+                }
+
+                final Field prototypeField = (prototypeFields != null) ? prototypeFields.get(fieldName) : null;
 
                 if (prototypeField != null) {
                     fieldPrototype = new FieldPrototype(fieldName, accessType);
@@ -308,6 +296,12 @@ final class Prototype {
     }
 
     public ObservableMap<String, Field> getFields() {
+
+        if (_Fields == null) {
+
+            throw new NullPointerException(this + " fields are null");
+        }
+
         return _Fields;
     }
 
@@ -322,13 +316,13 @@ final class Prototype {
         }
         else {
 
-            ObservableMap<String, Link> linksByName = getLinksByName();
+            final ObservableMap<String, Link> linksByName = getLinksByName();
             if (linksByName != null) {
 
                 String relName = methodName;
                 Link link = linksByName.get(relName);
 
-                if (link == null && relName.startsWith("get")) {
+                if ((link == null) && relName.startsWith("get")) {
                     relName = relName.substring(3);
                     relName = Character.toLowerCase(relName.charAt(0)) + relName.substring(1);
 
@@ -336,7 +330,7 @@ final class Prototype {
                     if (link == null) {
                         // Check for links like getAuthorAsWriter where the rel name is "author"
                         // Here we need to convert "authorAsWriter" to just "author"
-                        int asIndex = relName.indexOf("As");
+                        final int asIndex = relName.indexOf("As");
                         if (asIndex >= 1) {
                             relName = relName.substring(0, asIndex);
                             link = linksByName.get(relName);
@@ -345,13 +339,13 @@ final class Prototype {
 
                     // We have done all of this assuming that the link we just found
                     // has a method of GET. Confirm that here.
-                    if (link != null && link.getRel().getMethod() != Method.GET) {
+                    if ((link != null) && (link.getRel().getMethod() != Method.GET)) {
                         link = null;
                     }
                 }
 
                 if (link != null) {
-                    Transformer<MediaType, Class<?>> mediaTypeToClassTransformer = getContext()
+                    final Transformer<MediaType, Class<?>> mediaTypeToClassTransformer = getContext()
                             .getMediaTypeToClassTransformer();
                     linkPrototype = new LinkPrototype(link.getRelId(), mediaTypeToClassTransformer.bToA(returnType));
                 }
@@ -367,11 +361,11 @@ final class Prototype {
     public ObservableMap<String, Link> getLinksByName() {
 
         if (_LinksByName == null) {
-            ObservableMap<URI, Link> linksByRel = getLinksByRel();
+            final ObservableMap<URI, Link> linksByRel = getLinksByRel();
             if (linksByRel != null) {
                 _LinksByName = Observables.observableMap(new TreeMap<String, Link>());
-                for (URI relId : linksByRel.keySet()) {
-                    Link link = linksByRel.get(relId);
+                for (final URI relId : linksByRel.keySet()) {
+                    final Link link = linksByRel.get(relId);
                     _LinksByName.put(link.getRel().getName(), link);
                 }
             }
@@ -384,9 +378,63 @@ final class Prototype {
         return _LinksByRel;
     }
 
+    public URI getSchemaId() {
+        return _SchemaId;
+    }
+
     @Override
     public String toString() {
-        return "Prototype for " + _SchemaId;
+        return "Prototype (" + hashCode() + ") : \"" + getSchemaId() + "\"";
+    }
+
+    void init() {
+
+        final URI schemaId = getSchemaId();
+
+        System.out.println(this + " is being initialized.");
+
+        List<URI> allYourBase = getAllBaseSchemaIds();
+        if (allYourBase != null) {
+
+            /*
+             * Assemble all schemas in reverse order starting from the top end
+             * of the schema hierarchy, which are the last entries in the
+             * ordered LinkedHashMap "allYourBase".
+             */
+
+            allYourBase = new ArrayList<URI>(allYourBase);
+            Collections.reverse(allYourBase);
+        }
+        else {
+            allYourBase = new ArrayList<URI>();
+        }
+
+        // Include our blueprint schema fields last to achieve final locality
+        allYourBase.add(schemaId);
+
+        for (int i = 0; i < allYourBase.size(); i++) {
+            final URI baseId = allYourBase.get(i);
+
+            final Context context = getContext();
+            final Schema baseSchema = context.getSchema(baseId);
+
+            System.out.println(this + " has \"" + baseSchema + "\" as basis[" + i + "].");
+
+            if (baseSchema == null) {
+                // TODO: Handle the problem differently?
+                System.err.println("==== WARNING: " + this
+                        + " has === N U L L ===  as a base schema is for schema id: " + baseId);
+                return;
+            }
+
+            initFields(_Fields, baseSchema);
+            initLinks(_LinksByRel, baseSchema);
+
+            // TODO: Implement contstraints
+            //initConstraints(allYourConstraints, baseSchema);
+        }
+
+        System.out.println(this + " has been \"fully\" initialized.");
     }
 
     /**
@@ -401,25 +449,24 @@ final class Prototype {
      * @param enqueuedIds
      *            The reused map enqueued schema ids
      */
-    private void enqueueBaseSchemas(final Queue<Schema> queue, final URI schemaId, final HashMap<URI, URI> enqueuedIds) {
+    private void enqueueBaseSchemas(final Queue<URI> queue, final URI schemaId, final HashMap<URI, URI> enqueuedIds) {
 
         final Context context = getContext();
-        Schema schema = context.getSchema(schemaId);
+        final Schema schema = context.getSchema(schemaId);
         if (schema == null) {
             System.out.println("Schema is null: " + schemaId);
             return;
         }
 
-        final List<Schema> baseSchemas = schema.getBaseSchemas();
-        if ((baseSchemas == null) || (baseSchemas.size() == 0)) {
+        @SuppressWarnings("unchecked")
+        final List<URI> baseSchemaIds = (List<URI>) schema.getFieldValue(FieldNames.Schema.baseSchemaIds.toString());
+        if ((baseSchemaIds == null) || (baseSchemaIds.size() == 0)) {
             return;
         }
 
         final URI mySchemaId = getSchemaId();
 
-        for (final Schema baseSchema : baseSchemas) {
-
-            final URI baseSchemaId = baseSchema.getId();
+        for (final URI baseSchemaId : baseSchemaIds) {
 
             /*
              * Double check that we haven't enqueued this base schema yet and
@@ -431,94 +478,49 @@ final class Prototype {
                  * Add the base schema to the queue and mark it as such (in the
                  * reused map) so that we never enqueue it again.
                  */
-                queue.add(baseSchema);
+                queue.add(baseSchemaId);
                 enqueuedIds.put(baseSchemaId, baseSchemaId);
             }
         }
     }
 
-    private void init() {
+    /*
+     * private void initConstraints(final SortedMap<URI, Constraint>
+     * allYourConstraints, final Schema baseSchema) {
+     * new PrototypicalExtension<URI, Constraint>(allYourConstraints,
+     * baseSchema.getConstraints(), getContext()
+     * .getSchemaIdToClassTransformer().bToA(Constraint.class));
+     * }
+     */
 
-        final URI schemaId = getSchemaId();
-
-        System.out.println(this + " is being initialized.");
-
-        List<URI> baseIds = null;
-        final ObservableMap<URI, Schema> allYourBase = getAllBaseSchemas();
-        if (allYourBase != null) {
-
-            /*
-             * Assemble all schemas in reverse order starting from the top end
-             * of the schema hierarchy, which are the last entries in the
-             * ordered LinkedHashMap "allYourBase".
-             */
-
-            baseIds = new ArrayList<URI>(allYourBase.keySet());
-            Collections.reverse(baseIds);
-        }
-        else {
-            baseIds = new ArrayList<URI>();
-        }
-
-        // Include our blueprint schema fields last to achieve final locality
-        baseIds.add(schemaId);
-
-        final SortedMap<String, Field> allYourFields = new TreeMap<String, Field>();
-        final SortedMap<URI, Link> allYourLinks = new TreeMap<URI, Link>();
-        final SortedMap<URI, Constraint> allYourConstraints = new TreeMap<URI, Constraint>();
-
-        for (final URI baseId : baseIds) {
-
-            final Context context = getContext();
-            final Schema baseSchema = context.getSchema(baseId);
-
-            System.out.println(this + " has \"" + baseSchema + "\" as base schema is for schema id: " + baseId);
-
-            // TODO: Handle the meta problem differently?
-            if (baseSchema == null) {
-                System.out.println("==== WARNING: " + this + " has \"" + baseSchema
-                        + "\" as base schema is for schema id: " + baseId);
-                return;
-            }
-
-            initFields(allYourFields, baseSchema);
-            initLinks(allYourLinks, baseSchema);
-            initConstraints(allYourConstraints, baseSchema);
-        }
-
-        _Fields = Observables.observableMap(allYourFields);
-        _LinksByRel = Observables.observableMap(allYourLinks);
-        _Constraints = Observables.observableMap(allYourConstraints);
-
-        System.out.println(this + " has been \"fully\" initialized.");
+    @SuppressWarnings("unchecked")
+    private void initFields(final Map<String, Field> allYourFields, final Schema baseSchema) {
+        new PrototypicalExtension<String, Field>(allYourFields,
+                (Map<String, Field>) baseSchema.getFieldValue(FieldNames.Schema.fields.toString()), getContext()
+                        .getSchemaIdToClassTransformer().bToA(Field.class));
     }
 
-    private void initConstraints(final SortedMap<URI, Constraint> allYourConstraints, final Schema baseSchema) {
-        new PrototypicalExtension<URI, Constraint>(allYourConstraints, baseSchema.getConstraints(), getContext()
-                .getSchemaIdToClassTransformer().bToA(Constraint.class));
-    }
-
-    private void initFields(final SortedMap<String, Field> allYourFields, final Schema baseSchema) {
-        new PrototypicalExtension<String, Field>(allYourFields, baseSchema.getFields(), getContext()
-                .getSchemaIdToClassTransformer().bToA(Field.class));
-    }
-
-    private void initLinks(final SortedMap<URI, Link> allYourLinks, final Schema baseSchema) {
-        new PrototypicalExtension<URI, Link>(allYourLinks, baseSchema.getLinks(), getContext()
-                .getSchemaIdToClassTransformer().bToA(Link.class));
+    @SuppressWarnings("unchecked")
+    private void initLinks(final Map<URI, Link> allYourLinks, final Schema baseSchema) {
+        new PrototypicalExtension<URI, Link>(allYourLinks,
+                (Map<URI, Link>) baseSchema.getFieldValue(FieldNames.Schema.links.toString()), getContext()
+                        .getSchemaIdToClassTransformer().bToA(Link.class));
     }
 
     private class PrototypicalExtension<K, M extends Model> {
 
-        @SuppressWarnings("unchecked")
-        public PrototypicalExtension(final Map<K, M> allModels, final List<M> extensionModels, URI schemaId) {
-            if (extensionModels != null) {
-                for (final M extensionModel : extensionModels) {
-                    K modelKey = (K) ((Document) extensionModel).getId();
-                    extend(allModels, modelKey, extensionModel, schemaId);
-                }
-            }
-        }
+        /*
+         * @SuppressWarnings("unchecked")
+         * public PrototypicalExtension(final Map<K, M> allModels, final List<M>
+         * extensionModels, URI schemaId) {
+         * if (extensionModels != null) {
+         * for (final M extensionModel : extensionModels) {
+         * K modelKey = (K) ((Document) extensionModel).getId();
+         * extend(allModels, modelKey, extensionModel, schemaId);
+         * }
+         * }
+         * }
+         */
 
         public PrototypicalExtension(final Map<K, M> allModels, final Map<K, M> extensionModels, URI schemaId) {
 
@@ -541,7 +543,7 @@ final class Prototype {
             final Context context = getContext();
             M model = allModels.get(modelKey);
             if (model == null) {
-                model = (M) context.instantiateModel(schemaId).getStaticInterface();
+                model = (M) context.instantiateModel(schemaId);
                 allModels.put(modelKey, model);
             }
 

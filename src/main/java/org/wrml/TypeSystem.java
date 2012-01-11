@@ -14,81 +14,34 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime;
+package org.wrml;
 
 import java.util.Date;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import org.wrml.Model;
 import org.wrml.model.schema.Type;
 import org.wrml.util.observable.ObservableList;
 import org.wrml.util.observable.ObservableMap;
 
+/**
+ * Maps WRML's type system to/from Java's.
+ */
 public final class TypeSystem {
 
+    // WRML's only TypeSystem need not register for Match.com =(  
     public static final TypeSystem instance = new TypeSystem();
 
     // TODO: Cache based on class name (string) not class (don't hold classes)
+    // This could grow large from Enums
     private final Map<Class<?>, Object> _DefaultValues;
 
     private TypeSystem() {
         _DefaultValues = new WeakHashMap<Class<?>, Object>();
     }
 
-    public final Object getDefaultValue(final Class<?> type) {
-
-        Object defaultValue = null;
-
-        if (_DefaultValues.containsKey(type)) {
-            defaultValue = _DefaultValues.get(type);
-            System.out.println("The default value for type \"" + type.getCanonicalName() + "\" is already mapped as \""
-                    + defaultValue + "\"");
-            return defaultValue;
-        }
-
-        Class<?> keyType = type;
-
-        if (String.class.equals(type)) {
-            defaultValue = null;
-        }
-        else if (Boolean.TYPE.equals(type) || Boolean.class.equals(type)) {
-            defaultValue = Boolean.FALSE;
-        }
-        else if (Integer.TYPE.equals(type) || Integer.class.equals(type)) {
-            defaultValue = 0;
-        }
-        else if (Float.TYPE.equals(type) || Float.class.equals(type)) {
-            defaultValue = (Double) 0.0;
-        }
-        else if (Double.TYPE.equals(type) || Double.class.equals(type)) {
-            defaultValue = 0.0;
-        }
-        else if (Long.TYPE.equals(type) || Long.class.equals(type)) {
-            defaultValue = 0L;
-        }
-        else if (Void.TYPE.equals(type) || Void.class.equals(type)) {
-            defaultValue = type;
-        }
-        else if (Enum.class.isAssignableFrom(type)) {
-            Object[] enumConstants = type.getEnumConstants();
-            if (enumConstants.length > 0) {
-                defaultValue = enumConstants[0];
-            }
-        }
-        else {
-            keyType = Object.class;
-        }
-
-        _DefaultValues.put(keyType, defaultValue);
-
-        System.out.println("The default value for type \"" + type.getCanonicalName() + "\" is \"" + defaultValue
-                + "\" it is now mapped with key type \"" + keyType.getCanonicalName() + "\"");
-
-        return defaultValue;
-    }
-
-    public final Class<?> getJavaType(final Type type) {
+    @SuppressWarnings("unchecked")
+    public final <V> Class<V> getJavaType(final Type type) {
 
         Class<?> javaType = Object.class;
         switch (type) {
@@ -147,7 +100,70 @@ public final class TypeSystem {
             break;
         }
 
-        return javaType;
+        return (Class<V>) javaType;
+    }
+
+    @SuppressWarnings("unchecked")
+    public final <V> V getWrmlDefaultValue(final Class<V> type) {
+
+        Object defaultValue = null;
+
+        if (_DefaultValues.containsKey(type)) {
+
+            defaultValue = _DefaultValues.get(type);
+
+            /*
+             * System.out.println("The default value for type \"" +
+             * type.getCanonicalName() + "\" is already mapped as \""
+             * + defaultValue + "\"");
+             */
+
+            return (V) defaultValue;
+        }
+
+        Class<?> keyType = type;
+
+        if (String.class.equals(type)) {
+            defaultValue = null;
+        }
+        else if (Boolean.TYPE.equals(type) || Boolean.class.equals(type)) {
+            defaultValue = Boolean.FALSE;
+        }
+        else if (Integer.TYPE.equals(type) || Integer.class.equals(type)) {
+            defaultValue = 0;
+        }
+        else if (Float.TYPE.equals(type) || Float.class.equals(type)) {
+            defaultValue = 0.0;
+        }
+        else if (Double.TYPE.equals(type) || Double.class.equals(type)) {
+            defaultValue = 0.0;
+        }
+        else if (Long.TYPE.equals(type) || Long.class.equals(type)) {
+            defaultValue = 0L;
+        }
+        else if (Void.TYPE.equals(type) || Void.class.equals(type)) {
+            defaultValue = type;
+        }
+        else if (Enum.class.isAssignableFrom(type)) {
+            final Object[] enumConstants = type.getEnumConstants();
+            if (enumConstants.length > 0) {
+                defaultValue = enumConstants[0];
+            }
+        }
+        else {
+            keyType = Object.class;
+        }
+
+        _DefaultValues.put(keyType, defaultValue);
+
+        /*
+         * System.out.println("The default value for type \"" +
+         * type.getCanonicalName() + "\" is \"" + defaultValue
+         * + "\" it is now mapped with key type \"" + keyType.getCanonicalName()
+         * + "\"");
+         */
+
+        return (V) defaultValue;
     }
 
 }

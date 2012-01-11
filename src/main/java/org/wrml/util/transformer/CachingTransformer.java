@@ -45,7 +45,7 @@ public class CachingTransformer<A, B, T extends Transformer<A, B>> extends Deleg
             }
         }
 
-        B bValue = super.aToB(aValue);
+        final B bValue = super.aToB(aValue);
 
         if (_AbCache != null) {
             _AbCache.put(aValue, bValue);
@@ -63,7 +63,7 @@ public class CachingTransformer<A, B, T extends Transformer<A, B>> extends Deleg
             }
         }
 
-        A aValue = super.bToA(bValue);
+        final A aValue = super.bToA(bValue);
 
         if (_BaCache != null) {
             _BaCache.put(bValue, aValue);

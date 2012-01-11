@@ -32,8 +32,8 @@ public class SchemaIdToMediaTypeTransformer extends AbstractTransformer<URI, Med
             return null;
         }
 
-        String schemaIdString = getContext().getUriToStringTransformer().aToB(aValue);
-        String mediaTypeString = MediaType.createWrmlMediaTypeString(schemaIdString, null);
+        final String schemaIdString = getContext().getUriToStringTransformer().aToB(aValue);
+        final String mediaTypeString = MediaType.createWrmlMediaTypeString(schemaIdString, null);
         return getContext().getMediaTypeToStringTransformer().bToA(mediaTypeString);
     }
 

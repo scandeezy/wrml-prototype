@@ -36,6 +36,14 @@ public class ProxyService extends DelegatingObservableMap<URI, Object> implement
         _Context = context;
     }
 
+    public Object create(URI collectionId, Object requestEntity, MediaType responseType, Model referrer) {
+        return getOriginService().create(collectionId, requestEntity, responseType, referrer);
+    }
+
+    public Object get(URI resourceId, Object cachedEntity, MediaType responseType, Model referrer) {
+        return getOriginService().get(resourceId, cachedEntity, responseType, referrer);
+    }
+
     public final Context getContext() {
         return _Context;
     }
@@ -48,14 +56,6 @@ public class ProxyService extends DelegatingObservableMap<URI, Object> implement
         return (Service) super.getDelegate();
     }
 
-    public Object create(URI collectionId, Object requestEntity, MediaType responseType, Model referrer) {
-        return getOriginService().create(collectionId, requestEntity, responseType, referrer);
-    }
-
-    public Object get(URI resourceId, Object cachedEntity, MediaType responseType, Model referrer) {
-        return getOriginService().get(resourceId, cachedEntity, responseType, referrer);
-    }
-
     public Object put(URI resourceId, Object requestEntity, MediaType responseType, Model referrer) {
         return getOriginService().put(resourceId, requestEntity, responseType, referrer);
     }
@@ -64,5 +64,4 @@ public class ProxyService extends DelegatingObservableMap<URI, Object> implement
         return getOriginService().remove(resourceId, responseType, referrer);
     }
 
-    
 }

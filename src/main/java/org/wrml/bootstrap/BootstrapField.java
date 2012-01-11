@@ -14,26 +14,29 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime;
+package org.wrml.bootstrap;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.List;
 
-import org.wrml.model.schema.Constraint;
+import org.wrml.TypeSystem;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Schema;
 import org.wrml.model.schema.Type;
+import org.wrml.runtime.Context;
 import org.wrml.util.observable.ObservableList;
 import org.wrml.util.observable.Observables;
 
-public class StaticField extends StaticModel<Field> {
+/**
+ * A bootstrap proxy-based implementation of WRML's Field schema.
+ */
+public class BootstrapField extends BootstrapModel<Field> {
 
     private static final long serialVersionUID = 1L;
 
     private final Type _Type;
 
-    private final Schema _Owner;
+    private final BootstrapSchema _Owner;
     private String _Name;
     private String _Title;
 
@@ -43,30 +46,25 @@ public class StaticField extends StaticModel<Field> {
     private boolean _Hidden;
     private boolean _ReadOnly;
     private boolean _Required;
-    private boolean _TransientFlag;
+    private boolean _Local;
+    private final ObservableList<URI> _ConstraintIds;
 
-    private ObservableList<Constraint> _Constraints;
-
-    public StaticField(Context context, Schema owner, final String name, final Type type) {
+    @SuppressWarnings("unchecked")
+    public BootstrapField(Context context, BootstrapSchema owner, final String name, final Type type) {
         super(context, Field.class);
 
-        TypeSystem typeSystem = TypeSystem.instance;
         _Owner = owner;
         _Type = type;
         _Name = name;
-        _DefaultValue = typeSystem.getDefaultValue(typeSystem.getJavaType(type));
+
+        _ConstraintIds = Observables.observableList(new ArrayList<URI>());
+
+        final TypeSystem typeSystem = TypeSystem.instance;
+        _DefaultValue = (Object) typeSystem.getWrmlDefaultValue(typeSystem.getJavaType(type));
     }
 
-    public final ObservableList<Constraint> getConstraints() {
-
-        if (_Constraints == null) {
-
-            Context context = getContext();
-            List<Constraint> constraintsList = new ArrayList<Constraint>();
-            _Constraints = Observables.observableList(constraintsList);
-        }
-
-        return _Constraints;
+    public final ObservableList<URI> getConstraintIds() {
+        return _ConstraintIds;
     }
 
     public final Schema getDeclaredSchema() {
@@ -92,7 +90,7 @@ public class StaticField extends StaticModel<Field> {
     }
 
     public final Schema getOwner() {
-        return _Owner;
+        return _Owner.getStaticInterface();
     }
 
     public final URI getOwnerId() {
@@ -111,6 +109,10 @@ public class StaticField extends StaticModel<Field> {
         return _Hidden;
     }
 
+    public final boolean isLocal() {
+        return _Local;
+    }
+
     public final boolean isReadOnly() {
         return _ReadOnly;
     }
@@ -119,56 +121,52 @@ public class StaticField extends StaticModel<Field> {
         return _Required;
     }
 
-    public final boolean isTransient() {
-        return _TransientFlag;
-    }
-
     public final Object setDefaultValue(Object defaultValue) {
-        Object oldDefaultValue = _DefaultValue;
+        final Object oldDefaultValue = _DefaultValue;
         _DefaultValue = defaultValue;
         return oldDefaultValue;
     }
 
     public final String setDescription(String description) {
-        String oldDescription = _Description;
+        final String oldDescription = _Description;
         _Description = description;
         return oldDescription;
     }
 
     public final boolean setHidden(boolean hidden) {
-        boolean oldHidden = _Hidden;
+        final boolean oldHidden = _Hidden;
         _Hidden = hidden;
         return oldHidden;
     }
 
+    public final boolean setLocal(boolean local) {
+        final boolean oldLocal = _Local;
+        _Local = local;
+        return oldLocal;
+    }
+
     public final String setName(String name) {
-        String oldName = _Name;
+        final String oldName = _Name;
         _Name = name;
         return oldName;
     }
 
     public final boolean setReadOnly(boolean readOnly) {
-        boolean oldReadOnly = _ReadOnly;
+        final boolean oldReadOnly = _ReadOnly;
         _ReadOnly = readOnly;
         return oldReadOnly;
     }
 
     public final boolean setRequired(boolean required) {
-        boolean oldRequired = _Required;
+        final boolean oldRequired = _Required;
         _Required = required;
         return oldRequired;
     }
 
     public final String setTitle(String title) {
-        String oldTitle = _Title;
+        final String oldTitle = _Title;
         _Title = title;
         return oldTitle;
-    }
-
-    public final boolean setTransient(boolean transientFlag) {
-        boolean oldTransientFlag = _TransientFlag;
-        _TransientFlag = transientFlag;
-        return oldTransientFlag;
     }
 
 }

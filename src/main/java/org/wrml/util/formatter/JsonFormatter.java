@@ -18,6 +18,9 @@ package org.wrml.util.formatter;
 
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jackson.JsonFactory;
 import org.codehaus.jackson.JsonParser;
@@ -31,7 +34,10 @@ import org.wrml.runtime.Context;
 import org.wrml.util.http.Body;
 import org.wrml.util.http.Entity;
 import org.wrml.util.http.Message;
+import org.wrml.util.http.RequestLine;
+import org.wrml.util.observable.ObservableList;
 import org.wrml.util.observable.ObservableMap;
+import org.wrml.util.observable.Observables;
 
 public class JsonFormatter extends AbstractFormatter {
 
@@ -39,24 +45,68 @@ public class JsonFormatter extends AbstractFormatter {
         super(context);
     }
 
-    public Model read(Message requestMessage, Message responseMessage, Context context, URI schemaId) throws Exception {
+    @SuppressWarnings("unchecked")
+    public <M extends Model> M read(Context context, Message requestMessage, URI schemaId, Message responseMessage)
+            throws Exception {
 
-        Model responseModel = context.instantiateModel(schemaId);
+        final RequestLine requestLine = (RequestLine) requestMessage.getStartLine();
+        final URI id = requestLine.getUri();
 
-        System.out.println("A JSON formatting of: " + responseModel + " of type: " + schemaId);
+        final Entity entity = responseMessage.getEntity();
+        final Body body = entity.getBody();
+        final InputStream inputStream = body.getInputStream();
+        final JsonFactory jsonFactory = new JsonFactory();
+        final JsonParser jsonParser = jsonFactory.createJsonParser(inputStream);
+        final JsonToken jsonToken = jsonParser.nextToken();
 
-        Schema schema = context.getSchema(schemaId);
-        ObservableMap<String, Field> fields = schema.getFields();
+        Model responseModel = readModel(context, jsonParser, schemaId, jsonToken);
+        responseModel.setFieldValue("id", id);
+        jsonParser.close();
 
-        Entity entity = responseMessage.getEntity();
-        Body body = entity.getBody();
-        InputStream inputStream = body.getInputStream();
-        JsonFactory jsonFactory = new JsonFactory();
-        JsonParser jsonParser = jsonFactory.createJsonParser(inputStream);
+        return (M) responseModel;
+    }
 
-        JsonToken token = jsonParser.nextToken();
+    public void write(Context context, Message requestMessage, URI schemaId, Model requestModel) throws Exception {
+        // TODO Write the flip side for PUT and POST
 
-        while (token != null) {
+    }
+
+    @SuppressWarnings("unchecked")
+    private <E> ObservableList<E> readList(Context context, JsonParser jsonParser, JsonToken jsonToken, List<E> list)
+            throws Exception {
+
+        while (jsonToken != null) {
+            jsonToken = jsonParser.nextToken();
+
+            if (jsonToken.equals(JsonToken.END_ARRAY)) {
+                break;
+            }
+
+            list.add((E) readWrmlValueFromJsonToken(context, jsonParser, jsonToken));
+
+        }
+
+        return Observables.observableList(list);
+    }
+
+    private <K, V> ObservableMap<K, V> readMap(Context context, JsonParser jsonParser, JsonToken jsonToken,
+            Map<K, V> map) throws Exception {
+
+        return Observables.observableMap(map);
+    }
+
+    @SuppressWarnings("unchecked")
+    private <M extends Model> M readModel(Context context, JsonParser jsonParser, URI schemaId, JsonToken jsonToken)
+            throws Exception {
+
+        Model model = context.instantiateModel(schemaId);
+
+        System.out.println("JsonFormatter - read: A JSON model with schema: \"" + schemaId + "\" for model: " + model);
+
+        final Schema schema = context.getSchema(schemaId);
+        final ObservableMap<String, Field> fields = schema.getFields();
+
+        while (jsonToken != null) {
 
             String currentName = jsonParser.getCurrentName();
 
@@ -65,114 +115,96 @@ public class JsonFormatter extends AbstractFormatter {
                     // TODO: !!!!----- Deal with links
                 }
                 else {
-                    token = jsonParser.nextToken();
-                    System.out.println("A JSON field named: " + currentName + " : " + token);
+                    jsonToken = jsonParser.nextToken();
 
-                    if (fields != null) {
-                        Field field = fields.get(currentName);
-                        System.out.println("To fill a schema field: " + field);
-                        if (field != null) {
-
-                        }
+                    currentName = jsonParser.getCurrentName();
+                    if (currentName == null) {
+                        continue;
                     }
 
-                    Object fieldValue = null;
-
-                    switch (token) {
-
-                    case START_ARRAY:
-
-                        //Map<K, V> map = new HashMap<K, V>;
-                        //fieldValue = Observables.observableMap(map);
-
-                        break;
-
-                    case VALUE_EMBEDDED_OBJECT:
-                        //fieldValue = context.instantiateModel(innerSchemaId);
-
-                        break;
-
-                    case VALUE_FALSE:
-                        fieldValue = Boolean.FALSE;
-                        break;
-
-                    case VALUE_TRUE:
-                        fieldValue = Boolean.TRUE;
-                        break;
-
-                    case VALUE_STRING:
-                        fieldValue = jsonParser.getText();
-                        break;
-
-                    case VALUE_NUMBER_FLOAT:
-                        fieldValue = jsonParser.getFloatValue();
-                        break;
-
-                    case VALUE_NUMBER_INT:
-                        fieldValue = jsonParser.getIntValue();
-                        break;
-
-                    default:
-                        fieldValue = null;
-                        break;
+                    if (!fields.containsKey(currentName)) {
+                        System.err.println("JsonFormatter - read: Field  \"" + currentName
+                                + "\" is unknown to schema: " + schemaId);
+                        continue;
                     }
 
-                    responseModel.setFieldValue(currentName, fieldValue);
+                    final Field field = fields.get(currentName);
+                    Object fieldValue = readWrmlValueFromJsonToken(context, jsonParser, jsonToken, field);
+                    model.setFieldValue(currentName, fieldValue);
                 }
             }
 
-            token = jsonParser.nextToken();
+            jsonToken = jsonParser.nextToken();
         }
 
-        jsonParser.close();
-
-        return responseModel;
+        return (M) model;
     }
 
-    public Model write(Message requestMessage, Context context, URI schemaId) throws Exception {
-        // TODO Write the flip side
-        return null;
-    }
+    private Object readWrmlValueFromJsonToken(Context context, final JsonParser jsonParser, final JsonToken jsonToken)
+            throws Exception {
 
-    public Type getWrmlType(JsonToken jsonToken) {
+        String currentName = jsonParser.getCurrentName();
 
-        Type type;
+        System.out.println("JsonFormatter: currentName = \"" + currentName + "\", token = \"" + jsonToken + "\"");
+
+        Object tokenValue = null;
 
         switch (jsonToken) {
 
         case START_ARRAY:
-            type = Type.List;
+
+            tokenValue = readList(context, jsonParser, jsonToken, new ArrayList<Object>());
+
             break;
 
-        case START_OBJECT:
         case VALUE_EMBEDDED_OBJECT:
-            type = Type.Model;
+
+            // TODO: HACK temporary for debug/testing the boot sequence
+
+            URI schemaId = context.getSchemaIdToClassTransformer().bToA(Field.class);
+            tokenValue = readModel(context, jsonParser, schemaId, jsonToken);
+
             break;
 
         case VALUE_FALSE:
+            tokenValue = Boolean.FALSE;
+            break;
+
         case VALUE_TRUE:
-            type = Type.Boolean;
+            tokenValue = Boolean.TRUE;
             break;
 
         case VALUE_STRING:
-            type = Type.Text;
+            tokenValue = jsonParser.getText();
             break;
 
         case VALUE_NUMBER_FLOAT:
-            type = Type.Double;
+            tokenValue = jsonParser.getFloatValue();
             break;
 
         case VALUE_NUMBER_INT:
-            type = Type.Integer;
+            tokenValue = jsonParser.getIntValue();
             break;
 
         default:
-            type = Type.Native;
+            tokenValue = null;
             break;
         }
 
-        return type;
+        return tokenValue;
 
+    }
+
+    private Object readWrmlValueFromJsonToken(Context context, final JsonParser jsonParser, final JsonToken jsonToken,
+            final Field field) throws Exception {
+
+        final Type type = field.getType();
+        String fieldName = field.getName();
+
+        System.out.println("JsonFormatter: currentName = \"" + fieldName + "\", token = \"" + jsonToken + "\""
+                + "\", WRML type = \"" + type);
+
+        return readWrmlValueFromJsonToken(context, jsonParser, jsonToken);
     }
 
 }

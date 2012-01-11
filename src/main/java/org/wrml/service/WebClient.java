@@ -68,7 +68,7 @@ public class WebClient extends ServiceMap {
 
     private final HttpClient _HttpClient;
     private MediaType _DefaultFormatMediaType;
-    private JsonFormatter _TempJsonFormatter;
+    private final JsonFormatter _TempJsonFormatter;
 
     public final static PassthroughTransformer<URI> ID_TRANSFORMER = new PassthroughTransformer<URI>();
 
@@ -132,7 +132,7 @@ public class WebClient extends ServiceMap {
      */
     public Object get(URI resourceId, Object cachedEntity, MediaType responseType, Model referrer) {
 
-        System.out.println("A GET request for: " + resourceId + " as: " + responseType);
+        System.out.println("WebClient: WWW GET request for: " + resourceId + " as: " + responseType);
 
         final Context context = getContext();
 
@@ -159,14 +159,14 @@ public class WebClient extends ServiceMap {
             }
 
             // Default the format if need be
-            MediaType formatMediaType = (responseType != null) ? responseType : getDefaultFormatMediaType();
-            Formatter formatter = getFormatter(formatMediaType);
+            final MediaType formatMediaType = (responseType != null) ? responseType : getDefaultFormatMediaType();
+            final Formatter formatter = getFormatter(formatMediaType);
 
             Model model = null;
             try {
-                model = formatter.read(requestMessage, responseMessage, context, schemaId);
+                model = formatter.read(context, requestMessage, schemaId, responseMessage);
             }
-            catch (Exception e) {
+            catch (final Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
@@ -191,7 +191,7 @@ public class WebClient extends ServiceMap {
     public Formatter getFormatter(MediaType mediaType) {
 
         // TODO: !!!!----- Deal with Formatter
-        
+
         // Get the Format associated with the MediaType
         //Format format = getFormat(mediaType);
 
@@ -288,6 +288,30 @@ public class WebClient extends ServiceMap {
         super.finalize();
     }
 
+    private Message createMessage(final MessageType messageType, final StartLine startLine) {
+
+        // Create the message model
+        final Message message = new DefaultMessage();
+
+        // HTTP-message   = Request | Response
+        message.setType(messageType);
+
+        // start-line     = Request-Line | Status-Line
+        message.setStartLine(startLine);
+
+        // Create the entity with headers and a body
+        final Entity entity = new DefaultEntity();
+        message.setEntity(entity);
+
+        final Headers headers = new DefaultHeaders();
+        entity.setHeaders(headers);
+
+        final Body body = new DefaultBody();
+        entity.setBody(body);
+
+        return message;
+    }
+
     private Message createRequestMessage(final URI resourceId, final Object cachedEntity, final MediaType responseType,
             final Model referrer, final Method method) {
 
@@ -307,9 +331,9 @@ public class WebClient extends ServiceMap {
 
         HttpUriRequest request = null;
 
-        RequestLine requestLine = (RequestLine) requestMessage.getStartLine();
-        Method method = requestLine.getMethod();
-        URI uri = requestLine.getUri();
+        final RequestLine requestLine = (RequestLine) requestMessage.getStartLine();
+        final Method method = requestLine.getMethod();
+        final URI uri = requestLine.getUri();
 
         switch (method) {
 
@@ -350,17 +374,17 @@ public class WebClient extends ServiceMap {
 
         try {
 
-            HttpResponse response = _HttpClient.execute(request);
-            HttpEntity entity = response.getEntity();
+            final HttpResponse response = _HttpClient.execute(request);
+            final HttpEntity entity = response.getEntity();
             if (entity != null) {
                 inputStream = entity.getContent();
             }
         }
-        catch (ClientProtocolException e) {
+        catch (final ClientProtocolException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        catch (IOException e) {
+        catch (final IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -376,60 +400,45 @@ public class WebClient extends ServiceMap {
         responseMessage.getEntity().getBody().setInputStream(inputStream);
         return responseMessage;
     }
-
-    private Message createMessage(final MessageType messageType, final StartLine startLine) {
-
-        // Create the message model
-        final Message message = new DefaultMessage();
-
-        // HTTP-message   = Request | Response
-        message.setType(messageType);
-
-        // start-line     = Request-Line | Status-Line
-        message.setStartLine(startLine);
-
-        // Create the entity with headers and a body
-        final Entity entity = new DefaultEntity();
-        message.setEntity(entity);
-
-        final Headers headers = new DefaultHeaders();
-        entity.setHeaders(headers);
-
-        final Body body = new DefaultBody();
-        entity.setBody(body);
-
-        return message;
-    }
 }
 
-class DefaultMessage implements Message {
+abstract class AbstractStartLine implements StartLine {
 
-    private Entity _Entity;
-    private StartLine _StartLine;
-    private MessageType _Type;
+    private HttpVersion _HttpVersion;
 
-    public Entity getEntity() {
-        return _Entity;
+    public HttpVersion getHttpVersion() {
+        return _HttpVersion;
     }
 
-    public void setEntity(Entity entity) {
-        _Entity = entity;
+    public void setHttpVersion(HttpVersion httpVersion) {
+        _HttpVersion = httpVersion;
     }
 
-    public StartLine getStartLine() {
-        return _StartLine;
+}
+
+class DefaultAcceptHeader implements AcceptHeader {
+
+}
+
+class DefaultBody implements Body {
+
+    private InputStream _InputStream;
+    private OutputStream _OutputStream;
+
+    public InputStream getInputStream() {
+        return _InputStream;
     }
 
-    public void setStartLine(StartLine startLine) {
-        _StartLine = startLine;
+    public OutputStream getOutputStream() {
+        return _OutputStream;
     }
 
-    public MessageType getType() {
-        return _Type;
+    public void setInputStream(InputStream inputStream) {
+        _InputStream = inputStream;
     }
 
-    public void setType(MessageType type) {
-        _Type = type;
+    public void setOutputStream(OutputStream outputStream) {
+        _OutputStream = outputStream;
     }
 
 }
@@ -443,39 +452,16 @@ class DefaultEntity implements Entity {
         return _Body;
     }
 
-    public void setBody(Body body) {
-        _Body = body;
-    }
-
     public Headers getHeaders() {
         return _Headers;
     }
 
+    public void setBody(Body body) {
+        _Body = body;
+    }
+
     public void setHeaders(Headers headers) {
         _Headers = headers;
-    }
-
-}
-
-class DefaultBody implements Body {
-
-    private InputStream _InputStream;
-    private OutputStream _OutputStream;
-
-    public InputStream getInputStream() {
-        return _InputStream;
-    }
-
-    public void setInputStream(InputStream inputStream) {
-        _InputStream = inputStream;
-    }
-
-    public OutputStream getOutputStream() {
-        return _OutputStream;
-    }
-
-    public void setOutputStream(OutputStream outputStream) {
-        _OutputStream = outputStream;
     }
 
 }
@@ -494,20 +480,34 @@ class DefaultHeaders implements Headers {
 
 }
 
-class DefaultAcceptHeader implements AcceptHeader {
+class DefaultMessage implements Message {
 
-}
+    private Entity _Entity;
+    private StartLine _StartLine;
+    private MessageType _Type;
 
-abstract class AbstractStartLine implements StartLine {
-
-    private HttpVersion _HttpVersion;
-
-    public HttpVersion getHttpVersion() {
-        return _HttpVersion;
+    public Entity getEntity() {
+        return _Entity;
     }
 
-    public void setHttpVersion(HttpVersion httpVersion) {
-        _HttpVersion = httpVersion;
+    public StartLine getStartLine() {
+        return _StartLine;
+    }
+
+    public MessageType getType() {
+        return _Type;
+    }
+
+    public void setEntity(Entity entity) {
+        _Entity = entity;
+    }
+
+    public void setStartLine(StartLine startLine) {
+        _StartLine = startLine;
+    }
+
+    public void setType(MessageType type) {
+        _Type = type;
     }
 
 }
@@ -521,12 +521,12 @@ class DefaultRequestLine extends AbstractStartLine implements RequestLine {
         return _Method;
     }
 
-    public void setMethod(Method method) {
-        _Method = method;
-    }
-
     public URI getUri() {
         return _RequestUri;
+    }
+
+    public void setMethod(Method method) {
+        _Method = method;
     }
 
     public void setUri(URI requestUri) {

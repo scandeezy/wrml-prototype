@@ -40,8 +40,7 @@ public interface Schema extends Named, Versioned, Descriptive, Document {
     //     Name: name 
     //     Constraints: TextSyntax - Mixed-Upper Case
 
-    public ObservableList<Schema> getBaseSchemas();
-
+    public ObservableList<URI> getBaseSchemaIds();
 
     /**
      * The ability to add Constraints to Schemas can have serve a few different
@@ -56,7 +55,7 @@ public interface Schema extends Named, Versioned, Descriptive, Document {
      * 
      * @return
      */
-    public ObservableList<Constraint> getConstraints();
+    public ObservableList<URI> getConstraintIds();
 
     // Generated from Field
     //     Name: fields 

@@ -40,10 +40,6 @@ final class HypermediaEngine {
         _Resources = new HashMap<URI, Resource>();
     }
 
-    public Context getContext() {
-        return _Context;
-    }
-
     public Api getApi() {
         return (Api) getContext().getService(Api.class).get(getApiId());
     }
@@ -52,22 +48,18 @@ final class HypermediaEngine {
         return _ApiId;
     }
 
-    public Resource getResource(URI resourceTemplateId) {
-        if (!_Resources.containsKey(resourceTemplateId)) {
-            _Resources.put(resourceTemplateId, new Resource(this, resourceTemplateId));
-        }
-
-        return _Resources.get(resourceTemplateId);
+    public Context getContext() {
+        return _Context;
     }
 
     public List<LinkTemplate> getLinkTemplates() {
 
         if (_LinkTemplates == null) {
 
-            Context context = getContext();
-            Api api = getApi();
+            final Context context = getContext();
+            final Api api = getApi();
 
-            Collection<LinkTemplate> linkTemplates = api.getLinkTemplates();
+            final Collection<LinkTemplate> linkTemplates = api.getLinkTemplates();
             int size = linkTemplates.getSize();
             size = (size > 0) ? size : linkTemplates.getElements().size();
             _LinkTemplates = new ArrayList<LinkTemplate>(size);
@@ -76,6 +68,14 @@ final class HypermediaEngine {
         }
 
         return _LinkTemplates;
+    }
+
+    public Resource getResource(URI resourceTemplateId) {
+        if (!_Resources.containsKey(resourceTemplateId)) {
+            _Resources.put(resourceTemplateId, new Resource(this, resourceTemplateId));
+        }
+
+        return _Resources.get(resourceTemplateId);
     }
 
 }

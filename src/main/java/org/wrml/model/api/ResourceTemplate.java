@@ -30,8 +30,8 @@ import org.wrml.model.Versioned;
  * persisted for reuse.
  */
 // Generated from a Web Resource Schema
-public interface ResourceTemplate extends Versioned, Descriptive,
-        TreeNode<Api, ResourceTemplate, ResourceTemplate>, Document {
+public interface ResourceTemplate extends Versioned, Descriptive, TreeNode<Api, ResourceTemplate, ResourceTemplate>,
+        Document {
 
     public String getPathSegment();
 

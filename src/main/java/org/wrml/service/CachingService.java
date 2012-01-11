@@ -42,10 +42,6 @@ public class CachingService extends ProxyService {
         _Cache = cache;
     }
 
-    public ObservableMap<URI, Object> getCache() {
-        return _Cache;
-    }
-
     @Override
     public Object get(URI resourceId, Object cachedEntity, MediaType responseType, Model referrer) {
 
@@ -53,28 +49,39 @@ public class CachingService extends ProxyService {
             throw new NullPointerException("Resource ID (URI) cannot be null");
         }
 
-        System.out.println("A cache request for: " + resourceId + " as: " + responseType);
+        //System.out.println("CachingService.get: \"" + resourceId + "\" as: " + responseType);
 
-        Map<URI, Object> cache = getCache();
+        final Map<URI, Object> cache = getCache();
         Object responseEntity = null;
-        boolean isRefresh = (referrer != null && referrer instanceof Document && resourceId
+        final boolean isRefresh = ((referrer != null) && (referrer instanceof Document) && resourceId
                 .equals(((Document) referrer).getId()));
 
         if (cache.containsKey(resourceId) && !isRefresh) {
             responseEntity = cache.get(resourceId);
-            System.out.println(resourceId + " was already cached as: " + String.valueOf(responseEntity));
+
+            /*
+             * System.out.println("CachingService.get: \"" + resourceId +
+             * "\" was ALREADY CACHED as: "
+             * + String.valueOf(responseEntity));
+             */
+
         }
         else {
             // TODO: Pass the cached entity?
             responseEntity = super.get(resourceId, null, responseType, referrer);
             cache.put(resourceId, responseEntity);
-            System.out.println(resourceId + " is now cached as: " + String.valueOf(responseEntity));
+            System.out.println("CachingService.get: \"" + resourceId + "\" is now CACHED as: "
+                    + String.valueOf(responseEntity));
         }
 
         // TODO: Consider a composite key for the cache map to consider response type attributes (like a good HTTP cache would)
         // TODO: Honor TTL and Etags etc                
 
         return responseEntity;
+    }
+
+    public ObservableMap<URI, Object> getCache() {
+        return _Cache;
     }
 
     @Override

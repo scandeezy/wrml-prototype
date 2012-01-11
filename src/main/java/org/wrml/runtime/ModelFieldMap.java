@@ -19,13 +19,14 @@ package org.wrml.runtime;
 import java.net.URI;
 import java.util.Map;
 
-import org.wrml.model.schema.Constraint;
+import org.wrml.TypeSystem;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Type;
+import org.wrml.util.DelegatingFieldMap;
 import org.wrml.util.observable.ObservableList;
 import org.wrml.util.observable.ObservableMap;
 
-public class ModelFieldMap extends DynamicFieldMap {
+public class ModelFieldMap extends DelegatingFieldMap {
 
     private final transient Context _Context;
     private final URI _SchemaId;
@@ -37,73 +38,70 @@ public class ModelFieldMap extends DynamicFieldMap {
         _SchemaId = schemaId;
     }
 
-    public Context getContext() {
+    public final Context getContext() {
         return _Context;
     }
 
-    public Prototype getPrototype() {
-        return getContext().getPrototype(getSchemaId());
-    }
-
-    public URI getSchemaId() {
+    public final URI getSchemaId() {
         return _SchemaId;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected Class<?> getFieldType(String fieldName) {
+    protected <V> Class<V> getFieldType(String fieldName) {
 
-        Prototype prototype = getPrototype();
+        final Prototype prototype = getContext().getPrototype(getSchemaId());
 
-        ObservableMap<String, Field> prototypeFields = prototype.getFields();
-        Field prototypeField = (prototypeFields != null) ? prototypeFields.get(fieldName) : null;
+        final ObservableMap<String, Field> prototypeFields = prototype.getFields();
+        final Field prototypeField = (prototypeFields != null) ? prototypeFields.get(fieldName) : null;
 
         if (prototypeField == null) {
-            return Object.class;
+            return (Class<V>) Object.class;
         }
 
-        Type type = prototypeField.getType();
+        final Type type = prototypeField.getType();
         return TypeSystem.instance.getJavaType(type);
     }
 
     @Override
     protected boolean isReadOnly(String fieldName) {
 
-        Prototype prototype = getPrototype();
-        ObservableMap<String, Field> prototypeFields = prototype.getFields();
-        Field prototypeField = (prototypeFields != null) ? prototypeFields.get(fieldName) : null;
+        final Prototype prototype = getContext().getPrototype(getSchemaId());
+        final ObservableMap<String, Field> prototypeFields = prototype.getFields();
+        final Field prototypeField = (prototypeFields != null) ? prototypeFields.get(fieldName) : null;
         if (prototypeField != null) {
             return prototypeField.isReadOnly();
         }
 
-        return true;
+        return false;
     }
 
-    @Override
-    protected Object setRawFieldValue(String fieldName, Object fieldValue) {
+    @SuppressWarnings("unchecked")
+    protected <V> V setRawFieldValue(String fieldName, V fieldValue) {
 
-        Prototype prototype = getPrototype();
-        ObservableMap<String, Field> prototypeFields = prototype.getFields();
+        final Prototype prototype = getContext().getPrototype(getSchemaId());
+        final ObservableMap<String, Field> prototypeFields = prototype.getFields();
 
-        Field prototypeField = (prototypeFields != null) ? prototypeFields.get(fieldName) : null;
+        final Field prototypeField = (prototypeFields != null) ? prototypeFields.get(fieldName) : null;
         if (prototypeField != null) {
             if (prototypeField.isReadOnly()) {
                 throw new IllegalAccessError("Field \"" + fieldName + "\" is read only in \"" + prototype.getSchemaId()
                         + "\"");
             }
 
-            if (prototypeField.isRequired() && fieldValue == null) {
+            if (prototypeField.isRequired() && (fieldValue == null)) {
                 throw new NullPointerException("Field \"" + fieldName + "\" is requires a value in \""
                         + prototype.getSchemaId() + "\"");
             }
 
-            ObservableList<Constraint> constraints = prototypeField.getConstraints();
-            if (constraints != null && constraints.size() > 0) {
+            final ObservableList<URI> constraintIds = prototypeField.getConstraintIds();
+            if ((constraintIds != null) && (constraintIds.size() > 0)) {
                 // MSMTODO: Validate constraints
             }
 
         }
 
-        return super.setRawFieldValue(fieldName, fieldValue);
+        return (V) super.setRawFieldValue(fieldName, fieldValue);
     }
 
 }

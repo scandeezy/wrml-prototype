@@ -16,7 +16,6 @@
 
 package org.wrml.model.schema;
 
-
 public interface TypeConstraint extends Typed, Constraint {
-    
+
 }

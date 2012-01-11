@@ -14,19 +14,17 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime;
+package org.wrml.util;
 
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.wrml.util.Delegating;
-
-public abstract class DynamicFieldMap extends FieldMap implements Delegating<Map<String, Object>> {
+public abstract class DelegatingFieldMap extends FieldMap implements DelegatingMap<String, Object> {
 
     private final Map<String, Object> _Delegate;
 
-    public DynamicFieldMap(final Map<String, Object> delegate) {
+    public DelegatingFieldMap(final Map<String, Object> delegate) {
         _Delegate = delegate;
     }
 
@@ -39,9 +37,10 @@ public abstract class DynamicFieldMap extends FieldMap implements Delegating<Map
         return new TreeSet<String>(_Delegate.keySet());
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected Object getRawFieldValue(String fieldName) {
-        return _Delegate.get(fieldName);
+    protected <V> V getRawFieldValue(String fieldName) {
+        return (V) _Delegate.get(fieldName);
     }
 
     @Override
@@ -49,9 +48,10 @@ public abstract class DynamicFieldMap extends FieldMap implements Delegating<Map
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    protected Object setRawFieldValue(String fieldName, Object fieldValue) {
-        return _Delegate.put(fieldName, fieldValue);
+    protected <V> V setRawFieldValue(String fieldName, V fieldValue) {
+        return (V) _Delegate.put(fieldName, fieldValue);
     }
 
 }

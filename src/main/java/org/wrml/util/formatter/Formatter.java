@@ -24,7 +24,7 @@ import org.wrml.util.http.Message;
 
 public interface Formatter {
 
-    public Model read(Message requestMessage, Message responseMessage, Context context, URI schemaId) throws Exception;
+    public <M extends Model> M read(Context context, Message requestMessage, URI schemaId, Message responseMessage) throws Exception;
 
-    public Model write(Message requestMessage, Context context, URI schemaId) throws Exception;
+    public void write(Context context, Message requestMessage, URI schemaId, Model requestModel) throws Exception;
 }

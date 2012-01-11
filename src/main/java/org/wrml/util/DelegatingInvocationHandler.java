@@ -125,7 +125,7 @@ public class DelegatingInvocationHandler implements Delegating<Object>, Invocati
 
     @Override
     public String toString() {
-        return getClass().getName() + " [" + (_Delegate != null ? "Delegate=" + _Delegate : "") + "]";
+        return getClass().getName() + " : { " + (_Delegate != null ? "delegate : { " + _Delegate : " }") + " }";
     }
 
     /**

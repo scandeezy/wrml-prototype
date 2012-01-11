@@ -34,12 +34,12 @@ public abstract class MultiProxyService extends ServiceMap implements Delegating
         _Services = new DelegatingObservableList<Service>(services);
     }
 
-    public DelegatingObservableList<Service> getServices() {
-        return _Services;
-    }
-
     public List<Service> getDelegate() {
         return _Services.getDelegate();
+    }
+
+    public DelegatingObservableList<Service> getServices() {
+        return _Services;
     }
 
 }

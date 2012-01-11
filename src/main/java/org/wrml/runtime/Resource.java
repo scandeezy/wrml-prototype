@@ -45,9 +45,9 @@ final class Resource {
         if (_Links == null) {
             _Links = new TreeMap<URI, LinkTemplate>();
 
-            HypermediaEngine hypermediaEngine = getHypermediaEngine();
-            List<LinkTemplate> linkTemplates = hypermediaEngine.getLinkTemplates();
-            for (LinkTemplate linkTemplate : linkTemplates) {
+            final HypermediaEngine hypermediaEngine = getHypermediaEngine();
+            final List<LinkTemplate> linkTemplates = hypermediaEngine.getLinkTemplates();
+            for (final LinkTemplate linkTemplate : linkTemplates) {
                 if (linkTemplate.getReferrerId().equals(_ResourceTemplateId)) {
                     _Links.put(linkTemplate.getLinkRelationId(), linkTemplate);
                 }
@@ -63,9 +63,9 @@ final class Resource {
         if (_References == null) {
             _References = new TreeMap<URI, LinkTemplate>();
 
-            HypermediaEngine hypermediaEngine = getHypermediaEngine();
-            List<LinkTemplate> linkTemplates = hypermediaEngine.getLinkTemplates();
-            for (LinkTemplate linkTemplate : linkTemplates) {
+            final HypermediaEngine hypermediaEngine = getHypermediaEngine();
+            final List<LinkTemplate> linkTemplates = hypermediaEngine.getLinkTemplates();
+            for (final LinkTemplate linkTemplate : linkTemplates) {
                 if (linkTemplate.getEndPointId().equals(_ResourceTemplateId)) {
                     _References.put(linkTemplate.getLinkRelationId(), linkTemplate);
                 }

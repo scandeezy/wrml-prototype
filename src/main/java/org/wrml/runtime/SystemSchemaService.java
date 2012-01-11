@@ -17,45 +17,92 @@
 package org.wrml.runtime;
 
 import java.net.URI;
+import java.util.HashMap;
 
 import org.wrml.Model;
-import org.wrml.model.schema.Field;
-import org.wrml.model.schema.Schema;
-import org.wrml.model.schema.Type;
-import org.wrml.runtime.StaticSchema.SchemaFields;
+import org.wrml.bootstrap.FieldBootstrapSchema;
+import org.wrml.bootstrap.SchemaBootstrapSchema;
 import org.wrml.service.ProxyService;
 import org.wrml.service.Service;
 import org.wrml.util.MediaType;
 import org.wrml.util.observable.ObservableMap;
+import org.wrml.util.observable.Observables;
 import org.wrml.util.transformer.Transformer;
 
 /**
- * The WRML equivalent of the SystemClassLoader
+ * The WRML equivalent of the SystemClassLoader.
  */
 public class SystemSchemaService extends ProxyService implements Service {
 
-    public static final String META_SCHEMA_NAME = "Schema";
+    public static final String SCHEMA_NAMESPACE = "org.wrml.model.schema";
 
-    public static final String META_SCHEMA_DESCRIPTION = "A schema describes the structure of a model independent of its format. Schemas provide contractual resource type definitions, which are a crucial component of the interface that binds a server and its clients together.";
+    public static final String SCHEMA_SCHEMA_NAME = "Schema";
+    public static final String FIELD_SCHEMA_NAME = "Field";
 
-    private Schema _MetaSchema;
+    public static final String SCHEMA_SCHEMA_FULL_NAME = SCHEMA_NAMESPACE + "." + SCHEMA_SCHEMA_NAME;
+    public static final String FIELD_SCHEMA_FULL_NAME = SCHEMA_NAMESPACE + "." + FIELD_SCHEMA_NAME;
+
+    private final SchemaBootstrapSchema _SchemaBootstrapSchema;
+    private final FieldBootstrapSchema _FieldBootstrapSchema;
+
+    private Prototype _SchemaBootstrapPrototype;
+    private Prototype _FieldBootstrapPrototype;
+
+    private final ObservableMap<URI, Prototype> _Prototypes;
 
     public SystemSchemaService(Context context, Service originService) {
         super(context, originService);
+
+        // TODO: Add ClassLoader segregated by API for "reloadablilty"
+
+        _Prototypes = Observables.observableMap(new HashMap<URI, Prototype>());
+
+        final Transformer<URI, String> idTransformer = getIdTransformer();
+
+        _FieldBootstrapSchema = new FieldBootstrapSchema(context, idTransformer.bToA(FIELD_SCHEMA_FULL_NAME));
+        _SchemaBootstrapSchema = new SchemaBootstrapSchema(context, idTransformer.bToA(SCHEMA_SCHEMA_FULL_NAME));
     }
 
     @Override
-    public Object get(URI resourceId, Object cachedEntity, MediaType responseType, Model referrer) {
+    public Object get(URI schemaId, Object cachedEntity, MediaType responseType, Model referrer) {
 
-        Context context = getContext();
+        //System.out.println("SystemSchemaService.get: \"" + schemaId + "\"");
+
         Object responseEntity = null;
 
-        URI metaSchemaId = context.getSchemaIdToClassTransformer().bToA(Schema.class);
-        if (metaSchemaId.equals(resourceId)) {
-            responseEntity = getMetaSchema();
+        if (_SchemaBootstrapSchema.getId().equals(schemaId)) {
+
+            /*
+             * A Request to get "org.wrml.model.schema.Schema", return the
+             * static (Schema) interface of the bootstrap meta schema.
+             */
+
+            responseEntity = _SchemaBootstrapSchema.getStaticInterface();
+            //System.out.println("SystemSchemaService: Returning the bootstrap \"MetaSchema\" : \n" + responseEntity);
+        }
+        else if (_FieldBootstrapSchema.getId().equals(schemaId)) {
+
+            /*
+             * Since the Field schema is referenced by the (meta) Schema schema,
+             * it also needs to be bootstrapped with a "local" static class
+             * implementation.
+             * 
+             * A Request to get "org.wrml.model.schema.Field", return the
+             * static (Schema) interface of the bootstrap field.
+             */
+
+            responseEntity = _FieldBootstrapSchema.getStaticInterface();
+            //System.out.println("SystemSchemaService: Returning the bootstrap Field: \n" + responseEntity);
         }
         else {
-            responseEntity = super.get(resourceId, cachedEntity, responseType, referrer);
+
+            /*
+             * Use the WWW or whatever service we can delegate to to actually go
+             * and GET a new Schema right about now.
+             */
+
+            responseEntity = super.get(schemaId, cachedEntity, responseType, referrer);
+            //System.out.println("SystemSchemaService: Returning remote schema: \n" + responseEntity);
         }
 
         return responseEntity;
@@ -63,44 +110,43 @@ public class SystemSchemaService extends ProxyService implements Service {
 
     @Override
     public final Transformer<URI, String> getIdTransformer() {
-        return getContext().getSchemaIdToClassNameTransformer();
+        return getContext().getSchemaIdToFullNameTransformer();
     }
 
-    public Schema getMetaSchema() {
+    public Prototype getPrototype(URI schemaId) {
 
-        if (_MetaSchema == null) {
-            
-            System.out.println("!!!!!! Creating the MetaSchema");
-            
-            _MetaSchema = new StaticSchema(getContext()).getStaticInterface();
-
-            ObservableMap<String, Field> fields = _MetaSchema.getFields();
-
-            _MetaSchema.setName(META_SCHEMA_NAME);
-            _MetaSchema.setDescription(META_SCHEMA_DESCRIPTION);
-
-            System.out.println("MetaSchema created: " + _MetaSchema);
-            
-            
-            Field baseSchemaField = createField(_MetaSchema, SchemaFields.baseSchemas.toString(), Type.List);
-
-            // TODO: Add a List<T> constraint (with a <T> of <Schmea>) to make this a field like: List<Schema>
-            fields.put(baseSchemaField.getName(), baseSchemaField);
-
-            Field fieldsField = createField(_MetaSchema, SchemaFields.fields.toString(), Type.Map);
-
-            // TODO: Add a Map<K, V> constraint (with a 'K' of Type.Text and 'V' of Field (Schema)) to make this a field like: Map<String, Field>            
-            fields.put(fieldsField.getName(), fieldsField);
-
-            System.out.println("MetaSchema fields: " + fields);
+        if (_Prototypes.containsKey(schemaId)) {
+            return _Prototypes.get(schemaId);
         }
 
-        return _MetaSchema;
-    }
-    
-    private Field createField(Schema owner, String name, Type type) {
-        return new StaticField(getContext(), owner, name, type).getStaticInterface();
-    }
+        Prototype prototype = null;
 
+        if (_SchemaBootstrapSchema.getId().equals(schemaId)) {
+
+            if (_SchemaBootstrapPrototype == null) {
+                _SchemaBootstrapPrototype = new Prototype(getContext(), schemaId);
+                _SchemaBootstrapPrototype.getFields().putAll(_SchemaBootstrapSchema.getFields());
+            }
+
+            prototype = _SchemaBootstrapPrototype;
+        }
+        else if (_FieldBootstrapSchema.getId().equals(schemaId)) {
+
+            if (_FieldBootstrapPrototype == null) {
+                _FieldBootstrapPrototype = new Prototype(getContext(), schemaId);
+                _FieldBootstrapPrototype.getFields().putAll(_FieldBootstrapSchema.getFields());
+            }
+
+            prototype = _FieldBootstrapPrototype;
+
+        }
+        else if (!_Prototypes.containsKey(schemaId)) {
+            prototype = new Prototype(getContext(), schemaId);
+        }
+
+        _Prototypes.put(schemaId, prototype);
+        prototype.init();
+        return prototype;
+    }
 
 }

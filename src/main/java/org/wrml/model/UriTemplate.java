@@ -18,7 +18,6 @@ package org.wrml.model;
 
 import org.wrml.Model;
 
-
 /*
  * TODO: Figure out how/where UriTemplate fits in. Is it a schema type or a core
  * wrml type?

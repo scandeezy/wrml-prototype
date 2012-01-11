@@ -37,19 +37,19 @@ public interface Service extends Map<URI, Object> {
     public Object create(URI collectionId, Object requestEntity, MediaType responseType, Model referrer);
 
     public Object get(URI resourceId, Object cachedEntity, MediaType responseType, Model referrer);
-    
+
     public Context getContext();
-    
+
     public Transformer<URI, ?> getIdTransformer();
-    
+
     public Object put(URI resourceId, Object requestEntity, MediaType responseType, Model referrer);
-    
-    public Object remove(URI resourceId, MediaType responseType, Model referrer);       
-    
+
+    public Object remove(URI resourceId, MediaType responseType, Model referrer);
+
     // TODO: Provide "first class" support for Container resources in the Service Java API
     // Need to figure out how to pass pagination and query by example params 
     //public Container<Document> getContainer(URI containerId, MediaType responseType, Model referrer, Options options);
-    
+
     // TODO: Support non-model input/output with I/O Streams?
 
     // TODO: Support model search? Fuzzy matching? Query by example?

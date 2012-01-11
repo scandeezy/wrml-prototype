@@ -30,7 +30,21 @@ import org.wrml.runtime.Context;
 import org.wrml.util.MediaType;
 
 /**
- * The base interface for all web resource schema instances.
+ * <p>
+ * Model is the base interface of all Web resource schema instances. A "model"
+ * in both the design-time context of data "modeling" and the runtime context of
+ * a client-server "Model" View Controller (MVC) Web application.
+ * </p>
+ * 
+ * <blockquote>
+ * "You're a problem solver. You’re one of these people who would pick up a
+ * rope that's gotten all tangled up and spend an entire day untangling it.
+ * Because it's a challenge, because it defies your sense of order in the
+ * universe, and because you can."
+ * <blockquote>
+ * 
+ * <span>-- Delenn, Babylon 5</span>
+ * 
  */
 public interface Model extends Serializable {
 
@@ -55,7 +69,7 @@ public interface Model extends Serializable {
 
     public List<URI> getEmbeddedLinkRelationIds();
 
-    public Object getFieldValue(String fieldName);
+    public <V> V getFieldValue(String fieldName);
 
     public ResourceTemplate getResourceTemplate();
 
@@ -65,7 +79,7 @@ public interface Model extends Serializable {
 
     public URI getSchemaId();
 
-    public Model getStaticInterface();
+    public <M extends Model> M getStaticInterface();
 
     public void removeEventListener(ModelEventListener listener);
 
@@ -77,6 +91,6 @@ public interface Model extends Serializable {
 
     public void setFieldToDefaultValue(String fieldName);
 
-    public Object setFieldValue(String fieldName, Object fieldValue);
+    public <V> V setFieldValue(String fieldName, V fieldValue);
 
 }

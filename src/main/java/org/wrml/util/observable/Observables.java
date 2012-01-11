@@ -16,6 +16,7 @@
 
 package org.wrml.util.observable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +26,19 @@ import java.util.Map;
  * @see java.util.Collections
  */
 public final class Observables {
+
+    private final static ObservableMap<?, ?> EMPTY_MAP = observableMap(Collections.emptyMap());
+    private final static ObservableList<?> EMPTY_LIST = observableList(Collections.emptyList());
+
+    @SuppressWarnings("unchecked")
+    public static <E> ObservableList<E> emptyList() {
+        return (ObservableList<E>) EMPTY_LIST;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <K, V> ObservableMap<K, V> emptyMap() {
+        return (ObservableMap<K, V>) EMPTY_MAP;
+    }
 
     /**
      * Convenience utility method for decorating a List as an ObservableList.

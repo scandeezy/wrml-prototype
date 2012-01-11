@@ -44,11 +44,11 @@ final class FieldPrototype {
         return oldFieldValue;
     }
 
-    public String getFieldName() {
-        return _FieldName;
-    }
-
     public FieldAccessType getAccessType() {
         return _AccessType;
+    }
+
+    public String getFieldName() {
+        return _FieldName;
     }
 }

@@ -20,11 +20,10 @@ import java.net.URI;
 
 import org.wrml.Model;
 
-
 public interface Owned<D extends Document> extends Model {
 
-    public URI getOwnerId();
-
     public D getOwner();
+
+    public URI getOwnerId();
 
 }

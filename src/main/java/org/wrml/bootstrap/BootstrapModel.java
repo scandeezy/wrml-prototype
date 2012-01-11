@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime;
+package org.wrml.bootstrap;
 
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
@@ -24,8 +24,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.wrml.Model;
+import org.wrml.runtime.Context;
+import org.wrml.runtime.HyperLink;
+import org.wrml.util.ReflectiveFieldMap;
 
-public class StaticModel<M extends Model> implements Serializable {
+/**
+ * A bootstrap proxy-based implementation of WRML's Model interface.
+ * 
+ * @param <M>
+ *            The Model type to proxy.
+ */
+public class BootstrapModel<M extends Model> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,11 +43,11 @@ public class StaticModel<M extends Model> implements Serializable {
     private M _StaticInterface;
     private final List<URI> _EmbeddedLinkRelationIds;
 
-    public StaticModel(final Context context, final Class<M> staticType) {
+    public BootstrapModel(final Context context, final Class<M> staticType) {
         this(context, staticType, null);
     }
-    
-    public StaticModel(final Context context, final Class<M> staticType, final List<URI> embeddedLinkRelationIds) {
+
+    public BootstrapModel(final Context context, final Class<M> staticType, final List<URI> embeddedLinkRelationIds) {
         _Context = context;
         _StaticType = staticType;
         _EmbeddedLinkRelationIds = embeddedLinkRelationIds;
@@ -61,16 +70,16 @@ public class StaticModel<M extends Model> implements Serializable {
 
         if (_StaticInterface == null) {
 
-            Class<M> staticType = getStaticType();
-            Context context = getContext();
+            final Class<M> staticType = getStaticType();
+            final Context context = getContext();
 
-            URI schemaId = context.getSchemaIdToClassTransformer().bToA(staticType);
+            final URI schemaId = context.getSchemaIdToClassTransformer().bToA(staticType);
 
-            List<URI> embeddedLinkRelationIds = getEmbeddedLinkRelationIds();
+            final List<URI> embeddedLinkRelationIds = getEmbeddedLinkRelationIds();
 
-            StaticFieldMap<M> fieldMap = new StaticFieldMap<M>(this, staticType);
+            final ReflectiveFieldMap<M> fieldMap = new ReflectiveFieldMap<M>(this, staticType);
 
-            Map<URI, HyperLink> linkMap = new HashMap<URI, HyperLink>();
+            final Map<URI, HyperLink> linkMap = new HashMap<URI, HyperLink>();
 
             _StaticInterface = (M) context.instantiateModel(schemaId, embeddedLinkRelationIds, fieldMap, linkMap)
                     .getStaticInterface();

@@ -20,9 +20,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.wrml.util.Delegating;
+import org.wrml.util.DelegatingMap;
 
-public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> implements Delegating<Map<K, V>> {
+public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> implements DelegatingMap<K, V> {
 
     private final Map<K, V> _Delegate;
 
@@ -63,11 +63,6 @@ public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> i
 
     public Map<K, V> getDelegate() {
         return _Delegate;
-    }
-
-    @Override
-    public String toString() {
-        return getClass().getName() + " [" + (_Delegate != null ? "Delegate=" + _Delegate : "") + "]";
     }
 
     @Override
@@ -122,6 +117,11 @@ public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> i
 
     public int size() {
         return _Delegate.size();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + " [" + (_Delegate != null ? "Delegate=" + _Delegate : "") + "]";
     }
 
     public Collection<V> values() {

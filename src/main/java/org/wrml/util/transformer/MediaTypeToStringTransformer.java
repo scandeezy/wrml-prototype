@@ -32,7 +32,7 @@ public class MediaTypeToStringTransformer extends AbstractTransformer<MediaType,
             return null;
         }
 
-        String aValue = bValue.toString();
+        final String aValue = bValue.toString();
 
         System.out.println("MediaTypeToStringTransformer.aToB(" + bValue + ") returning: " + aValue);
         return aValue;

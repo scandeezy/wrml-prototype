@@ -50,12 +50,12 @@ public final class FieldEvent extends CancelableEvent {
         return _SourceEvent;
     }
 
-    public void setConstraintEvent(FieldConstraintEvent fieldConstraintEvent) {
-        _FieldConstraintEvent = fieldConstraintEvent;
-    }
-
     public Model getSourceModel() {
         return (Model) getSource();
+    }
+
+    public void setConstraintEvent(FieldConstraintEvent fieldConstraintEvent) {
+        _FieldConstraintEvent = fieldConstraintEvent;
     }
 
 }

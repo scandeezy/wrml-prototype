@@ -18,7 +18,6 @@ package org.wrml.event;
 
 import java.util.EventListener;
 
-
 /**
  * An event listener for events related to a Model field.
  * 

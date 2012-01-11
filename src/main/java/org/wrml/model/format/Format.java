@@ -28,12 +28,12 @@ import org.wrml.util.observable.ObservableList;
 
 public interface Format extends Titled, Versioned, Descriptive, Model {
 
-    public MediaType getMediaType();
+    public ObservableList<CodeOnDemand> getFormatters();
 
     public URI getHomeUri();
 
-    public URI getRfcUri();
+    public MediaType getMediaType();
 
-    public ObservableList<CodeOnDemand> getFormatters();
+    public URI getRfcUri();
 
 }

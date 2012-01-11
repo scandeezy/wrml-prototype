@@ -215,7 +215,7 @@ public final class HyperLink implements Serializable {
         final Model referrer = getReferrer();
         final Context context = referrer.getContext();
 
-        if (responseType != null && !isGeneratableResponseType(responseType)) {
+        if ((responseType != null) && !isGeneratableResponseType(responseType)) {
             // TODO: Preemptively throw "406 Not Acceptable" exception
 
             // TODO: Give the alert an ID?
@@ -228,16 +228,17 @@ public final class HyperLink implements Serializable {
 
         if (requestEntity != null) {
 
-            Transformer<MediaType, Class<?>> mediaTypeToClassTransformer = context.getMediaTypeToClassTransformer();
+            final Transformer<MediaType, Class<?>> mediaTypeToClassTransformer = context
+                    .getMediaTypeToClassTransformer();
             requestType = mediaTypeToClassTransformer.bToA(requestEntity.getClass());
 
-            if (requestType != null && !isSupportedRequestType(requestType)) {
+            if ((requestType != null) && !isSupportedRequestType(requestType)) {
                 // TODO: Preemptively throw "415 Unsupported Media Type" exception
                 return null;
             }
         }
 
-        Service responseTypeService = context.getService(responseType);
+        final Service responseTypeService = context.getService(responseType);
 
         // TODO: The last minute hrefParams is a possibly half-baked way to fill
         // in any remaining URI Template params, such as the client-assigned
@@ -304,20 +305,20 @@ public final class HyperLink implements Serializable {
 
     public Link getLink() {
         final Model referrer = getReferrer();
-        final Context context = referrer.getContext();        
-        final URI schemaId = referrer.getSchemaId();        
+        final Context context = referrer.getContext();
+        final URI schemaId = referrer.getSchemaId();
         final Prototype prototype = context.getPrototype(schemaId);
-        
-        ObservableMap<URI, Link> links = prototype.getLinksByRel();
-        URI rel = getLinkRelationId();
-        return (links != null && links.containsKey(rel)) ? links.get(rel) : null;
+
+        final ObservableMap<URI, Link> links = prototype.getLinksByRel();
+        final URI rel = getLinkRelationId();
+        return ((links != null) && links.containsKey(rel)) ? links.get(rel) : null;
     }
 
     public LinkRelation getLinkRelation() {
         final Model referrer = getReferrer();
-        Context context = referrer.getContext();
-        MediaType linkRelationMediaType = context.getMediaTypeToClassTransformer().bToA(LinkRelation.class);
-        Service service = context.getService(linkRelationMediaType);
+        final Context context = referrer.getContext();
+        final MediaType linkRelationMediaType = context.getMediaTypeToClassTransformer().bToA(LinkRelation.class);
+        final Service service = context.getService(linkRelationMediaType);
         return (LinkRelation) ((Model) service.get(getLinkRelationId(), null, linkRelationMediaType, referrer))
                 .getStaticInterface();
     }

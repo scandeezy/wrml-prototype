@@ -73,10 +73,9 @@ public abstract class Identifiable<I extends Comparable<I>> implements Unique<I>
                 return false;
             }
         }
-        else
-            if (!id.equals(other.getId())) {
-                return false;
-            }
+        else if (!id.equals(other.getId())) {
+            return false;
+        }
         return true;
     }
 

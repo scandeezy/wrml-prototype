@@ -20,7 +20,6 @@ import java.net.URI;
 
 import org.wrml.Model;
 
-
 /**
  * A resource archetype used to model a singular concept.
  */
@@ -40,8 +39,6 @@ public interface Document extends Model {
     public String getEtag();
 
     public URI getId();
-
-    public URI setId(URI id);
 
     // Generated from Link
     //     Relation: metadata
@@ -73,11 +70,6 @@ public interface Document extends Model {
     //     Href: <parentId>
     public Document getParent();
 
-    // Generated from Field
-    //     Name: parentId 
-    //     Flags: ReadOnly
-    public URI getParentId();
-
     public Long getSecondsToLive();
 
     // Generated from Link
@@ -95,6 +87,8 @@ public interface Document extends Model {
     public boolean isReadOnly();
 
     public String setEtag(String etag);
+
+    public URI setId(URI id);
 
     public boolean setReadOnly(boolean readOnly);
 

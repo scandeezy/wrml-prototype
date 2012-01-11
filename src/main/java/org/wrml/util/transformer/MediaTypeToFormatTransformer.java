@@ -34,7 +34,7 @@ public class MediaTypeToFormatTransformer extends AbstractTransformer<MediaType,
         final Context context = getContext();
 
         URI formatId = null;
-        String formatIdString = bValue.getFormatIdString();
+        final String formatIdString = bValue.getFormatIdString();
         if (formatIdString != null) {
             formatId = context.getUriToStringTransformer().bToA(formatIdString);
         }
@@ -42,7 +42,7 @@ public class MediaTypeToFormatTransformer extends AbstractTransformer<MediaType,
             formatId = context.getFormatIdToMediaTypeTransformer().bToA(bValue);
         }
 
-        Service service = context.getService(Format.class);
+        final Service service = context.getService(Format.class);
         return (Format) ((Model) service.get(formatId, null, context.getMediaTypeToClassTransformer()
                 .bToA(Format.class), null)).getStaticInterface();
     }

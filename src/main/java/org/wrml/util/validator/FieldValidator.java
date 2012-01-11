@@ -20,7 +20,7 @@ import org.wrml.Model;
 import org.wrml.model.schema.Field;
 
 public interface FieldValidator {
-    
+
     public FieldValidationResult validateFieldValue(Model model, Field field, Object newValue);
 
 }

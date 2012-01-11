@@ -14,15 +14,10 @@
  * limitations under the License.
  */
 
-package org.wrml.event;
+package org.wrml.util;
 
-public interface ModelEventListener {
+import java.util.Map;
 
-    public void fieldConstraintViolated(FieldEvent event);
+public interface DelegatingMap<K, V> extends Delegating<Map<K, V>> {
 
-    public void fieldValueChanged(FieldEvent event);
-
-    public void fieldValueInitialized(FieldEvent event);
-
-    public void linkEnabledStateChanged(LinkEvent event);
 }

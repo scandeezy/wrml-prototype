@@ -34,8 +34,8 @@ public class FormatIdToMediaTypeTransformer extends AbstractTransformer<URI, Med
         if (aValue == null) {
             return null;
         }
-                
-        String mediaTypeString = getBaseUri().relativize(aValue).toString();
+
+        final String mediaTypeString = getBaseUri().relativize(aValue).toString();
         return getContext().getMediaTypeToStringTransformer().bToA(mediaTypeString);
     }
 
