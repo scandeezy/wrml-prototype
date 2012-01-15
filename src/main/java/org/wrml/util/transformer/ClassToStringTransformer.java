@@ -16,14 +16,25 @@
 
 package org.wrml.util.transformer;
 
-public class PassthroughTransformer<T> implements ConstantTransformation<T, T> {
+public class ClassToStringTransformer implements ConstantTransformation<Class<?>, String> {
 
-    public T aToB(T aValue) {
-        return aValue;
+    public String aToB(Class<?> clazz) {
+        // TODO: Is this unique enough? Does parameterization matter and if so does this string include the <T>?
+        return clazz.getCanonicalName();
     }
 
-    public T bToA(T bValue) {
-        return bValue;
+    public Class<?> bToA(String className) {
+
+        // TODO: Is className formatted correctly for this?
+        // TODO: Do we need to deal with a wrml ClassLoader here?
+
+        try {
+            return Class.forName(className);
+        }
+        catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

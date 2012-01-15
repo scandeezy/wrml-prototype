@@ -17,10 +17,11 @@
 package org.wrml.runtime;
 
 import java.lang.reflect.Method;
-import java.net.URI;
 import java.util.Map;
 
 import org.wrml.Model;
+import org.wrml.TypeSystem;
+import org.wrml.model.schema.Type;
 import org.wrml.util.DelegatingInvocationHandler;
 
 public class StaticInterfaceFacade extends DelegatingInvocationHandler {
@@ -41,13 +42,13 @@ public class StaticInterfaceFacade extends DelegatingInvocationHandler {
 
         final Model model = getDelegateModel().getStaticInterface();
         final Context context = model.getContext();
-        final URI schemaId = model.getSchemaId();
-        final Prototype prototype = context.getPrototype(schemaId);
+        final Prototype prototype = context.getPrototype(model.getMediaType());
 
         final String methodKey = getMethodKey(method);
         final String methodName = method.getName();
 
-        final FieldPrototype fieldPrototype = prototype.getFieldPrototype(methodKey, methodName);
+        Type type = TypeSystem.instance.getTypeToClassTransformer().bToA(method.getReturnType());
+        final FieldPrototype fieldPrototype = prototype.getFieldPrototype(methodKey, methodName, type);
         if (fieldPrototype != null) {
             Object fieldValue = null;
             if ((fieldPrototype.getAccessType() == FieldAccessType.SET) && (args != null) && (args.length > 0)) {

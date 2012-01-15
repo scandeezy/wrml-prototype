@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package org.wrml.util.transformer;
+package org.wrml.model.schema;
 
-public class PassthroughTransformer<T> implements ConstantTransformation<T, T> {
+import org.wrml.util.MediaType;
 
-    public T aToB(T aValue) {
-        return aValue;
-    }
+public interface MediaTypeConstraint<T extends Constrainable<T>> extends Constraint<T> {
 
-    public T bToA(T bValue) {
-        return bValue;
-    }
+    public MediaType getMediaType();
 
+    public MediaType setMediaType(MediaType mediaType);
 }

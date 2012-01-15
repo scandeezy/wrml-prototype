@@ -16,11 +16,17 @@
 
 package org.wrml.util.http;
 
+import org.wrml.util.MediaType;
+
 public interface Headers {
 
     public AcceptHeader getAcceptHeader();
 
     public void setAcceptHeader(AcceptHeader acceptHeader);
+
+    public MediaType getContentType();
+
+    public void setContentType(MediaType mediaType);
 
     /*
      * TODO: Add methods and models for all of the common HTTP headers

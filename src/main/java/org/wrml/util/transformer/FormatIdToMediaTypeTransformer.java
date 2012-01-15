@@ -21,7 +21,7 @@ import java.net.URI;
 import org.wrml.runtime.Context;
 import org.wrml.util.MediaType;
 
-public class FormatIdToMediaTypeTransformer extends AbstractTransformer<URI, MediaType> {
+public class FormatIdToMediaTypeTransformer extends ConstantTransformer<URI, MediaType> {
 
     public final URI _BaseUri;
 
@@ -30,21 +30,22 @@ public class FormatIdToMediaTypeTransformer extends AbstractTransformer<URI, Med
         _BaseUri = baseUri;
     }
 
-    public MediaType aToB(URI aValue) {
-        if (aValue == null) {
+    public MediaType aToB(URI formatId) {
+        if (formatId == null) {
             return null;
         }
 
-        final String mediaTypeString = getBaseUri().relativize(aValue).toString();
+        final String mediaTypeString = getBaseUri().relativize(formatId).toString();
         return getContext().getMediaTypeToStringTransformer().bToA(mediaTypeString);
     }
 
-    public URI bToA(MediaType bValue) {
-        if (bValue == null) {
+    public URI bToA(MediaType wrmlMediaType) {
+        if (wrmlMediaType == null) {
             return null;
         }
 
-        return getBaseUri().resolve(bValue.getType() + '/' + bValue.getSubtype());
+        // TODO: This doesnt look finished...
+        return getBaseUri().resolve(wrmlMediaType.getType() + '/' + wrmlMediaType.getSubtype());
     }
 
     public URI getBaseUri() {

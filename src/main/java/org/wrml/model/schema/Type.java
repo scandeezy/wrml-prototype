@@ -19,86 +19,73 @@ package org.wrml.model.schema;
 public enum Type {
 
     /**
-     * In Java, maps to: boolean
+     * In Java, maps to: java.lang.Object
      */
-    Boolean("Boolean"),
-
-    /**
-     * In Java, maps to: Enum<T>, where T is determined by
-     * ChoiceMenuConstraint's ChoiceMenu.
-     */
-    Choice("Choice"),
-
-    /**
-     * In Java, maps to: org.joda.time.DateTime
-     */
-    DateTime("DateTime"),
-
-    /**
-     * In Java, maps to: either double or java.lang.Double, dependent on Field's
-     * isRequired flag's value.
-     */
-    Double("Double"),
-
-    /**
-     * In Java, maps to: either int or java.lang.Integer, dependent on Field's
-     * isRequired flag's value.
-     */
-    Integer("Integer"),
-
-    /**
-     * In Java, maps to: org.wrml.util.ObservableList<T>, where "primitive" type
-     * is determined by TypeConstraint's Type.
-     * 
-     * Note: If the TypeConstraint's Type is "Model", then T is either
-     * org.wrml.Model or a subclass T determined by an added SchemaConstraint's
-     * Schema class
-     */
-    List("List"),
-
-    /**
-     * In Java, maps to: either long or java.lang.Long, dependent on Field's
-     * isRequired flag's value.
-     */
-    Long("Long"),
-
-    /**
-     * In Java, maps to: org.wrml.util.ObservableMap<K,V>, where "param" type
-     * is determined by TypeConstraints.
-     */
-    Map("Map"),
+    Native,
 
     /**
      * In Java, maps to: org.wrml.Model or a subclass T determined by
      * SchemaConstraint's Schema class.
      */
-    Model("Model"),
+    Model,
 
     /**
-     * In Java, maps to: java.lang.Object
+     * In Java, maps to: boolean
      */
-    Native("Native"),
+    Boolean,
 
     /**
      * In Java, maps to: java.lang.String or T, where T is determined by a
      * configuration-based mapping of TextSyntaxConstraint to
      * StringTransformer<T>
      */
-    Text("Text");
+    Text,
 
-    private final String _Name;
+    /**
+     * In Java, maps to: org.wrml.util.ObservableList<T>, where "primitive" type
+     * is determined by TypeParameterConstraint's Type.
+     * 
+     * Note: If the TypeParameterConstraint's Type is "Model", then T is either
+     * org.wrml.Model or a subclass T determined by an added SchemaConstraint's
+     * Schema class
+     */
+    List,
 
-    private Type(final String name) {
-        _Name = name;
-    }
+    /**
+     * In Java, maps to: org.wrml.util.ObservableMap<K,V>, where "param" type
+     * is determined by TypeConstraints.
+     */
+    Map,
 
-    public String getName() {
-        return _Name;
-    }
+    /**
+     * In Java, maps to: Enum<T>, where T is determined by
+     * ChoiceMenuConstraint's ChoiceMenu.
+     */
+    Choice,
 
-    @Override
-    public String toString() {
-        return getName();
-    }
+    /**
+     * In Java, maps to: either int or java.lang.Integer, dependent on Field's
+     * isRequired flag's value.
+     */
+    Integer,
+
+    /**
+     * In Java, maps to: org.joda.time.DateTime
+     */
+    DateTime,
+
+    /**
+     * In Java, maps to: either long or java.lang.Long, dependent on Field's
+     * isRequired flag's value.
+     */
+    Long,
+
+    /**
+     * In Java, maps to: either double or java.lang.Double, dependent on Field's
+     * isRequired flag's value.
+     */
+    Double;
+
+
 
 }

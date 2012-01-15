@@ -31,3 +31,19 @@ public abstract class AbstractFormatter implements Formatter {
     }
 
 }
+
+// TODO: Provide some base support
+/*
+ * final Transformer<URI, MediaType> schemaIdToMediaTypeTransformer =
+ * context.getSchemaIdToMediaTypeTransformer();
+ * final Transformer<URI, Class<?>> schemaIdToClassTransformer =
+ * context.getSchemaIdToClassTransformer();
+ * 
+ * URI schemaId = null;
+ * 
+ * schemaId = schemaIdToMediaTypeTransformer.bToA(responseType);
+ * if (schemaId == null) {
+ * // Default the schema to Document
+ * schemaId = schemaIdToClassTransformer.bToA(Document.class);
+ * }
+ */

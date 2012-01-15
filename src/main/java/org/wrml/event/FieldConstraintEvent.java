@@ -19,28 +19,28 @@ package org.wrml.event;
 import java.util.EventObject;
 
 import org.wrml.Model;
-import org.wrml.util.validator.FieldValidationResult;
-import org.wrml.util.validator.FieldValidator;
+import org.wrml.util.enforcer.EnforcementResult;
+import org.wrml.util.enforcer.FieldConstraintEnforcer;
 
 public class FieldConstraintEvent extends EventObject {
 
     private static final long serialVersionUID = 8426522526071747315L;
 
-    private final FieldValidator _FieldValidator;
-    private final FieldValidationResult _FieldValidationResult;
+    private final FieldConstraintEnforcer _FieldConstraintEnforcer;
+    private final EnforcementResult _EnforcementResult;
 
-    public FieldConstraintEvent(Model source, FieldValidator fieldValidator, FieldValidationResult fieldValidationResult) {
+    public FieldConstraintEvent(Model source, FieldConstraintEnforcer fieldConstraintEnforcer, EnforcementResult enforcementResult) {
         super(source);
-        _FieldValidator = fieldValidator;
-        _FieldValidationResult = fieldValidationResult;
+        _FieldConstraintEnforcer = fieldConstraintEnforcer;
+        _EnforcementResult = enforcementResult;
     }
 
-    public FieldValidationResult getValidationResult() {
-        return _FieldValidationResult;
+    public EnforcementResult getValidationResult() {
+        return _EnforcementResult;
     }
 
-    public FieldValidator getValidator() {
-        return _FieldValidator;
+    public FieldConstraintEnforcer getValidator() {
+        return _FieldConstraintEnforcer;
     }
 
 }

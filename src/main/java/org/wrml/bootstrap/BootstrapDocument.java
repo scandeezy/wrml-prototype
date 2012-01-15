@@ -62,8 +62,9 @@ public class BootstrapDocument<D extends Document> extends BootstrapModel<D> {
         return _SecondsToLive;
     }
 
+    @SuppressWarnings("unchecked")
     public final D getSelf() {
-        return getStaticInterface();
+        return (D) getStaticInterface();
     }
 
     public final boolean isReadOnly() {

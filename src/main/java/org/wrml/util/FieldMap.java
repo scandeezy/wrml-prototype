@@ -59,8 +59,8 @@ public abstract class FieldMap implements Map<String, Object> {
         return getFieldNames();
     }
 
-    public Object put(final String fieldName, Object fieldValue) {
-        return setFieldValue(fieldName, fieldValue);
+    public Object put(final String fieldName, Object newValue) {
+        return setFieldValue(fieldName, newValue);
     }
 
     @SuppressWarnings("unchecked")
@@ -93,10 +93,17 @@ public abstract class FieldMap implements Map<String, Object> {
         for (final String fieldName : fieldNames) {
 
             if (!isReadOnly(fieldName)) {
-                put(fieldName, getDefaultValue(fieldName));
+
+                Object currentValue = get(fieldName);
+
+                if (currentValue instanceof Collection) {
+                    ((Collection) currentValue).clear();
+                }
+                else {
+                    put(fieldName, getDefaultValue(fieldName));
+                }
             }
         }
-
     }
 
     protected final <V> V getDefaultValue(final String fieldName) {
@@ -122,14 +129,7 @@ public abstract class FieldMap implements Map<String, Object> {
     protected abstract <V> Class<V> getFieldType(final String fieldName);
 
     protected <V> V getFieldValue(final String fieldName) {
-        V fieldValue = getRawFieldValue(fieldName);
-
-        if (fieldValue == null) {
-            final Class<V> fieldType = getFieldType(fieldName);
-            fieldValue = getDefaultValue(fieldType);
-        }
-
-        return fieldValue;
+        return getRawFieldValue(fieldName);
     }
 
     protected abstract <V> V getRawFieldValue(final String fieldName);
@@ -142,42 +142,37 @@ public abstract class FieldMap implements Map<String, Object> {
 
     protected void setFields(Map<String, Object> fields) {
         for (final String fieldName : fields.keySet()) {
-            put(fieldName, fields.get(fieldName));
+            setFieldValue(fieldName, fields.get(fieldName));
         }
     }
 
     @SuppressWarnings("unchecked")
-    protected final <V> V setFieldValue(final String fieldName, final V fieldValue) {
+    protected final <V> V setFieldValue(final String fieldName, V newValue) {
 
         final V oldFieldValue = getFieldValue(fieldName);
-        V newFieldValue = fieldValue;
 
-        if ((oldFieldValue == null) && (newFieldValue == null)) {
+        if ((oldFieldValue == null) && (newValue == null)) {
             return null;
         }
 
-        if (((oldFieldValue != null) && oldFieldValue.equals(newFieldValue))
-                || ((newFieldValue != null) && newFieldValue.equals(oldFieldValue))) {
+        if (((oldFieldValue != null) && oldFieldValue.equals(newValue))
+                || ((newValue != null) && newValue.equals(oldFieldValue))) {
 
             return oldFieldValue;
         }
 
-        if (newFieldValue == null) {
-            final Class<V> fieldType = getFieldType(fieldName);
-            newFieldValue = (V) getDefaultValue(fieldType);
-        }
-        else if (newFieldValue instanceof Boolean) {
-            final Boolean booleanFieldValue = (Boolean) newFieldValue;
-            newFieldValue = (V) (booleanFieldValue.booleanValue() ? Boolean.TRUE : Boolean.FALSE);
-        }
-
-        return (V) setRawFieldValue(fieldName, newFieldValue);
+        return (V) setRawFieldValue(fieldName, newValue);
     }
 
     protected abstract <V> V setRawFieldValue(final String fieldName, final V fieldValue);
 
-    private <V> V getDefaultValue(Class<V> fieldType) {
-        return TypeSystem.instance.getWrmlDefaultValue(fieldType);
+    protected final <V> V getDefaultValue(Class<V> fieldType) {
+        return TypeSystem.instance.getDefaultValue(fieldType);
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + " { fieldNames : [ " + getFieldNames() + " ] }";
     }
 
 }

@@ -14,13 +14,9 @@
  * limitations under the License.
  */
 
-package org.wrml.util.validator;
+package org.wrml.model.schema;
 
-import org.wrml.Model;
-import org.wrml.model.schema.Field;
-
-public interface FieldValidator {
-
-    public FieldValidationResult validateFieldValue(Model model, Field field, Object newValue);
+public interface TypeParameterConstraint<T extends Constrainable<T>> extends Typed, Constraint<T> {
+    
 
 }

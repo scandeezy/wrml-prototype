@@ -16,14 +16,6 @@
 
 package org.wrml.model.schema;
 
-import java.net.URI;
-
-public interface SchemaConstraint extends Constraint {
-
-    public Schema getSchema();
-
-    public URI getSchemaId();
-
-    public URI setSchemaId(URI menuId);
+public interface SchemaTypeParameterConstraint extends TypeParameterConstraint<Schema> {
 
 }

@@ -18,7 +18,6 @@ package org.wrml.model.schema;
 
 import org.wrml.Model;
 
-//Generated from a Web Resource Schema
 public interface Typed extends Model {
 
     public Type getType();

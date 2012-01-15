@@ -19,6 +19,7 @@ package org.wrml;
 import java.net.URI;
 
 import org.wrml.model.Document;
+import org.wrml.model.config.Config;
 import org.wrml.model.schema.Schema;
 import org.wrml.runtime.Context;
 import org.wrml.service.Service;
@@ -32,7 +33,10 @@ public class App {
     public static void main(String[] args) throws Throwable {
 
         // Create a context for this simple test application
-        final Context context = new Context();
+
+        Config config = createConfig(args);
+
+        final Context context = new Context(config);
 
         // Get the media type: application/wrml; schema="http://.../org/wrml/model/schema/Schema"
         final MediaType schemaMediaType = context.getMediaTypeToClassTransformer().bToA(Schema.class);
@@ -98,7 +102,7 @@ public class App {
          * Schemas (like WRML's Class<Class<?>>).
          */
 
-        final Schema staticMetaSchemaModel = dynamicMetaSchemaModel.getStaticInterface();
+        final Schema staticMetaSchemaModel = (Schema) dynamicMetaSchemaModel.getStaticInterface();
 
         System.out.println("Static name: " + staticMetaSchemaModel.getName());
         System.out.println("Static id: " + staticMetaSchemaModel.getId());
@@ -133,17 +137,31 @@ public class App {
         System.out.println("Dynamic description: " + dynamicDocumentSchemaModel.getFieldValue("description"));
         System.out.println("Dynamic baseSchemaIds: " + dynamicDocumentSchemaModel.getFieldValue("baseSchemaIds"));
         System.out.println("Dynamic fields: " + dynamicDocumentSchemaModel.getFieldValue("fields"));
-        
+
         // Get the static interface
-        final Schema staticDocumentSchemaModel = dynamicDocumentSchemaModel.getStaticInterface();
+        final Schema staticDocumentSchemaModel = (Schema) dynamicDocumentSchemaModel.getStaticInterface();
 
         // Use the static interface
         System.out.println("Static name: " + staticDocumentSchemaModel.getName());
         System.out.println("Static id: " + staticDocumentSchemaModel.getId());
         System.out.println("Static description: " + staticDocumentSchemaModel.getDescription());
         System.out.println("Static baseSchemaIds: " + staticDocumentSchemaModel.getBaseSchemaIds());
-        
+
         System.out.println("Static fields: " + staticDocumentSchemaModel.getFields());
     }
 
+    private static Config createConfig(String[] args) {
+
+        /*
+         * TODO: How should we handle config.
+         * 
+         * I would like it to be a model.
+         * 
+         * Since config is needed very early in any WRML program, I would assume
+         * that Config model instances would need to be backed by a static class
+         * (for bootstrapping).
+         */
+
+        return null;
+    }
 }

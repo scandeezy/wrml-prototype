@@ -14,8 +14,11 @@
  * limitations under the License.
  */
 
-package org.wrml.model.schema;
+package org.wrml.model.config;
 
-public interface TypeConstraint extends Typed, Constraint {
+import org.wrml.model.Document;
+import org.wrml.model.Versioned;
+
+public interface Config extends Versioned, Document {
 
 }

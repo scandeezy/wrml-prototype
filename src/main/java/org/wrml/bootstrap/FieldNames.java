@@ -30,12 +30,18 @@ public class FieldNames {
     }
 
     public static enum Field {
-        constraintIds,
         defaultValue,
         hidden,
         local,
         readOnly,
         required;
+    }
+
+    public static enum Link {
+        href,
+        relId,
+        requestTypes,
+        responseTypes;
     }
 
     public static enum Named {
@@ -48,9 +54,12 @@ public class FieldNames {
 
     public static enum Schema {
         baseSchemaIds,
-        constraintIds,
         fields,
         links;
+    }
+
+    public static enum Constrainable {
+        constraints;
     }
 
     public static enum Titled {

@@ -22,7 +22,7 @@ import java.util.Map;
 import org.wrml.Model;
 import org.wrml.util.MediaType;
 
-final class LinkPrototype {
+public final class LinkPrototype {
 
     private final URI _Rel;
     private final MediaType _ResponseMediaType;

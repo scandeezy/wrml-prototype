@@ -17,7 +17,7 @@
 package org.wrml.bootstrap;
 
 import java.net.URI;
-import java.util.SortedMap;
+import java.util.List;
 
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
@@ -37,63 +37,63 @@ public class FieldBootstrapSchema extends BootstrapSchema {
         // Fields
         //
 
-        final SortedMap<String, BootstrapField> fields = getBootstrapFields();
+        final List<BootstrapField> fields = getBootstrapFields();
         String fieldName = null;
 
-        // constraintIds
-        fieldName = FieldNames.Field.constraintIds.toString();
-        final BootstrapField constraintIdsField = createBootstrapField(fieldName, Type.List);
-        fields.put(fieldName, constraintIdsField);
+        // constraints
+        fieldName = FieldNames.Constrainable.constraints.toString();
+        final BootstrapField constraintsField = createBootstrapField(fieldName, Type.List);
+        fields.add(constraintsField);
 
         // defaultValue
         fieldName = FieldNames.Field.defaultValue.toString();
         final BootstrapField defaultValueField = createBootstrapField(fieldName, Type.Native);
-        fields.put(fieldName, defaultValueField);
+        fields.add(defaultValueField);
 
         // hidden
         fieldName = FieldNames.Field.hidden.toString();
         final BootstrapField hiddenField = createBootstrapField(fieldName, Type.Boolean);
-        fields.put(fieldName, hiddenField);
+        fields.add(hiddenField);
 
         // readOnly
         fieldName = FieldNames.Field.readOnly.toString();
         final BootstrapField readOnlyField = createBootstrapField(fieldName, Type.Boolean);
-        fields.put(fieldName, readOnlyField);
+        fields.add(readOnlyField);
 
         // required
         fieldName = FieldNames.Field.required.toString();
         final BootstrapField requiredField = createBootstrapField(fieldName, Type.Boolean);
-        fields.put(fieldName, requiredField);
+        fields.add(requiredField);
 
         // local
         fieldName = FieldNames.Field.local.toString();
         final BootstrapField localField = createBootstrapField(fieldName, Type.Boolean);
-        fields.put(fieldName, localField);
+        fields.add(localField);
 
         // name
         fieldName = FieldNames.Named.name.toString();
         final BootstrapField nameField = createBootstrapField(fieldName, Type.Text);
-        fields.put(fieldName, nameField);
+        fields.add(nameField);
 
         // type
         fieldName = FieldNames.Typed.type.toString();
         final BootstrapField typeField = createBootstrapField(fieldName, Type.Choice);
-        fields.put(fieldName, typeField);
+        fields.add(typeField);
 
         // title
         fieldName = FieldNames.Titled.title.toString();
         final BootstrapField titleField = createBootstrapField(fieldName, Type.Text);
-        fields.put(fieldName, titleField);
+        fields.add(titleField);
 
         // description
         fieldName = FieldNames.Descriptive.description.toString();
         final BootstrapField desctiptionField = createBootstrapField(fieldName, Type.Text);
-        fields.put(fieldName, desctiptionField);
+        fields.add(desctiptionField);
 
         // owner
         fieldName = FieldNames.Owned.owner.toString();
         final BootstrapField ownerField = createBootstrapField(fieldName, Type.Model);
-        fields.put(fieldName, ownerField);
+        fields.add(ownerField);
 
     }
 

@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-package org.wrml.util.validator;
+package org.wrml.util.enforcer;
 
-public interface FieldValidationResult {
+import org.wrml.Model;
+import org.wrml.model.schema.Constraint;
+import org.wrml.model.schema.Schema;
 
-    // TODO: Define interface
-    // success/failure
-    // oldvalue new value
+public interface SchemaConstraintEnforcer {
+
+    public EnforcementResult enforceConstraint(Constraint<Schema> constraint, Model model);
+
 }

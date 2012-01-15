@@ -17,11 +17,10 @@
 package org.wrml.bootstrap;
 
 import java.net.URI;
-import java.util.SortedMap;
+import java.util.List;
 
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
-import org.wrml.util.observable.ObservableList;
 
 public class SchemaBootstrapSchema extends DocumentBootstrapSchema {
 
@@ -43,50 +42,50 @@ public class SchemaBootstrapSchema extends DocumentBootstrapSchema {
         // Base Schemas
         //
 
-        final ObservableList<URI> baseSchemaIds = getBaseSchemaIds();
+        final List<URI> baseSchemaIds = getBaseSchemaIds();
         baseSchemaIds.add(getSchemaId(DOCUMENT_SCHEMA_FULL_NAME));
 
         //
         // Fields
         //
 
-        final SortedMap<String, BootstrapField> fields = getBootstrapFields();
+        final List<BootstrapField> fields = getBootstrapFields();
         String fieldName = null;
 
         // baseSchemaIds
         fieldName = FieldNames.Schema.baseSchemaIds.toString();
         final BootstrapField baseSchemaIdsField = createBootstrapField(fieldName, Type.List);
-        fields.put(fieldName, baseSchemaIdsField);
+        fields.add(baseSchemaIdsField);
 
-        // constraintIds
-        fieldName = FieldNames.Schema.constraintIds.toString();
-        final BootstrapField constraintIdsField = createBootstrapField(fieldName, Type.List);
-        fields.put(fieldName, constraintIdsField);
+        // constraints
+        fieldName = FieldNames.Constrainable.constraints.toString();
+        final BootstrapField constraintsField = createBootstrapField(fieldName, Type.List);
+        fields.add(constraintsField);
 
         // description
         fieldName = FieldNames.Descriptive.description.toString();
         final BootstrapField descriptionField = createBootstrapField(fieldName, Type.Text);
-        fields.put(fieldName, descriptionField);
+        fields.add(descriptionField);
 
         // fields
         fieldName = FieldNames.Schema.fields.toString();
-        final BootstrapField fieldsField = createBootstrapField(fieldName, Type.Map);
-        fields.put(fieldName, fieldsField);
-
+        final BootstrapField fieldsField = createBootstrapField(fieldName, Type.List);
+        fields.add(fieldsField);
+        
         // links
         fieldName = FieldNames.Schema.links.toString();
         final BootstrapField linksField = createBootstrapField(fieldName, Type.List);
-        fields.put(fieldName, linksField);
+        fields.add(linksField);
 
         // name
         fieldName = FieldNames.Named.name.toString();
         final BootstrapField nameField = createBootstrapField(fieldName, Type.Text);
-        fields.put(fieldName, nameField);
-
+        fields.add(nameField);
+        
         // version
         fieldName = FieldNames.Versioned.version.toString();
         final BootstrapField versionField = createBootstrapField(fieldName, Type.Long);
-        fields.put(fieldName, versionField);
+        fields.add(versionField);
     }
 
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.model.relation;
+package org.wrml.model.schema;
 
 import org.wrml.model.Descriptive;
 import org.wrml.model.Document;
@@ -37,12 +37,7 @@ import org.wrml.util.observable.ObservableList;
  * Note: This is a metadata class - instances should be edited with tools and
  * persisted for reuse.
  */
-//Generated from a Web Resource Schema
 public interface LinkRelation extends Named, Titled, Versioned, Descriptive, Document {
-
-    // Added to Field
-    //     Name: name 
-    //     Constraints: TextSyntax - Mixed-Lower Case
 
     public Method getMethod();
 
@@ -51,16 +46,4 @@ public interface LinkRelation extends Named, Titled, Versioned, Descriptive, Doc
     public ObservableList<MediaType> getResponseMediaTypes();
 
     public Method setMethod(Method method);
-
-    /*
-     * TODO: Need to move logic elsewhere since this class is becoming a
-     * generated wrml object. Suggest move it to the Context class as utility
-     * functions available to the Model.
-     * 
-     * public boolean isGeneratableResponseSchema(URI responseModelSchemaId) {
-     * // TODO Auto-generated method stub return false; }
-     * 
-     * public boolean isSupportedRequestSchema(URI requestModelSchemaId) { //
-     * TODO Auto-generated method stub return false; }
-     */
 }

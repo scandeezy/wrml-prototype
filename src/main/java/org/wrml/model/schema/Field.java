@@ -16,13 +16,9 @@
 
 package org.wrml.model.schema;
 
-import java.net.URI;
-
 import org.wrml.model.Descriptive;
 import org.wrml.model.Named;
-import org.wrml.model.Owned;
 import org.wrml.model.Titled;
-import org.wrml.util.observable.ObservableList;
 
 /**
  * A web resource schema's field. Conceptually a field is a typed data slot,
@@ -31,9 +27,7 @@ import org.wrml.util.observable.ObservableList;
  * 
  */
 // Generated from a Web Resource Schema
-public interface Field extends Typed, Named, Titled, Descriptive, Owned<Schema> {
-
-    public ObservableList<URI> getConstraintIds();
+public interface Field extends Named, Titled, Descriptive, Typed, SchemaMember<Field> {
 
     public Object getDefaultValue();
 

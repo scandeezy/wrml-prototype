@@ -18,12 +18,10 @@ package org.wrml.model.schema;
 
 import java.net.URI;
 
-import org.wrml.model.Owned;
-import org.wrml.model.relation.LinkRelation;
 import org.wrml.util.MediaType;
 import org.wrml.util.observable.ObservableList;
 
-public interface Link extends Owned<Schema> {
+public interface Link extends SchemaMember<Link> {
 
     public URI getHref();
 
@@ -31,28 +29,10 @@ public interface Link extends Owned<Schema> {
 
     public URI getRelId();
 
-    // Generated from Field
-    //     Name: requestTypes 
-    //     Value: List[Text[MediaType]]
     public ObservableList<MediaType> getRequestTypes();
 
-    // Generated from Field
-    //     Name: responseTypes 
-    //     Value: List[Text[MediaType]]    
     public ObservableList<MediaType> getResponseTypes();
 
-    public String getStateExpression();
-
     public URI setHref(URI href);
-
-    /**
-     * 
-     * 
-     * @param stateExpression
-     *            The (optional) boolean expression that can be evaluated to
-     *            determine the state of a link.
-     * @return
-     */
-    public String setStateExpression(String stateExpression);
 
 }

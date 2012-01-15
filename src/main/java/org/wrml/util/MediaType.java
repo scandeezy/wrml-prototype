@@ -145,11 +145,11 @@ public class MediaType implements Comparable<MediaType> {
     private String _String;
     private final boolean _IsWrml;
 
-    public MediaType(String type, String subtype) {
+    MediaType(String type, String subtype) {
         this(type, subtype, null);
     }
 
-    public MediaType(String type, String subtype, Map<String, String> parameters) {
+    MediaType(String type, String subtype, Map<String, String> parameters) {
         _Type = type.toLowerCase();
         _Subtype = subtype.toLowerCase();
 
@@ -167,7 +167,7 @@ public class MediaType implements Comparable<MediaType> {
     public final int compareTo(final MediaType other) {
         return ALPHA_ORDER.compare(this, other);
     }
-
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -201,7 +201,7 @@ public class MediaType implements Comparable<MediaType> {
         else if (!_Subtype.equals(other._Subtype)) {
             return false;
         }
-
+        
         if (_Parameters == null) {
             if (other._Parameters != null) {
                 return false;
@@ -274,4 +274,6 @@ public class MediaType implements Comparable<MediaType> {
         return _String;
     }
 
+        
+    
 }

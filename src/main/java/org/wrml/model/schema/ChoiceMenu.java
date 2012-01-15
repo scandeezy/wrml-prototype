@@ -21,17 +21,15 @@ import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Versioned;
 import org.wrml.util.observable.ObservableList;
+import org.wrml.util.observable.ObservableMap;
 
-// Generated from a Web Resource Schema
 public interface ChoiceMenu extends Named, Versioned, Descriptive, Document {
-
-    // Added to Field
-    //     Name: name 
-    //     Constraints: TextSyntax - Mixed-Upper Case
 
     public int getDefaultChoiceIndex();
 
     public ObservableList<String> getItems();
+
+    public ObservableMap<String, String> getItemComment();
 
     public int setDefaultChoiceIndex(int defaultChoiceIndex);
 

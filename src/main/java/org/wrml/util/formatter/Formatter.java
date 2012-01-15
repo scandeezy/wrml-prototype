@@ -16,15 +16,13 @@
 
 package org.wrml.util.formatter;
 
-import java.net.URI;
-
 import org.wrml.Model;
 import org.wrml.runtime.Context;
 import org.wrml.util.http.Message;
 
 public interface Formatter {
 
-    public <M extends Model> M read(Context context, Message requestMessage, URI schemaId, Message responseMessage) throws Exception;
+    public <M extends Model> M read(Context context, Message requestMessage, Message responseMessage) throws Exception;
 
-    public void write(Context context, Message requestMessage, URI schemaId, Model requestModel) throws Exception;
+    public void write(Context context, Message requestMessage, Model model) throws Exception;
 }

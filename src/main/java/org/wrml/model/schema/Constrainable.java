@@ -14,16 +14,13 @@
  * limitations under the License.
  */
 
-package org.wrml.util.transformer;
+package org.wrml.model.schema;
 
-public class PassthroughTransformer<T> implements ConstantTransformation<T, T> {
+import org.wrml.Model;
+import org.wrml.util.observable.ObservableList;
 
-    public T aToB(T aValue) {
-        return aValue;
-    }
+public interface Constrainable<T extends Constrainable<T>> extends Model {
 
-    public T bToA(T bValue) {
-        return bValue;
-    }
+    public ObservableList<Constraint<T>> getConstraints();
 
 }

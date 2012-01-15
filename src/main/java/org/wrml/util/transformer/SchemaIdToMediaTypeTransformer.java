@@ -21,28 +21,28 @@ import java.net.URI;
 import org.wrml.runtime.Context;
 import org.wrml.util.MediaType;
 
-public class SchemaIdToMediaTypeTransformer extends AbstractTransformer<URI, MediaType> {
+public class SchemaIdToMediaTypeTransformer extends ConstantTransformer<URI, MediaType> {
 
     public SchemaIdToMediaTypeTransformer(Context context) {
         super(context);
     }
 
-    public MediaType aToB(URI aValue) {
-        if (aValue == null) {
+    public MediaType aToB(URI schemaId) {
+        if (schemaId == null) {
             return null;
         }
 
-        final String schemaIdString = getContext().getUriToStringTransformer().aToB(aValue);
+        final String schemaIdString = getContext().getUriToStringTransformer().aToB(schemaId);
         final String mediaTypeString = MediaType.createWrmlMediaTypeString(schemaIdString, null);
         return getContext().getMediaTypeToStringTransformer().bToA(mediaTypeString);
     }
 
-    public URI bToA(MediaType bValue) {
-        if (bValue == null) {
+    public URI bToA(MediaType mediaType) {
+        if (mediaType == null) {
             return null;
         }
 
-        return getContext().getUriToStringTransformer().bToA(bValue.getSchemaIdString());
+        return getContext().getUriToStringTransformer().bToA(mediaType.getSchemaIdString());
     }
 
 }

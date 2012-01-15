@@ -18,31 +18,28 @@ package org.wrml.util.transformer;
 
 import java.net.URI;
 
-import org.wrml.runtime.Context;
-
-public class SchemaIdToFullNameTransformer extends AbstractTransformer<URI, String> {
+public class SchemaIdToFullNameTransformer implements ConstantTransformation<URI, String> {
 
     public final URI _BaseUri;
 
-    public SchemaIdToFullNameTransformer(Context context, URI baseUri) {
-        super(context);
+    public SchemaIdToFullNameTransformer(URI baseUri) {
         _BaseUri = baseUri;
     }
 
-    public String aToB(URI aValue) {
-        if (aValue == null) {
+    public String aToB(URI schemaId) {
+        if (schemaId == null) {
             return null;
         }
 
-        return getBaseUri().relativize(aValue).toString().replace('/', '.');
+        return getBaseUri().relativize(schemaId).toString().replace('/', '.');
     }
 
-    public URI bToA(String bValue) {
-        if (bValue == null) {
+    public URI bToA(String schemaFullName) {
+        if (schemaFullName == null) {
             return null;
         }
 
-        return getBaseUri().resolve(bValue.toString().replace('.', '/'));
+        return getBaseUri().resolve(schemaFullName.toString().replace('.', '/'));
     }
 
     public URI getBaseUri() {

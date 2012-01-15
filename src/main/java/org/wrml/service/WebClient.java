@@ -38,7 +38,6 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import org.wrml.Model;
-import org.wrml.model.Document;
 import org.wrml.model.format.Format;
 import org.wrml.runtime.Context;
 import org.wrml.util.MediaType;
@@ -143,28 +142,22 @@ public class WebClient extends ServiceMap {
         // Send the request message to get the response message
         final Message responseMessage = sendRequestMessage(requestMessage);
 
+        final MediaType actualResponseType = responseMessage.getEntity().getHeaders().getContentType();
+
         final Entity responseEntity = responseMessage.getEntity();
         final Body responseBody = responseEntity.getBody();
         final InputStream responseInputStream = responseBody.getInputStream();
 
-        final Transformer<URI, MediaType> schemaIdToMediaTypeTransformer = context.getSchemaIdToMediaTypeTransformer();
-        final Transformer<URI, Class<?>> schemaIdToClassTransformer = context.getSchemaIdToClassTransformer();
-
-        URI schemaId = null;
-        if (responseType.isWrml()) {
-            schemaId = schemaIdToMediaTypeTransformer.bToA(responseType);
-            if (schemaId == null) {
-                // Default the schema to Document
-                schemaId = schemaIdToClassTransformer.bToA(Document.class);
-            }
+        if (actualResponseType.isWrml()) {
 
             // Default the format if need be
-            final MediaType formatMediaType = (responseType != null) ? responseType : getDefaultFormatMediaType();
+            final MediaType formatMediaType = (actualResponseType != null) ? actualResponseType
+                    : getDefaultFormatMediaType();
             final Formatter formatter = getFormatter(formatMediaType);
 
             Model model = null;
             try {
-                model = formatter.read(context, requestMessage, schemaId, responseMessage);
+                model = formatter.read(context, requestMessage, responseMessage);
             }
             catch (final Exception e) {
                 // TODO Auto-generated catch block
@@ -372,10 +365,13 @@ public class WebClient extends ServiceMap {
 
         InputStream inputStream = null;
 
+        MediaType responseMediaType = null;
         try {
 
             final HttpResponse response = _HttpClient.execute(request);
             final HttpEntity entity = response.getEntity();
+            responseMediaType = getContext().getMediaTypeToStringTransformer().bToA(entity.getContentType().getValue());
+
             if (entity != null) {
                 inputStream = entity.getContent();
             }
@@ -397,7 +393,11 @@ public class WebClient extends ServiceMap {
 
         // Create the response message
         final Message responseMessage = createMessage(MessageType.RESPONSE, statusLine);
-        responseMessage.getEntity().getBody().setInputStream(inputStream);
+        Entity responseEntity = responseMessage.getEntity();
+
+        responseEntity.getHeaders().setContentType(responseMediaType);
+        responseEntity.getBody().setInputStream(inputStream);
+
         return responseMessage;
     }
 }
@@ -469,6 +469,7 @@ class DefaultEntity implements Entity {
 class DefaultHeaders implements Headers {
 
     private AcceptHeader _AcceptHeader;
+    private MediaType _ContentType;
 
     public AcceptHeader getAcceptHeader() {
         return _AcceptHeader;
@@ -476,6 +477,14 @@ class DefaultHeaders implements Headers {
 
     public void setAcceptHeader(AcceptHeader acceptHeader) {
         _AcceptHeader = acceptHeader;
+    }
+
+    public MediaType getContentType() {
+        return _ContentType;
+    }
+
+    public void setContentType(MediaType contentType) {
+        _ContentType = contentType;
     }
 
 }

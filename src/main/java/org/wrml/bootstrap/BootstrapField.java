@@ -20,6 +20,7 @@ import java.net.URI;
 import java.util.ArrayList;
 
 import org.wrml.TypeSystem;
+import org.wrml.model.schema.Constraint;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Schema;
 import org.wrml.model.schema.Type;
@@ -47,9 +48,8 @@ public class BootstrapField extends BootstrapModel<Field> {
     private boolean _ReadOnly;
     private boolean _Required;
     private boolean _Local;
-    private final ObservableList<URI> _ConstraintIds;
+    private final ObservableList<Constraint<Field>> _Constraints;
 
-    @SuppressWarnings("unchecked")
     public BootstrapField(Context context, BootstrapSchema owner, final String name, final Type type) {
         super(context, Field.class);
 
@@ -57,14 +57,14 @@ public class BootstrapField extends BootstrapModel<Field> {
         _Type = type;
         _Name = name;
 
-        _ConstraintIds = Observables.observableList(new ArrayList<URI>());
+        _Constraints = Observables.observableList(new ArrayList<Constraint<Field>>());
 
-        final TypeSystem typeSystem = TypeSystem.instance;
-        _DefaultValue = (Object) typeSystem.getWrmlDefaultValue(typeSystem.getJavaType(type));
+        _DefaultValue = (Object) TypeSystem.instance.getDefaultValue(TypeSystem.instance.getTypeToClassTransformer()
+                .aToB(type));
     }
 
-    public final ObservableList<URI> getConstraintIds() {
-        return _ConstraintIds;
+    public final ObservableList<Constraint<Field>> getConstraints() {
+        return _Constraints;
     }
 
     public final Schema getDeclaredSchema() {
@@ -90,7 +90,7 @@ public class BootstrapField extends BootstrapModel<Field> {
     }
 
     public final Schema getOwner() {
-        return _Owner.getStaticInterface();
+        return (Schema) _Owner.getStaticInterface();
     }
 
     public final URI getOwnerId() {
@@ -167,6 +167,11 @@ public class BootstrapField extends BootstrapModel<Field> {
         final String oldTitle = _Title;
         _Title = title;
         return oldTitle;
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + " { name : \"" + _Name + "\", type : \"" + _Type + "\" }";
     }
 
 }

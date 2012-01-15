@@ -69,7 +69,9 @@ public interface Model extends Serializable {
 
     public List<URI> getEmbeddedLinkRelationIds();
 
-    public <V> V getFieldValue(String fieldName);
+    public Object getFieldValue(String fieldName);
+
+    public MediaType getMediaType();
 
     public ResourceTemplate getResourceTemplate();
 
@@ -79,7 +81,7 @@ public interface Model extends Serializable {
 
     public URI getSchemaId();
 
-    public <M extends Model> M getStaticInterface();
+    public Model getStaticInterface();
 
     public void removeEventListener(ModelEventListener listener);
 
@@ -91,6 +93,6 @@ public interface Model extends Serializable {
 
     public void setFieldToDefaultValue(String fieldName);
 
-    public <V> V setFieldValue(String fieldName, V fieldValue);
+    public Object setFieldValue(String fieldName, Object fieldValue);
 
 }

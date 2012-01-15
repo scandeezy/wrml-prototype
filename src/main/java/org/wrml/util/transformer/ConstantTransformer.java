@@ -16,14 +16,13 @@
 
 package org.wrml.util.transformer;
 
-public class PassthroughTransformer<T> implements ConstantTransformation<T, T> {
+import org.wrml.runtime.Context;
 
-    public T aToB(T aValue) {
-        return aValue;
-    }
+public abstract class ConstantTransformer<A, B> extends AbstractTransformer<A, B> implements
+        ConstantTransformation<A, B> {
 
-    public T bToA(T bValue) {
-        return bValue;
+    public ConstantTransformer(final Context context) {
+        super(context);
     }
 
 }

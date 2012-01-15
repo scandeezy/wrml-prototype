@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package org.wrml.util.transformer;
+package org.wrml.model.schema;
 
-public class PassthroughTransformer<T> implements ConstantTransformation<T, T> {
+import org.wrml.model.Owned;
 
-    public T aToB(T aValue) {
-        return aValue;
-    }
-
-    public T bToA(T bValue) {
-        return bValue;
-    }
+public interface SchemaMember<M extends SchemaMember<M>> extends Constrainable<M>, Owned<Schema> {
 
 }

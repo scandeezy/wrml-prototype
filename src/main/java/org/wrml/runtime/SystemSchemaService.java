@@ -18,10 +18,14 @@ package org.wrml.runtime;
 
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.wrml.Model;
 import org.wrml.bootstrap.FieldBootstrapSchema;
+import org.wrml.bootstrap.FieldNames;
 import org.wrml.bootstrap.SchemaBootstrapSchema;
+import org.wrml.model.schema.Field;
 import org.wrml.service.ProxyService;
 import org.wrml.service.Service;
 import org.wrml.util.MediaType;
@@ -32,13 +36,14 @@ import org.wrml.util.transformer.Transformer;
 /**
  * The WRML equivalent of the SystemClassLoader.
  */
-public class SystemSchemaService extends ProxyService implements Service {
+final class SystemSchemaService extends ProxyService implements Service {
 
     public static final String SCHEMA_NAMESPACE = "org.wrml.model.schema";
 
     public static final String SCHEMA_SCHEMA_NAME = "Schema";
     public static final String FIELD_SCHEMA_NAME = "Field";
 
+    public static final String MODEL_SCHEMA_FULL_NAME = "org.wrml.Model";
     public static final String SCHEMA_SCHEMA_FULL_NAME = SCHEMA_NAMESPACE + "." + SCHEMA_SCHEMA_NAME;
     public static final String FIELD_SCHEMA_FULL_NAME = SCHEMA_NAMESPACE + "." + FIELD_SCHEMA_NAME;
 
@@ -48,14 +53,14 @@ public class SystemSchemaService extends ProxyService implements Service {
     private Prototype _SchemaBootstrapPrototype;
     private Prototype _FieldBootstrapPrototype;
 
-    private final ObservableMap<URI, Prototype> _Prototypes;
+    private final ObservableMap<MediaType, Prototype> _Prototypes;
 
-    public SystemSchemaService(Context context, Service originService) {
+    SystemSchemaService(Context context, Service originService) {
         super(context, originService);
 
         // TODO: Add ClassLoader segregated by API for "reloadablilty"
 
-        _Prototypes = Observables.observableMap(new HashMap<URI, Prototype>());
+        _Prototypes = Observables.observableMap(new HashMap<MediaType, Prototype>());
 
         final Transformer<URI, String> idTransformer = getIdTransformer();
 
@@ -113,38 +118,46 @@ public class SystemSchemaService extends ProxyService implements Service {
         return getContext().getSchemaIdToFullNameTransformer();
     }
 
-    public Prototype getPrototype(URI schemaId) {
+    final Prototype getPrototype(MediaType mediaType) {
 
-        if (_Prototypes.containsKey(schemaId)) {
-            return _Prototypes.get(schemaId);
+        Context context = getContext();
+        mediaType = context.normalize(mediaType);
+        
+        if (_Prototypes.containsKey(mediaType)) {
+            return _Prototypes.get(mediaType);
         }
 
         Prototype prototype = null;
+        
 
-        if (_SchemaBootstrapSchema.getId().equals(schemaId)) {
+        if (_SchemaBootstrapSchema.getId().equals(mediaType)) {
 
             if (_SchemaBootstrapPrototype == null) {
-                _SchemaBootstrapPrototype = new Prototype(getContext(), schemaId);
-                _SchemaBootstrapPrototype.getFields().putAll(_SchemaBootstrapSchema.getFields());
+                _SchemaBootstrapPrototype = new Prototype(getContext(), mediaType);
+                List<Field> schemaFields = _SchemaBootstrapSchema.getFields();
+                Map<String, Field> prototypeFields = _SchemaBootstrapPrototype.getFields();
+                context.mapFieldsByFieldName(prototypeFields, schemaFields, FieldNames.Schema.fields.toString());
             }
 
             prototype = _SchemaBootstrapPrototype;
         }
-        else if (_FieldBootstrapSchema.getId().equals(schemaId)) {
+        else if (_FieldBootstrapSchema.getId().equals(mediaType)) {
 
             if (_FieldBootstrapPrototype == null) {
-                _FieldBootstrapPrototype = new Prototype(getContext(), schemaId);
-                _FieldBootstrapPrototype.getFields().putAll(_FieldBootstrapSchema.getFields());
+                _FieldBootstrapPrototype = new Prototype(getContext(), mediaType);
+                List<Field> schemaFields = _FieldBootstrapSchema.getFields();
+                Map<String, Field> prototypeFields = _FieldBootstrapPrototype.getFields();
+                context.mapFieldsByFieldName(prototypeFields, schemaFields, FieldNames.Schema.fields.toString());
             }
 
             prototype = _FieldBootstrapPrototype;
 
         }
-        else if (!_Prototypes.containsKey(schemaId)) {
-            prototype = new Prototype(getContext(), schemaId);
+        else if (!_Prototypes.containsKey(mediaType)) {
+            prototype = new Prototype(getContext(), mediaType);
         }
 
-        _Prototypes.put(schemaId, prototype);
+        _Prototypes.put(mediaType, prototype);
         prototype.init();
         return prototype;
     }

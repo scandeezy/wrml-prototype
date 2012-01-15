@@ -26,6 +26,7 @@ import java.util.Map;
 import org.wrml.Model;
 import org.wrml.runtime.Context;
 import org.wrml.runtime.HyperLink;
+import org.wrml.util.MediaType;
 import org.wrml.util.ReflectiveFieldMap;
 
 /**
@@ -53,6 +54,11 @@ public class BootstrapModel<M extends Model> implements Serializable {
         _EmbeddedLinkRelationIds = embeddedLinkRelationIds;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
     public final Context getContext() {
         return _Context;
     }
@@ -62,28 +68,35 @@ public class BootstrapModel<M extends Model> implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    public final M getStaticInterface() {
+    public final Model getStaticInterface() {
 
-        if (Proxy.isProxyClass(this.getClass())) {
-            return (M) this;
+        try {
+            if (Proxy.isProxyClass(this.getClass())) {
+                return (Model) this;
+            }
+
+            if (_StaticInterface == null) {
+
+                final Class<M> staticType = getStaticType();
+                final Context context = getContext();
+
+                final MediaType mediaType = context.getMediaTypeToClassTransformer().bToA(staticType);
+
+                final List<URI> embeddedLinkRelationIds = getEmbeddedLinkRelationIds();
+
+                final ReflectiveFieldMap<M> fieldMap = new ReflectiveFieldMap<M>(this, staticType);
+
+                final Map<URI, HyperLink> linkMap = new HashMap<URI, HyperLink>();
+
+                _StaticInterface = (M) context.instantiateModel(mediaType, embeddedLinkRelationIds, fieldMap, linkMap)
+                        .getStaticInterface();
+
+            }
         }
+        catch (Throwable bootstrapProblem) {
 
-        if (_StaticInterface == null) {
-
-            final Class<M> staticType = getStaticType();
-            final Context context = getContext();
-
-            final URI schemaId = context.getSchemaIdToClassTransformer().bToA(staticType);
-
-            final List<URI> embeddedLinkRelationIds = getEmbeddedLinkRelationIds();
-
-            final ReflectiveFieldMap<M> fieldMap = new ReflectiveFieldMap<M>(this, staticType);
-
-            final Map<URI, HyperLink> linkMap = new HashMap<URI, HyperLink>();
-
-            _StaticInterface = (M) context.instantiateModel(schemaId, embeddedLinkRelationIds, fieldMap, linkMap)
-                    .getStaticInterface();
-
+            System.err.println(bootstrapProblem.getMessage());
+            bootstrapProblem.printStackTrace();
         }
 
         return _StaticInterface;
@@ -91,6 +104,16 @@ public class BootstrapModel<M extends Model> implements Serializable {
 
     public final Class<M> getStaticType() {
         return _StaticType;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return getClass().getName() + " { staticType : \"" + _StaticType + "\", hashCode : " + hashCode() + "}";
     }
 
 }

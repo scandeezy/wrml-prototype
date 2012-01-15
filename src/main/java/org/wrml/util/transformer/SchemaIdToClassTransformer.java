@@ -20,17 +20,17 @@ import java.net.URI;
 
 import org.wrml.runtime.Context;
 
-public class SchemaIdToClassTransformer extends AbstractTransformer<URI, Class<?>> {
+public class SchemaIdToClassTransformer extends ConstantTransformer<URI, Class<?>> {
 
     public SchemaIdToClassTransformer(Context context) {
         super(context);
     }
 
-    public Class<?> aToB(URI aValue) {
+    public Class<?> aToB(URI schemaId) {
 
         final Context context = getContext();
 
-        final String className = context.getSchemaIdToFullNameTransformer().aToB(aValue);
+        final String className = context.getSchemaIdToFullNameTransformer().aToB(schemaId);
 
         System.out.println(this + ": Loading schema class: " + className);
         if (className == null) {
@@ -51,7 +51,7 @@ public class SchemaIdToClassTransformer extends AbstractTransformer<URI, Class<?
         return schemaInterface;
     }
 
-    public URI bToA(Class<?> bValue) {
-        return getContext().getSchemaIdToFullNameTransformer().bToA(bValue.getCanonicalName());
+    public URI bToA(Class<?> clazz) {
+        return getContext().getSchemaIdToFullNameTransformer().bToA(clazz.getCanonicalName());
     }
 }

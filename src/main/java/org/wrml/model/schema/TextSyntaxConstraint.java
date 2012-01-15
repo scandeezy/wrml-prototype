@@ -16,7 +16,6 @@
 
 package org.wrml.model.schema;
 
-// A marker interface to map
-public interface TextSyntaxConstraint extends Constraint {
+public interface TextSyntaxConstraint extends Constraint<Field> {
 
 }

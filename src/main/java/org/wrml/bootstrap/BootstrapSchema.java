@@ -18,10 +18,9 @@ package org.wrml.bootstrap;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.List;
 
+import org.wrml.model.schema.Constraint;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Link;
 import org.wrml.model.schema.Schema;
@@ -77,54 +76,51 @@ public class BootstrapSchema extends BootstrapDocument<Schema> {
     private static final long serialVersionUID = 1L;
 
     private final ObservableList<URI> _BaseSchemaIds;
-    private final ObservableList<URI> _ConstraintIds;
+    private final ObservableList<Constraint<Schema>> _Constraints;
     private String _Description;
-    private final SortedMap<String, BootstrapField> _BootstrapFields;
+    private final ObservableList<BootstrapField> _BootstrapFields;
     private String _Name;
 
     public BootstrapSchema(Context context, URI id) {
         super(context, Schema.class, null, id);
 
         _BaseSchemaIds = Observables.observableList(new ArrayList<URI>());
-        _ConstraintIds = Observables.observableList(new ArrayList<URI>());
-        _BootstrapFields = new TreeMap<String, BootstrapField>();
+        _Constraints = Observables.observableList(new ArrayList<Constraint<Schema>>());                
+        _BootstrapFields = Observables.observableList(new ArrayList<BootstrapField>());
     }
 
     public final ObservableList<URI> getBaseSchemaIds() {
         return _BaseSchemaIds;
     }
 
-    public final SortedMap<String, BootstrapField> getBootstrapFields() {
+    public final ObservableList<BootstrapField> getBootstrapFields() {
         return _BootstrapFields;
     }
 
-    public final ObservableList<URI> getConstraintIds() {
-        return _ConstraintIds;
+    public final ObservableList<Constraint<Schema>> getConstraints() {
+        return _Constraints;
     }
 
     public final String getDescription() {
         return _Description;
     }
 
-    public final ObservableMap<String, Field> getFields() {
+    public final ObservableList<Field> getFields() {
 
         if (_BootstrapFields.isEmpty()) {
-            return Observables.emptyMap();
+            return Observables.emptyList();
         }
 
-        final SortedMap<String, Field> fields = new TreeMap<String, Field>();
-
-        final Set<String> bootstrapFieldNames = _BootstrapFields.keySet();
-        for (final String bootstrapFieldName : bootstrapFieldNames) {
-            final BootstrapField bootstrapField = _BootstrapFields.get(bootstrapFieldName);
-            fields.put(bootstrapFieldName, (Field) bootstrapField.getStaticInterface());
+        List<Field> fields = new ArrayList<Field>();
+        for (final BootstrapField bootstrapField : _BootstrapFields) {
+            fields.add((Field) bootstrapField.getStaticInterface());
         }
 
-        return Observables.observableMap(fields);
+        return Observables.observableList(fields);
     }
 
     public final ObservableMap<URI, Link> getLinks() {
-        // TODO
+        // TODO: Implement getLinks
         System.out.println(this + " - TODO: getLinks()");
         return null;
     }

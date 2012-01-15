@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package org.wrml.util.transformer;
+package org.wrml.util.enforcer;
 
-public class PassthroughTransformer<T> implements ConstantTransformation<T, T> {
+import org.wrml.Model;
+import org.wrml.model.schema.Constraint;
+import org.wrml.model.schema.Link;
+import org.wrml.runtime.HyperLink;
 
-    public T aToB(T aValue) {
-        return aValue;
-    }
+public interface LinkConstraintEnforcer {
 
-    public T bToA(T bValue) {
-        return bValue;
-    }
+    public EnforcementResult enforceConstraint(Constraint<Link> constraint, Model model, HyperLink link);
 
 }

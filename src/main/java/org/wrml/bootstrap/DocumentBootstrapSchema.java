@@ -17,7 +17,7 @@
 package org.wrml.bootstrap;
 
 import java.net.URI;
-import java.util.SortedMap;
+import java.util.List;
 
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
@@ -38,28 +38,28 @@ public class DocumentBootstrapSchema extends BootstrapSchema {
         // Fields
         //
 
-        final SortedMap<String, BootstrapField> fields = getBootstrapFields();
+        final List<BootstrapField> fields = getBootstrapFields();
         String fieldName = null;
 
         // etag
         fieldName = FieldNames.Document.etag.toString();
         final BootstrapField etagField = createBootstrapField(fieldName, Type.Text);
-        fields.put(fieldName, etagField);
+        fields.add(etagField);
 
         // id
         fieldName = FieldNames.Document.id.toString();
         final BootstrapField idField = createBootstrapField(fieldName, Type.Text);
-        fields.put(fieldName, idField);
+        fields.add(idField);
 
         // readOnly
         fieldName = FieldNames.Document.readOnly.toString();
         final BootstrapField readOnlyField = createBootstrapField(fieldName, Type.Boolean);
-        fields.put(fieldName, readOnlyField);
+        fields.add(readOnlyField);
 
         // secondsToLive
         fieldName = FieldNames.Document.secondsToLive.toString();
         final BootstrapField secondsToLiveField = createBootstrapField(fieldName, Type.Long);
-        fields.put(fieldName, secondsToLiveField);
+        fields.add(secondsToLiveField);
 
     }
 

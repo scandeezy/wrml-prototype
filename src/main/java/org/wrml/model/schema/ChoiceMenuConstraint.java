@@ -18,7 +18,7 @@ package org.wrml.model.schema;
 
 import java.net.URI;
 
-public interface ChoiceMenuConstraint extends Constraint {
+public interface ChoiceMenuConstraint extends Constraint<Field> {
 
     public ChoiceMenu getMenu();
 

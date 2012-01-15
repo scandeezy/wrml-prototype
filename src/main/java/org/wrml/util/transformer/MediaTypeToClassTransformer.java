@@ -26,18 +26,15 @@ import org.wrml.Model;
 import org.wrml.runtime.Context;
 import org.wrml.util.MediaType;
 
-public class MediaTypeToClassTransformer extends AbstractTransformer<MediaType, Class<?>> {
+public class MediaTypeToClassTransformer extends ConstantTransformer<MediaType, Class<?>> {
 
     public MediaTypeToClassTransformer(Context context) {
         super(context);
     }
 
-    public Class<?> aToB(MediaType bValue) {
+    public Class<?> aToB(MediaType mediaType) {
         final Context context = getContext();
-        final URI schemaId = context.getSchemaIdToMediaTypeTransformer().bToA(bValue);
-
-        // TODO: Check for parameterized types
-
+        final URI schemaId = context.getSchemaIdToMediaTypeTransformer().bToA(mediaType);
         return context.getSchemaIdToClassTransformer().aToB(schemaId);
     }
 
@@ -70,7 +67,7 @@ public class MediaTypeToClassTransformer extends AbstractTransformer<MediaType, 
                  * Use reflection to determine if the type is parameterized.
                  * Ultimately
                  * looking to get a map of type parameter name (aka Schema
-                 * Constraint Name)
+                 * ConstraintDefinition Name)
                  * to schema Id. Get the name (keys) from the Java generics
                  * reflection API.
                  * Get the URI values using Java class name to Schema URI

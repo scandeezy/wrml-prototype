@@ -17,20 +17,37 @@
 package org.wrml.util.transformer;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.util.observable.Observables;
 
-public class CachingTransformer<A, B, T extends Transformer<A, B>> extends DelegatingTransformer<A, B, T> {
+public class CachingTransformer<A, B, T extends ConstantTransformation<A, B>> extends DelegatingTransformer<A, B, T> {
+
+    public static <A, B, T extends ConstantTransformation<A, B>> CachingTransformer<A, B, T> create(
+            T constantTransformation) {
+        
+        return new CachingTransformer<A, B, T>(constantTransformation);
+    }
+
+    public static <A, B, T extends ConstantTransformation<A, B>> CachingTransformer<A, B, T> create(
+            T constantTransformation, Map<A, B> abMap, Map<B, A> baMap) {
+
+        return new CachingTransformer<A, B, T>(constantTransformation, abMap, baMap);
+    }
 
     private final ObservableMap<A, B> _AbCache;
     private final ObservableMap<B, A> _BaCache;
 
     public CachingTransformer(T delegate) {
-        this(delegate, Observables.observableMap(new HashMap<A, B>()), Observables.observableMap(new HashMap<B, A>()));
+        this(delegate, new HashMap<A, B>(), new HashMap<B, A>());
     }
 
-    public CachingTransformer(T delegate, ObservableMap<A, B> abCache, ObservableMap<B, A> baCache) {
+    public CachingTransformer(T delegate, Map<A, B> abMap, Map<B, A> baMap) {
+        this(delegate, Observables.observableMap(abMap), Observables.observableMap(baMap));
+    }
+
+    private CachingTransformer(T delegate, ObservableMap<A, B> abCache, ObservableMap<B, A> baCache) {
         super(delegate);
         _AbCache = abCache;
         _BaCache = baCache;

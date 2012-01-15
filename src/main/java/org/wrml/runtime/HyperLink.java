@@ -23,8 +23,8 @@ import java.util.Map;
 import org.wrml.Model;
 import org.wrml.event.LinkEventListener;
 import org.wrml.model.api.LinkTemplate;
-import org.wrml.model.relation.LinkRelation;
 import org.wrml.model.schema.Link;
+import org.wrml.model.schema.LinkRelation;
 import org.wrml.service.Service;
 import org.wrml.util.MediaType;
 import org.wrml.util.observable.ObservableMap;
@@ -306,8 +306,7 @@ public final class HyperLink implements Serializable {
     public Link getLink() {
         final Model referrer = getReferrer();
         final Context context = referrer.getContext();
-        final URI schemaId = referrer.getSchemaId();
-        final Prototype prototype = context.getPrototype(schemaId);
+        final Prototype prototype = context.getPrototype(referrer.getMediaType());
 
         final ObservableMap<URI, Link> links = prototype.getLinksByRel();
         final URI rel = getLinkRelationId();

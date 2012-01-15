@@ -50,8 +50,8 @@ public abstract class DelegatingFieldMap extends FieldMap implements DelegatingM
 
     @SuppressWarnings("unchecked")
     @Override
-    protected <V> V setRawFieldValue(String fieldName, V fieldValue) {
-        return (V) _Delegate.put(fieldName, fieldValue);
+    protected <V> V setRawFieldValue(String fieldName, V newValue) {
+        return (V) _Delegate.put(fieldName, newValue);
     }
 
 }

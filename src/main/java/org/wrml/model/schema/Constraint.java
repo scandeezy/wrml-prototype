@@ -16,34 +16,16 @@
 
 package org.wrml.model.schema;
 
-import org.wrml.model.CodeOnDemand;
-import org.wrml.model.Descriptive;
-import org.wrml.model.Document;
+import java.net.URI;
+
 import org.wrml.model.Named;
-import org.wrml.model.Titled;
-import org.wrml.model.Versioned;
-import org.wrml.util.observable.ObservableList;
 
-/**
- * A field constraint's metadata and pointers to "executable" Validators.
- * 
- * Note: This is a metadata class - instances should be edited with tools and
- * persisted for reuse.
- * 
- * @param <T>
- *            The field type
- */
-// Generated from a Web Resource Schema
-public interface Constraint extends Named, Titled, Versioned, Descriptive, Document {
+public interface Constraint<T extends Constrainable<T>> extends Named, SchemaMember<Constraint<T>> {
 
-    // Added to Field
-    //     Name: name 
-    //     Constraints: TextSyntax - Mixed-Upper Case
+    public T getConstrainable();
 
-    /**
-     * Get the (optional) code-on-demand validators
-     * 
-     * @return
-     */
-    public ObservableList<CodeOnDemand> getValidators();
+    public ConstraintDefinition getDefinition();
+
+    public URI getDefinitionId();
+
 }

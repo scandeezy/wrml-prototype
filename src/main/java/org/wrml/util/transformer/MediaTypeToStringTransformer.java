@@ -16,39 +16,34 @@
 
 package org.wrml.util.transformer;
 
-import org.wrml.runtime.Context;
 import org.wrml.util.MediaType;
 
-public class MediaTypeToStringTransformer extends AbstractTransformer<MediaType, String> {
+public class MediaTypeToStringTransformer implements ConstantTransformation<MediaType, String> {
 
-    public MediaTypeToStringTransformer(Context context) {
-        super(context);
-    }
+    public String aToB(MediaType mediaType) {
 
-    public String aToB(MediaType bValue) {
-
-        if (bValue == null) {
-            System.out.println("MediaTypeToStringTransformer.aToB(" + bValue + ") returning: null");
+        if (mediaType == null) {
+            System.out.println("MediaTypeToStringTransformer.aToB(" + mediaType + ") returning: null");
             return null;
         }
 
-        final String aValue = bValue.toString();
+        final String aValue = mediaType.toString();
 
-        System.out.println("MediaTypeToStringTransformer.aToB(" + bValue + ") returning: " + aValue);
+        System.out.println("MediaTypeToStringTransformer.aToB(" + mediaType + ") returning: " + aValue);
         return aValue;
 
     }
 
-    public MediaType bToA(String aValue) {
+    public MediaType bToA(String mediaTypeString) {
 
         //System.out.println("MediaTypeToStringTransformer.bToA(" + aValue + ")");
 
-        if (aValue == null) {
+        if (mediaTypeString == null) {
             //System.out.println("MediaTypeToStringTransformer.bToA(" + aValue + ") returning: null");
             return null;
         }
 
-        return MediaType.create(aValue);
+        return MediaType.create(mediaTypeString);
     }
 
 }

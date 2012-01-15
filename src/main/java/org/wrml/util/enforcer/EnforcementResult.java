@@ -14,16 +14,11 @@
  * limitations under the License.
  */
 
-package org.wrml.util.transformer;
+package org.wrml.util.enforcer;
 
-public class PassthroughTransformer<T> implements ConstantTransformation<T, T> {
+public interface EnforcementResult {
 
-    public T aToB(T aValue) {
-        return aValue;
-    }
-
-    public T bToA(T bValue) {
-        return bValue;
-    }
-
+    // TODO: Define interface
+    // success/failure
+    // oldvalue new value
 }

@@ -14,16 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.util.transformer;
+package org.wrml.model.schema;
 
-public class PassthroughTransformer<T> implements ConstantTransformation<T, T> {
-
-    public T aToB(T aValue) {
-        return aValue;
-    }
-
-    public T bToA(T bValue) {
-        return bValue;
-    }
-
+public interface FieldTypeParameterConstraint extends TypeParameterConstraint<Field> {
 }

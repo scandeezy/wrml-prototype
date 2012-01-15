@@ -24,22 +24,22 @@ import org.wrml.runtime.Context;
 import org.wrml.service.Service;
 import org.wrml.util.MediaType;
 
-public class MediaTypeToFormatTransformer extends AbstractTransformer<MediaType, Format> {
+public class MediaTypeToFormatTransformer extends ConstantTransformer<MediaType, Format> {
 
     public MediaTypeToFormatTransformer(Context context) {
         super(context);
     }
 
-    public Format aToB(MediaType bValue) {
+    public Format aToB(MediaType mediaType) {
         final Context context = getContext();
 
         URI formatId = null;
-        final String formatIdString = bValue.getFormatIdString();
+        final String formatIdString = mediaType.getFormatIdString();
         if (formatIdString != null) {
             formatId = context.getUriToStringTransformer().bToA(formatIdString);
         }
         else {
-            formatId = context.getFormatIdToMediaTypeTransformer().bToA(bValue);
+            formatId = context.getFormatIdToMediaTypeTransformer().bToA(mediaType);
         }
 
         final Service service = context.getService(Format.class);

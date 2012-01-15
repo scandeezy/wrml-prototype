@@ -96,11 +96,11 @@ public class ReflectiveFieldMap<T> extends FieldMap implements Delegating<Object
     }
 
     @SuppressWarnings("unchecked")
-    protected <V> V accessField(T staticInterface, Method method, FieldAccessType fieldAccessType, V fieldValue) {
+    protected <V> V accessField(T staticInterface, Method method, FieldAccessType fieldAccessType, V newValue) {
 
         Object[] args = null;
         if (fieldAccessType == FieldAccessType.SET) {
-            args = new Object[] { fieldValue };
+            args = new Object[] { newValue };
         }
 
         try {
@@ -111,10 +111,10 @@ public class ReflectiveFieldMap<T> extends FieldMap implements Delegating<Object
             final String debugMethodPrint = method.getDeclaringClass().getCanonicalName() + " - "
                     + DelegatingInvocationHandler.baseGetMethodKey(method);
 
-            final String fieldTypeString = (fieldValue != null) ? fieldValue.getClass().getCanonicalName() : "?";
+            final String fieldTypeString = (newValue != null) ? newValue.getClass().getCanonicalName() : "?";
 
             final String message = "A problem occured when trying to access a field using the method \""
-                    + debugMethodPrint + "\" with value: \"" + fieldValue + "\" (of type: \"" + fieldTypeString
+                    + debugMethodPrint + "\" with value: \"" + newValue + "\" (of type: \"" + fieldTypeString
                     + "\") invoked on the static interface: \"" + staticInterface + "\".";
 
             throw new RuntimeException(message, e);
@@ -123,6 +123,10 @@ public class ReflectiveFieldMap<T> extends FieldMap implements Delegating<Object
 
     protected final String getFieldName(Method method) {
 
+        if (Object.class.equals(method.getDeclaringClass())) {
+            return null;
+        }
+        
         final String methodName = method.getName();
         String fieldName = null;
         if (methodName.startsWith("get") || methodName.startsWith("set")) {
@@ -154,6 +158,10 @@ public class ReflectiveFieldMap<T> extends FieldMap implements Delegating<Object
         final SortedSet<String> fieldNames = new TreeSet<String>();
         if (methods != null) {
             for (final Method method : methods) {
+                
+                if (Object.class.equals(method.getDeclaringClass())) {
+                    continue;
+                }
 
                 final String fieldName = getFieldName(method);
                 if (fieldName != null) {
@@ -310,7 +318,7 @@ public class ReflectiveFieldMap<T> extends FieldMap implements Delegating<Object
     }
 
     @Override
-    protected <V> V setRawFieldValue(String fieldName, V fieldValue) {
+    protected <V> V setRawFieldValue(String fieldName, V newValue) {
 
         final T staticInterface = getStaticInterface();
         if (staticInterface == null) {
@@ -325,7 +333,7 @@ public class ReflectiveFieldMap<T> extends FieldMap implements Delegating<Object
                     + "\" in static interface: " + staticInterface);
         }
 
-        return accessField(staticInterface, method, FieldAccessType.SET, fieldValue);
+        return accessField(staticInterface, method, FieldAccessType.SET, newValue);
     }
 
 }

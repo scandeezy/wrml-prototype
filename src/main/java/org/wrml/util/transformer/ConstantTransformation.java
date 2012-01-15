@@ -16,14 +16,6 @@
 
 package org.wrml.util.transformer;
 
-public class PassthroughTransformer<T> implements ConstantTransformation<T, T> {
-
-    public T aToB(T aValue) {
-        return aValue;
-    }
-
-    public T bToA(T bValue) {
-        return bValue;
-    }
+public interface ConstantTransformation<A, B> extends Transformer<A, B> {
 
 }

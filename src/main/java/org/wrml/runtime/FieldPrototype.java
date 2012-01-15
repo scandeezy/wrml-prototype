@@ -17,18 +17,21 @@
 package org.wrml.runtime;
 
 import org.wrml.Model;
+import org.wrml.model.schema.Type;
 
-final class FieldPrototype {
+public final class FieldPrototype {
 
     private final String _FieldName;
+    private final Type _Type;
     private final FieldAccessType _AccessType;
 
-    public FieldPrototype(final String fieldName, final FieldAccessType accessType) {
+    public FieldPrototype(final String fieldName, final Type type, final FieldAccessType accessType) {
         _FieldName = fieldName;
+        _Type = type;
         _AccessType = accessType;
     }
 
-    public Object accessField(final Model model, final Object newFieldValue) {
+    public Object accessField(final Model model, final Object newValue) {
 
         Object oldFieldValue = null;
 
@@ -37,7 +40,7 @@ final class FieldPrototype {
             oldFieldValue = model.getFieldValue(_FieldName);
             break;
         case SET:
-            oldFieldValue = model.setFieldValue(_FieldName, newFieldValue);
+            oldFieldValue = model.setFieldValue(_FieldName, newValue);
             break;
         }
 
@@ -51,4 +54,9 @@ final class FieldPrototype {
     public String getFieldName() {
         return _FieldName;
     }
+
+    public Type getType() {
+        return _Type;
+    }
+
 }

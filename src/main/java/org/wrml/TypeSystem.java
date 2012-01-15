@@ -16,154 +16,89 @@
 
 package org.wrml;
 
-import java.util.Date;
 import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.wrml.model.schema.Type;
-import org.wrml.util.observable.ObservableList;
-import org.wrml.util.observable.ObservableMap;
+import org.wrml.util.transformer.CachingTransformer;
+import org.wrml.util.transformer.ConstantTransformation;
+import org.wrml.util.transformer.Transformer;
+import org.wrml.util.transformer.TypeToClassTransformer;
 
-/**
- * Maps WRML's type system to/from Java's.
- */
 public final class TypeSystem {
 
-    // WRML's only TypeSystem need not register for Match.com =(  
-    public static final TypeSystem instance = new TypeSystem();
+    public final static TypeSystem instance = new TypeSystem();
 
-    // TODO: Cache based on class name (string) not class (don't hold classes)
     // This could grow large from Enums
     private final Map<Class<?>, Object> _DefaultValues;
+    private final Transformer<Type, Class<?>> _TypeToClassTransformer;
 
     private TypeSystem() {
+
         _DefaultValues = new WeakHashMap<Class<?>, Object>();
+
+        _TypeToClassTransformer = new CachingTransformer<Type, Class<?>, ConstantTransformation<Type, Class<?>>>(
+                new TypeToClassTransformer(), new WeakHashMap<Type, Class<?>>(), new WeakHashMap<Class<?>, Type>());
     }
 
     @SuppressWarnings("unchecked")
-    public final <V> Class<V> getJavaType(final Type type) {
-
-        Class<?> javaType = Object.class;
-        switch (type) {
-
-        case Boolean:
-            javaType = Boolean.class;
-            break;
-
-        case Choice:
-            // TODO: Handle choice type
-            break;
-
-        case DateTime:
-            // TODO: Change to Joda DateTime
-            javaType = Date.class;
-            break;
-
-        case Double:
-            javaType = Double.class;
-            break;
-
-        case Integer:
-            javaType = Integer.class;
-            break;
-
-        case List:
-            // TODO: Is this right or does it need to be a parameterized type?
-            javaType = ObservableList.class;
-            break;
-
-        case Long:
-
-            javaType = Long.class;
-            break;
-
-        case Map:
-            // TODO: Is this right or does it need to be a parameterized type?
-            javaType = ObservableMap.class;
-            break;
-
-        case Model:
-            // TODO: Is this right or does it need to be a parameterized type or autogen schema subclass? 
-            javaType = Model.class;
-            break;
-
-        case Native:
-            // TODO: Handle other hints?
-
-            javaType = Object.class;
-            break;
-
-        case Text:
-            // TODO: Handle other syntax
-
-            javaType = String.class;
-            break;
-        }
-
-        return (Class<V>) javaType;
-    }
-
-    @SuppressWarnings("unchecked")
-    public final <V> V getWrmlDefaultValue(final Class<V> type) {
+    public final <V> V getDefaultValue(final Class<?> clazz) {
 
         Object defaultValue = null;
 
-        if (_DefaultValues.containsKey(type)) {
-
-            defaultValue = _DefaultValues.get(type);
-
-            /*
-             * System.out.println("The default value for type \"" +
-             * type.getCanonicalName() + "\" is already mapped as \""
-             * + defaultValue + "\"");
-             */
-
+        if (_DefaultValues.containsKey(clazz)) {
+            defaultValue = _DefaultValues.get(clazz);
             return (V) defaultValue;
         }
 
-        Class<?> keyType = type;
+        Type type = getTypeToClassTransformer().bToA(clazz);
 
-        if (String.class.equals(type)) {
+        switch (type) {
+
+        case Text:
+        case Model:
+        case Map:
+        case List:
+        case DateTime:
+        case Native:
+
             defaultValue = null;
-        }
-        else if (Boolean.TYPE.equals(type) || Boolean.class.equals(type)) {
+            break;
+
+        case Boolean:
             defaultValue = Boolean.FALSE;
-        }
-        else if (Integer.TYPE.equals(type) || Integer.class.equals(type)) {
+            break;
+
+        case Integer:
             defaultValue = 0;
-        }
-        else if (Float.TYPE.equals(type) || Float.class.equals(type)) {
+            break;
+
+        case Double:
             defaultValue = 0.0;
-        }
-        else if (Double.TYPE.equals(type) || Double.class.equals(type)) {
-            defaultValue = 0.0;
-        }
-        else if (Long.TYPE.equals(type) || Long.class.equals(type)) {
+            break;
+
+        case Long:
             defaultValue = 0L;
-        }
-        else if (Void.TYPE.equals(type) || Void.class.equals(type)) {
-            defaultValue = type;
-        }
-        else if (Enum.class.isAssignableFrom(type)) {
-            final Object[] enumConstants = type.getEnumConstants();
-            if (enumConstants.length > 0) {
+            break;
+
+        case Choice:
+            final Object[] enumConstants = clazz.getEnumConstants();
+            if (enumConstants != null && enumConstants.length > 0) {
                 defaultValue = enumConstants[0];
             }
-        }
-        else {
-            keyType = Object.class;
+            break;
+
+        default:
+            defaultValue = null;
+            break;
         }
 
-        _DefaultValues.put(keyType, defaultValue);
-
-        /*
-         * System.out.println("The default value for type \"" +
-         * type.getCanonicalName() + "\" is \"" + defaultValue
-         * + "\" it is now mapped with key type \"" + keyType.getCanonicalName()
-         * + "\"");
-         */
+        _DefaultValues.put(clazz, defaultValue);
 
         return (V) defaultValue;
     }
 
+    public Transformer<Type, Class<?>> getTypeToClassTransformer() {
+        return _TypeToClassTransformer;
+    }
 }

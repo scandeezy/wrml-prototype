@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package org.wrml.util.transformer;
+package org.wrml.model.schema;
 
-public class PassthroughTransformer<T> implements ConstantTransformation<T, T> {
+import org.wrml.model.CodeOnDemand;
+import org.wrml.model.Descriptive;
+import org.wrml.model.Document;
+import org.wrml.model.Named;
+import org.wrml.model.Titled;
+import org.wrml.model.Versioned;
+import org.wrml.util.observable.ObservableList;
 
-    public T aToB(T aValue) {
-        return aValue;
-    }
+public interface ConstraintDefinition extends Named, Titled, Versioned, Descriptive, Document {
 
-    public T bToA(T bValue) {
-        return bValue;
-    }
+    public ObservableList<CodeOnDemand> getEnforcers();
 
+    public ConstraintType getConstraintType();
+
+    public ConstraintType setConstraintType(ConstraintType constraintType);
 }
