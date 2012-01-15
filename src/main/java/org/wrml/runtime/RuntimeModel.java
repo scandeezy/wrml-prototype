@@ -294,85 +294,78 @@ public final class RuntimeModel implements Model {
     @SuppressWarnings("unchecked")
     public Model getStaticInterface() {
 
-        try {
-            if (Proxy.isProxyClass(this.getClass())) {
-
-                /*
-                 * If there is a proxy wrapped around us lets assume that we've
-                 * got
-                 * a static interface.
-                 */
-
-                return this;
-            }
-
-            if (_StaticInterface != null) {
-                /*
-                 * We've been here before.
-                 */
-                return _StaticInterface;
-            }
-
-            final URI schemaId = getSchemaId();
-            final Context context = getContext();
-            final URI modelSchemaURI = context.getSchemaIdToClassTransformer().bToA(Model.class);
-            if (modelSchemaURI.equals(schemaId)) {
-
-                /*
-                 * We have the same schema ID as Model.class does.
-                 * 
-                 * So, this model is already just supposed to be a model (i.e.
-                 * it's
-                 * not a subschema). This class implements the Model interface.
-                 * So this object already provides a "static" Model interface.
-                 * 
-                 * No need to proxy.
-                 */
-
-                return (Model) this;
-            }
-
-            // Get the Java class representing our schema
-            final Class<?> schemaInterface = context.getSchemaIdToClassTransformer().aToB(schemaId);
-
-            //System.err.println("====== getStaticInterface() schemaId : \"" + schemaId + "\" schemaInterface : \""  + schemaInterface + "\" (" + hashCode() + ")");
+        if (Proxy.isProxyClass(this.getClass())) {
 
             /*
-             * If we already implement the interface...
+             * If there is a proxy wrapped around us lets assume that we've
+             * got
+             * a static interface.
+             */
+
+            return this;
+        }
+
+        if (_StaticInterface != null) {
+            /*
+             * We've been here before.
+             */
+            return _StaticInterface;
+        }
+
+        final URI schemaId = getSchemaId();
+        final Context context = getContext();
+        final URI modelSchemaURI = context.getSchemaIdToClassTransformer().bToA(Model.class);
+        if (modelSchemaURI.equals(schemaId)) {
+
+            /*
+             * We have the same schema ID as Model.class does.
              * 
-             * Is this possible? If this class is final then this cannot already
-             * implement some unknown schema interface, right? Unless maybe this
-             * class has been subclassed? This may be needed if this class ever
-             * becomes un-final. Not sure if it is harmful to keep here anyway.
+             * So, this model is already just supposed to be a model (i.e.
+             * it's
+             * not a subschema). This class implements the Model interface.
+             * So this object already provides a "static" Model interface.
+             * 
+             * No need to proxy.
              */
-            if (schemaInterface.isInstance(this)) {
-                _StaticInterface = (Model) schemaInterface.cast(this);
-            }
-            else {
 
-                /*
-                 * Create a proxy that layers the static Java interface
-                 * associated
-                 * with this model's "declared" schema.
-                 */
+            return (Model) this;
+        }
 
-                final Class<?>[] schemaInterfaceArray = new Class<?>[] { schemaInterface };
-                final StaticInterfaceFacade facade = new StaticInterfaceFacade(this);
+        // Get the Java class representing our schema
+        final Class<?> schemaInterface = context.getSchemaIdToClassTransformer().aToB(schemaId);
 
-                _StaticInterface = (Model) Proxy.newProxyInstance(context, schemaInterfaceArray, facade);
-            }
+        //System.err.println("====== getStaticInterface() schemaId : \"" + schemaId + "\" schemaInterface : \""  + schemaInterface + "\" (" + hashCode() + ")");
+
+        /*
+         * If we already implement the interface...
+         * 
+         * Is this possible? If this class is final then this cannot already
+         * implement some unknown schema interface, right? Unless maybe this
+         * class has been subclassed? This may be needed if this class ever
+         * becomes un-final. Not sure if it is harmful to keep here anyway.
+         */
+        if (schemaInterface.isInstance(this)) {
+            _StaticInterface = (Model) schemaInterface.cast(this);
+        }
+        else {
 
             /*
-             * We are now able to return this same static interface repeatedly.
-             * There's no need to generate a new static facade for each call.
+             * Create a proxy that layers the static Java interface
+             * associated
+             * with this model's "declared" schema.
              */
-        }
-        catch (Throwable runtimeProblem) {
 
-            System.err.println(runtimeProblem.getMessage());
-            runtimeProblem.printStackTrace();
+            final Class<?>[] schemaInterfaceArray = new Class<?>[] { schemaInterface };
+            final StaticInterfaceFacade facade = new StaticInterfaceFacade(this);
 
+            _StaticInterface = (Model) Proxy.newProxyInstance(context, schemaInterfaceArray, facade);
         }
+
+        /*
+         * We are now able to return this same static interface repeatedly.
+         * There's no need to generate a new static facade for each call.
+         */
+
         return _StaticInterface;
     }
 

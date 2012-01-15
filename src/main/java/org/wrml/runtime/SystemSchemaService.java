@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.wrml.Model;
+import org.wrml.bootstrap.BootstrapSchema;
 import org.wrml.bootstrap.FieldBootstrapSchema;
 import org.wrml.bootstrap.FieldNames;
 import org.wrml.bootstrap.SchemaBootstrapSchema;
@@ -122,21 +123,17 @@ final class SystemSchemaService extends ProxyService implements Service {
 
         Context context = getContext();
         mediaType = context.normalize(mediaType);
-        
+
         if (_Prototypes.containsKey(mediaType)) {
             return _Prototypes.get(mediaType);
         }
 
         Prototype prototype = null;
-        
 
         if (_SchemaBootstrapSchema.getId().equals(mediaType)) {
 
-            if (_SchemaBootstrapPrototype == null) {
-                _SchemaBootstrapPrototype = new Prototype(getContext(), mediaType);
-                List<Field> schemaFields = _SchemaBootstrapSchema.getFields();
-                Map<String, Field> prototypeFields = _SchemaBootstrapPrototype.getFields();
-                context.mapFieldsByFieldName(prototypeFields, schemaFields, FieldNames.Schema.fields.toString());
+            if (_SchemaBootstrapPrototype == null) {                                
+                _SchemaBootstrapPrototype = createBootstrapPrototype(mediaType, _SchemaBootstrapSchema);
             }
 
             prototype = _SchemaBootstrapPrototype;
@@ -144,22 +141,36 @@ final class SystemSchemaService extends ProxyService implements Service {
         else if (_FieldBootstrapSchema.getId().equals(mediaType)) {
 
             if (_FieldBootstrapPrototype == null) {
-                _FieldBootstrapPrototype = new Prototype(getContext(), mediaType);
-                List<Field> schemaFields = _FieldBootstrapSchema.getFields();
-                Map<String, Field> prototypeFields = _FieldBootstrapPrototype.getFields();
-                context.mapFieldsByFieldName(prototypeFields, schemaFields, FieldNames.Schema.fields.toString());
+                _FieldBootstrapPrototype = createBootstrapPrototype(mediaType, _FieldBootstrapSchema);
             }
 
             prototype = _FieldBootstrapPrototype;
 
         }
         else if (!_Prototypes.containsKey(mediaType)) {
-            prototype = new Prototype(getContext(), mediaType);
+            prototype = createPrototype(mediaType);
         }
 
         _Prototypes.put(mediaType, prototype);
         prototype.init();
         return prototype;
+    }
+
+    private Prototype createPrototype(MediaType mediaType) {
+        return new Prototype(getContext(), mediaType);
+    }
+
+    private Prototype createBootstrapPrototype(MediaType mediaType, BootstrapSchema bootstrapSchema) {
+        Context context = getContext();
+        Prototype bootstrapPrototype = createPrototype(mediaType);
+        List<Field> schemaFields = bootstrapSchema.getFields();
+        Map<String, Field> prototypeFields = bootstrapPrototype.getFields();
+        
+        // Convert the bootstrap schema's list of fields to a map
+        context.mapFieldsByFieldName(prototypeFields, schemaFields, FieldNames.Schema.fields.toString());
+        
+        return bootstrapPrototype;
+
     }
 
 }

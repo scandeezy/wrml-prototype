@@ -70,33 +70,26 @@ public class BootstrapModel<M extends Model> implements Serializable {
     @SuppressWarnings("unchecked")
     public final Model getStaticInterface() {
 
-        try {
-            if (Proxy.isProxyClass(this.getClass())) {
-                return (Model) this;
-            }
-
-            if (_StaticInterface == null) {
-
-                final Class<M> staticType = getStaticType();
-                final Context context = getContext();
-
-                final MediaType mediaType = context.getMediaTypeToClassTransformer().bToA(staticType);
-
-                final List<URI> embeddedLinkRelationIds = getEmbeddedLinkRelationIds();
-
-                final ReflectiveFieldMap<M> fieldMap = new ReflectiveFieldMap<M>(this, staticType);
-
-                final Map<URI, HyperLink> linkMap = new HashMap<URI, HyperLink>();
-
-                _StaticInterface = (M) context.instantiateModel(mediaType, embeddedLinkRelationIds, fieldMap, linkMap)
-                        .getStaticInterface();
-
-            }
+        if (Proxy.isProxyClass(this.getClass())) {
+            return (Model) this;
         }
-        catch (Throwable bootstrapProblem) {
 
-            System.err.println(bootstrapProblem.getMessage());
-            bootstrapProblem.printStackTrace();
+        if (_StaticInterface == null) {
+
+            final Class<M> staticType = getStaticType();
+            final Context context = getContext();
+
+            final MediaType mediaType = context.getMediaTypeToClassTransformer().bToA(staticType);
+
+            final List<URI> embeddedLinkRelationIds = getEmbeddedLinkRelationIds();
+
+            final ReflectiveFieldMap<M> fieldMap = new ReflectiveFieldMap<M>(this, staticType);
+
+            final Map<URI, HyperLink> linkMap = new HashMap<URI, HyperLink>();
+
+            _StaticInterface = (M) context.instantiateModel(mediaType, embeddedLinkRelationIds, fieldMap, linkMap)
+                    .getStaticInterface();
+
         }
 
         return _StaticInterface;
