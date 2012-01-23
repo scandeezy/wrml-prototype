@@ -16,10 +16,10 @@
 
 package org.wrml.enforcer;
 
+import org.wrml.HyperLink;
 import org.wrml.Model;
 import org.wrml.model.schema.Constraint;
 import org.wrml.model.schema.Link;
-import org.wrml.runtime.HyperLink;
 
 public interface LinkConstraintEnforcer {
 

@@ -32,8 +32,8 @@ class LinkRelation extends StaticSchema {
         
         $uriTextSyntaxConstraint = $context->createUriTextSyntaxConstraint()->getId();
                 
-        $baseSchemas = &$this->getBaseSchemas();
-        $baseSchemas[] = $context->getRequestUri(Context::DOCUMENT_SCHEMA_PATH);
+        $baseSchemaIds = &$this->getBaseSchemaIds();
+        $baseSchemaIds[] = $context->getRequestUri(Context::DOCUMENT_SCHEMA_PATH);
     }
 
 }

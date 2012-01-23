@@ -45,8 +45,8 @@ class Field extends StaticSchema {
         $requiredField = new StaticField("required", Type::BOOLEAN_TYPE);
         $fields[] = $requiredField;
 
-        $transientField = new StaticField("transient", Type::BOOLEAN_TYPE);
-        $fields[] = $transientField;
+        $localField = new StaticField("local", Type::BOOLEAN_TYPE);
+        $fields[] = $localField;
                 
     }
     

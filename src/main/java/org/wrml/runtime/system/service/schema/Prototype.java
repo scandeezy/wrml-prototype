@@ -29,7 +29,6 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.wrml.Model;
-import org.wrml.bootstrap.FieldNames;
 import org.wrml.model.schema.Constraint;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Link;
@@ -38,6 +37,7 @@ import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
 import org.wrml.runtime.Contextual;
 import org.wrml.runtime.TypeSystem;
+import org.wrml.runtime.bootstrap.FieldNames;
 import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.util.observable.ObservableList;
 import org.wrml.util.observable.ObservableMap;

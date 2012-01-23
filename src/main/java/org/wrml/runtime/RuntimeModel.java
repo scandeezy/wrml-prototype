@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.wrml.HyperLink;
 import org.wrml.Model;
-import org.wrml.bootstrap.FieldNames;
 import org.wrml.event.FieldEvent;
 import org.wrml.event.FieldEventListener;
 import org.wrml.event.LinkEventListener;
@@ -35,6 +35,7 @@ import org.wrml.model.DocumentMetadata;
 import org.wrml.model.DocumentOptions;
 import org.wrml.model.api.ResourceTemplate;
 import org.wrml.model.schema.Schema;
+import org.wrml.runtime.bootstrap.FieldNames;
 import org.wrml.runtime.system.service.schema.Prototype;
 import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.service.ProxyService;
@@ -60,7 +61,7 @@ public final class RuntimeModel extends Contextual implements Model {
     private static final long serialVersionUID = 1L;
 
     private final ObservableMap<String, Object> _Fields;
-    private final ObservableMap<URI, HyperLink> _Links;
+    private final ObservableMap<URI, HyperLink> _HyperLinks;
 
     private transient FieldMapEventListener _FieldMapEventListener;
 
@@ -83,7 +84,7 @@ public final class RuntimeModel extends Contextual implements Model {
         _FieldMapEventListener = new FieldMapEventListener();
         _Fields.addMapEventListener(_FieldMapEventListener);
 
-        _Links = Observables.observableMap(linkMap);
+        _HyperLinks = Observables.observableMap(linkMap);
 
         init();
 
@@ -142,14 +143,14 @@ public final class RuntimeModel extends Contextual implements Model {
 
     public Object clickLink(URI rel, java.lang.reflect.Type nativeReturnType, Object requestEntity,
             Map<String, String> hrefParams) {
-        final HyperLink hyperLink = getHyperLink(rel);
+        final HyperLink runtimeHyperLink = getHyperLink(rel);
 
-        if (hyperLink == null) {
+        if (runtimeHyperLink == null) {
             // TODO: Error here instead?
             return null;
         }
 
-        return hyperLink.click(nativeReturnType, requestEntity, hrefParams);
+        return runtimeHyperLink.click(nativeReturnType, requestEntity, hrefParams);
     }
 
     public void die() {
@@ -195,8 +196,8 @@ public final class RuntimeModel extends Contextual implements Model {
         return getContext().getHypermediaEngine(apiId);
     }
 
-    public ObservableMap<URI, HyperLink> getLinkMap() {
-        return _Links;
+    public ObservableMap<URI, HyperLink> getHyperLinks() {
+        return _HyperLinks;
     }
 
     public MediaType getMediaType() {
@@ -539,12 +540,12 @@ public final class RuntimeModel extends Contextual implements Model {
 
     private HyperLink getHyperLink(URI rel) {
 
-        if (!_Links.containsKey(rel)) {
-            final HyperLink link = new HyperLink(this, rel);
-            _Links.put(rel, link);
+        if (!_HyperLinks.containsKey(rel)) {
+            final HyperLink link = new RuntimeHyperLink(this, rel);
+            _HyperLinks.put(rel, link);
         }
 
-        return _Links.get(rel);
+        return _HyperLinks.get(rel);
     }
 
     private Class<?> getStaticInterfaceClass() {

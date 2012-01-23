@@ -19,22 +19,20 @@ require_once(DOCROOT . '/runtime/StaticSchema.php');
 
 class StaticLink extends Model {
     
-    public $rel;    
+    public $relId;    
     public $href;
     public $requestTypes;    
     public $responseTypes;    
-    public $stateExpression;
         
-    function __construct($rel, $href) {
-        $this->rel = $rel;        
+    function __construct($relId, $href) {
+        $this->relId = $relId;        
         $this->href = $href;        
         $this->requestTypes = array();
         $this->responseTypes = array();
-        $this->stateExpression = "true";
     }
 
-    public function getRel() {
-        return $this->rel;
+    public function getRelId() {
+        return $this->relId;
     }
     
     public function &getRequestTypes() {
@@ -51,13 +49,5 @@ class StaticLink extends Model {
     
     public function setHref($href) {
         $this->href = $href;
-    }
-
-    public function getStateExpression() {
-        return $this->stateExpression;
-    }
-    
-    public function setStateExpression($stateExpression) {
-        $this->stateExpression = $stateExpression;
     }
 }

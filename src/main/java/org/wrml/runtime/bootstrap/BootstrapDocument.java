@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.bootstrap;
+package org.wrml.runtime.bootstrap;
 
 import java.net.URI;
 

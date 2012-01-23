@@ -26,6 +26,7 @@ import org.wrml.event.ModelEventListener;
 import org.wrml.model.api.ResourceTemplate;
 import org.wrml.model.schema.Schema;
 import org.wrml.runtime.Context;
+import org.wrml.util.observable.ObservableMap;
 import org.wrml.www.MediaType;
 
 /**
@@ -58,6 +59,8 @@ public interface Model extends Serializable {
     public Model getDynamicInterface();
 
     public Object getFieldValue(String fieldName);
+
+    public ObservableMap<URI, HyperLink> getHyperLinks();
 
     public MediaType getMediaType();
 

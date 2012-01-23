@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.Map;
 
+import org.wrml.HyperLink;
 import org.wrml.Model;
 import org.wrml.event.LinkEventListener;
 import org.wrml.model.api.LinkTemplate;
@@ -45,7 +46,7 @@ import org.wrml.www.MediaType;
  * LinkFormula
  * relies upon.
  */
-public final class HyperLink implements Serializable {
+public final class RuntimeHyperLink implements Serializable, HyperLink {
 
     private static final long serialVersionUID = -6235652220661484935L;
 
@@ -54,7 +55,7 @@ public final class HyperLink implements Serializable {
     private URI _Href;
     private boolean _Enabled;
 
-    public HyperLink(Model referrer, URI rel) {
+    public RuntimeHyperLink(Model referrer, URI rel) {
         _Referrer = referrer;
         _Rel = rel;
     }
@@ -370,6 +371,11 @@ public final class HyperLink implements Serializable {
 
     public boolean isEnabled() {
         return _Enabled;
+    }
+
+    public void removeEventListener(LinkEventListener listener) {
+        // TODO Auto-generated method stub
+
     }
 
     /**

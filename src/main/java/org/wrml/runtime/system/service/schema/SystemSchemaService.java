@@ -23,12 +23,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.wrml.Model;
-import org.wrml.bootstrap.BootstrapSchema;
-import org.wrml.bootstrap.FieldBootstrapSchema;
-import org.wrml.bootstrap.FieldNames;
-import org.wrml.bootstrap.SchemaBootstrapSchema;
 import org.wrml.model.schema.Field;
 import org.wrml.runtime.Context;
+import org.wrml.runtime.bootstrap.BootstrapSchema;
+import org.wrml.runtime.bootstrap.FieldBootstrapSchema;
+import org.wrml.runtime.bootstrap.FieldNames;
+import org.wrml.runtime.bootstrap.SchemaBootstrapSchema;
 import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.service.ProxyService;
 import org.wrml.service.Service;

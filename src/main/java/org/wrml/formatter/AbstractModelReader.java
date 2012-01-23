@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Stack;
 
 import org.wrml.Model;
+import org.wrml.model.schema.Link;
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
 import org.wrml.runtime.TypeSystem;
@@ -42,8 +43,7 @@ import org.wrml.util.observable.Observables;
 public abstract class AbstractModelReader implements ModelReader, Iterator<String> {
 
     private Stack<Model> _ModelStack;
-    private boolean _IsFinishedReading;
-
+    
     public void close() throws Exception {
         _ModelStack = null;
     }
@@ -54,7 +54,6 @@ public abstract class AbstractModelReader implements ModelReader, Iterator<Strin
 
     public void open(InputStream inputStream) throws Exception {
         _ModelStack = new Stack<Model>();
-        _IsFinishedReading = false;
     }
 
     public Model readModel(Context context, java.lang.reflect.Type nativeType) throws Exception {
@@ -63,21 +62,30 @@ public abstract class AbstractModelReader implements ModelReader, Iterator<Strin
         final Stack<Model> modelStack = getModelStack();
         modelStack.push(model);
 
-        System.out.println(this.getClass().getCanonicalName() + " - readModel: " + model);
+        System.out.println(this.getClass().getCanonicalName() + " - readModel: " + nativeType);
 
         // TODO: Use a Stack to track the model depth. Pass the stack down.
 
-        while (hasNext() && !_IsFinishedReading) {
+        while (hasNext()) {
 
             final String fieldName = next();
-
-            if ("links".equals(fieldName)) {
-                // TODO: !!!!----- Deal with links       
-                _IsFinishedReading = true;
+            if (fieldName == null) {
                 break;
             }
-
+            
             final Model currentModel = modelStack.peek();
+
+            if ("links".equals(fieldName)) {
+
+                final List<Object> list = new ArrayList<Object>();
+                readListElements(context, Link.class, list);
+                ObservableList<Object> links = Observables.observableList(list);
+
+                // TODO: Set the links on the model. 
+                //currentModel.getHyperLinks()
+                continue;
+            }
+
             final FieldPrototype fieldPrototype = getFieldPrototype(context, currentModel, fieldName);
 
             if (fieldPrototype == null) {

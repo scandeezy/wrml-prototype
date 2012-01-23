@@ -82,12 +82,25 @@ public class App {
 
         System.out.println("Static Schema fields: " + staticDocumentSchemaModel.getFields());
 
+        /*
+         * Fetch a simple Document from the Web. This is the first non-schema
+         * model loading test.
+         */
+
+        // There is no specially configured service for the WRML Document media type, so this will use the WWW (defaults to the web client)
         final Service documentService = context.getService(documentMediaType);
+
+        // The test document's ID
         final URI documentModelId = context.getStringTransformers().getTransformer(URI.class)
                 .bToA("http://www.wrml.org/test/docroot");
+
+        // GET the doc
         final Model dynamicDocumentModel = (Model) documentService.get(documentModelId, null, documentMediaType, null);
+
+        // Make it static
         final Document staticDocumentModel = (Document) dynamicDocumentModel.getStaticInterface();
 
+        
         System.out.println("Static Document id: " + staticDocumentModel.getId());
 
     }

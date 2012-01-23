@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
 
+import org.wrml.HyperLink;
 import org.wrml.Model;
 import org.wrml.formatter.ModelReader;
 import org.wrml.formatter.json.JsonModelReader;

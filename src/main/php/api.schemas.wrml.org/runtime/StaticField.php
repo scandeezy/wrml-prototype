@@ -29,7 +29,7 @@ class StaticField extends Model {
     public $readOnly;
     public $required;
     public $title;    
-    public $transient;
+    public $local;
             
     public function __construct($name, $type = Type::TEXT_TYPE) {        
         $this->name = $name;
@@ -41,7 +41,7 @@ class StaticField extends Model {
         $this->setHidden(false);
         $this->setReadOnly(false);
         $this->setRequired(false);
-        $this->setTransient(false);
+        $this->setLocal(false);
         
     }
 
@@ -101,11 +101,11 @@ class StaticField extends Model {
         return $this->title;
     }
 
-    public function setTransient($transient) {
-        $this->transient = $transient;
+    public function setLocal($local) {
+        $this->local = $local;
     }
     
-    public function getTransient() {
-        return $this->transient;
+    public function getLocal() {
+        return $this->local;
     }
 }

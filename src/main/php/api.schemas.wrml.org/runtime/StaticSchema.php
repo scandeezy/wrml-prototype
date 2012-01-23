@@ -23,10 +23,9 @@ class StaticSchema extends Model {
     
     public $id;
     public $name;
-    public $parentId;
     public $version;
     public $description;
-    public $baseSchemas;
+    public $baseSchemaIds;
     public $constraints;
     public $fields;
     public $links;
@@ -34,7 +33,7 @@ class StaticSchema extends Model {
     public function __construct($context) {
         $this->context = $context;
         $this->version = 1;
-        $this->baseSchemas = array();
+        $this->baseSchemaIds = array();
         $this->constraints = array();
         $this->fields = array();
         $this->links = array();                
@@ -47,6 +46,8 @@ class StaticSchema extends Model {
     public function getId() {
         return $this->id;
     }
+    
+    
     public function setId($id) {       
         $this->id = $id;        
         $this->name = basename($id);
@@ -61,9 +62,8 @@ class StaticSchema extends Model {
         $port = $uri['port'];
         $port = ($port != null) ? $port : "";
         $parentUri = $uri['scheme'] . '://' . $uri['host'] . $port . $parentUriPath;
-               
-        $this->parentId = $parentUri;
-    }
+    }       
+        
     
     public function getParentId() {
         return $this->parentId;
@@ -89,8 +89,8 @@ class StaticSchema extends Model {
         return $this->version;
     }
 
-    public function &getBaseSchemas() {
-        return $this->baseSchemas;
+    public function &getBaseSchemaIds() {
+        return $this->baseSchemaIds;
     }
     
     public function &getConstraints() {

@@ -27,27 +27,50 @@ class Schema extends StaticSchema {
         $this->setDescription("A schema describes the structure of a model independent of its format. Schemas provide contractual resource type definitions, which are a crucial component of the interface that binds a server and its clients together.");
                 
         $context = $this->getContext();                        
-                
-        $baseSchemas = &$this->getBaseSchemas();
-        $baseSchemas[] = $context->getRequestUri('/org/wrml/model/Document');
+            
+        //
+        // Base Schemas
+        //
+        
+        $baseSchemaIds = &$this->getBaseSchemaIds();
+        $baseSchemaIds[] = $context->getRequestUri(Context::DOCUMENT_SCHEMA_PATH);
+                        
+                        
+        //
+        // Fields
+        //
         
         $fields = &$this->getFields();
         
-        $baseSchemasField = new StaticField("baseSchemas", Type::LIST_TYPE);
-        $baseSchemasField->setDescription("The schema's base schemas. Schema extension allows a schema's forms to inherit the fields and links of its base schemas. Schema extension is analogous to the interface inheritance model offered by classical object-oriented programming languages like Java and C#.");        
+        // baseSchemaIds
+        $baseSchemaIdsField = new StaticField("baseSchemaIds", Type::LIST_TYPE);
+        $baseSchemaIdsField->setDescription("The schema's base schemas. Schema extension allows a schema's forms to inherit the fields and links of its base schemas. Schema extension is analogous to the interface inheritance model offered by classical object-oriented programming languages like Java and C#.");        
+        $fields[] = $baseSchemaIdsField;
         
-        //$uriTextSyntaxConstraint = $context->createUriTextSyntaxConstraint()->getId();
+        // description
+        $descriptionField = new StaticField("description", Type::TEXT_TYPE);
+        $descriptionField->setDescription("The description.");        
+        $fields[] = $descriptionField;
         
-        //$idFieldConstraints = &$baseSchemasField->getConstraints();        
-        //$idFieldConstraints[] = $uriTextSyntaxConstraint;
-        
-        $fields[] = $baseSchemasField;
-        
-        $fieldsField = new StaticField("fields", Type::MAP_TYPE);
+        // fields
+        $fieldsField = new StaticField("fields", Type::LIST_TYPE);
         $fieldsField->setDescription("The schema's field definitions.");
-        
         $fields[] = $fieldsField;
         
+        // version
+        $versionField = new StaticField("version", Type::INTEGER_TYPE);
+        $versionField->setDescription("The Version.");        
+        $fields[] = $versionField;
+        
+        // constraints
+        $constraintsField = new StaticField("constraints", Type::LIST_TYPE);
+        $fields[] = $constraintsField;
+                      
+        //
+        // Links
+        //
+
+       
     }
     
 

@@ -27,34 +27,39 @@ class Document extends StaticSchema {
         $this->setDescription("A resource archetype used to model a singular concept.");
                 
         $context = $this->getContext();
-                
+        
+        //
+        // Fields
+        //        
+        
         $fields = &$this->getFields();
+        
         
         // id
         $idField = new StaticField("id", Type::TEXT_TYPE);
-        $idField->setDescription("The document's identifier.");        
-        
-        $uriTextSyntaxConstraint = $context->createUriTextSyntaxConstraint()->getId();
-        
+        $idField->setDescription("The document's identifier.");                
+        $uriTextSyntaxConstraint = $context->createUriTextSyntaxConstraint()->getId();        
         $idFieldConstraints = &$idField->getConstraints();        
-        $idFieldConstraints[] = $uriTextSyntaxConstraint;
-        
+        $idFieldConstraints[] = $uriTextSyntaxConstraint;        
         $fields[] = $idField;
 
-        // parentId
-        $parentField = new StaticField("parentId", Type::TEXT_TYPE);
-        $parentField->setDescription("The document's parent identifier.");        
-        
-        $parentFieldConstraints = &$parentField->getConstraints();        
-        $parentFieldConstraints[] = $uriTextSyntaxConstraint;
-        
-        $fields[] = $parentField;
-
-        $links = &$this->getLinks();
-
-        // parentId
-        $self = $context->createLink("/common/self", $this->getId());                        
-        $links[] = $self;        
+                  
     }
+    
+     public function setId($id) {     
+        parent::setId($id);       
+        
+        $context = $this->getContext();
+        
+        //
+        // Links
+        //        
+        
+        $links = &$this->getLinks();
+        
+        // self
+        $self = $context->createLink("/common/self", $id);                        
+        $links[] = $self;      
+     }
 
 }
