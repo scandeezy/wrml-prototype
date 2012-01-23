@@ -1,0 +1,10 @@
+Options +FollowSymlinks
+RewriteEngine On
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}.php -f
+RewriteRule ^(.+)$ /$1.php [L,QSA]
+
+ErrorDocument 404 /errors/404
+ErrorDocument 500 /errors/500

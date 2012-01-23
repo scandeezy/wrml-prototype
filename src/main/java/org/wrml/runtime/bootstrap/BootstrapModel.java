@@ -28,7 +28,6 @@ import org.wrml.runtime.Context;
 import org.wrml.runtime.Contextual;
 import org.wrml.runtime.ReflectiveFieldMap;
 import org.wrml.runtime.TypeSystem;
-import org.wrml.util.observable.ObservableMap;
 
 /**
  * A bootstrap proxy-based implementation of WRML's Model interface.
@@ -55,11 +54,11 @@ public class BootstrapModel<M extends Model> extends Contextual implements Seria
 
     // TODO: Does the bootstrap model need links?
     /*
-    public ObservableMap<URI, HyperLink> getHyperLinks() {
-        return _HyperLinks;
-    }
-    */
-    
+     * public ObservableMap<URI, HyperLink> getHyperLinks() {
+     * return _HyperLinks;
+     * }
+     */
+
     public java.lang.reflect.Type getNativeType() {
         return _StaticInterfaceClass;
     }

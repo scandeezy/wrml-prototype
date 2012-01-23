@@ -186,6 +186,10 @@ public final class RuntimeModel extends Contextual implements Model {
         return _Fields.get(fieldName);
     }
 
+    public ObservableMap<URI, HyperLink> getHyperLinks() {
+        return _HyperLinks;
+    }
+
     public final HypermediaEngine getHypermediaEngine() {
         final ResourceTemplate resourceTemplate = getResourceTemplate();
         if (resourceTemplate == null) {
@@ -194,10 +198,6 @@ public final class RuntimeModel extends Contextual implements Model {
 
         final URI apiId = resourceTemplate.getRoot().getId();
         return getContext().getHypermediaEngine(apiId);
-    }
-
-    public ObservableMap<URI, HyperLink> getHyperLinks() {
-        return _HyperLinks;
     }
 
     public MediaType getMediaType() {

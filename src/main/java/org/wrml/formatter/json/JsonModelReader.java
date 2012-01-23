@@ -148,12 +148,12 @@ public class JsonModelReader extends AbstractModelReader {
 
             final Object element = readValue(context, elementNativeType);
             token = _JsonParser.nextToken();
-            
+
             if (element == null) {
                 break;
             }
 
-            list.add(element);            
+            list.add(element);
         }
     }
 

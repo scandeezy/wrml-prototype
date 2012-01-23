@@ -18,9 +18,7 @@ package org.wrml;
 
 import java.net.URI;
 
-import org.wrml.model.Document;
 import org.wrml.model.config.Config;
-import org.wrml.model.schema.Schema;
 import org.wrml.runtime.Context;
 import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.service.Service;
@@ -50,59 +48,9 @@ public class App {
          * fetched (remotely) from the schema service.
          */
 
-        final SystemTransformers systemTransformers = context.getSystemTransformers();
-        final MediaType schemaMediaType = systemTransformers.getMediaTypeToNativeTypeTransformer().bToA(Schema.class);
-        final Service schemaService = context.getService(schemaMediaType);
-
-        // Get the media type representing the base Document: application/wrml; schema="http://.../org/wrml/model/Document" 
-        final MediaType documentMediaType = systemTransformers.getMediaTypeToNativeTypeTransformer().bToA(
-                Document.class);
-
-        // Get the schema id representing the base Document: http://.../org/wrml/model/Document
-        final URI documentSchemaId = systemTransformers.getMediaTypeToSchemaIdTransformer().aToB(documentMediaType);
-
-        // Get the (remote) model representing the Document schema.
-        final Model dynamicDocumentSchemaModel = (Model) schemaService.get(documentSchemaId, null, schemaMediaType,
-                null);
-
-        // Use the dynamic interface
-        System.out.println("Dynamic Schema id: " + dynamicDocumentSchemaModel.getFieldValue("id"));
-        System.out.println("Dynamic Schema description: " + dynamicDocumentSchemaModel.getFieldValue("description"));
-        System.out
-                .println("Dynamic Schema baseSchemaIds: " + dynamicDocumentSchemaModel.getFieldValue("baseSchemaIds"));
-        System.out.println("Dynamic Schema fields: " + dynamicDocumentSchemaModel.getFieldValue("fields"));
-
-        // Get the static interface
-        final Schema staticDocumentSchemaModel = (Schema) dynamicDocumentSchemaModel.getStaticInterface();
-
-        // Use the static interface
-        System.out.println("Static Schema id: " + staticDocumentSchemaModel.getId());
-        System.out.println("Static Schema description: " + staticDocumentSchemaModel.getDescription());
-        System.out.println("Static Schema baseSchemaIds: " + staticDocumentSchemaModel.getBaseSchemaIds());
-
-        System.out.println("Static Schema fields: " + staticDocumentSchemaModel.getFields());
-
-        /*
-         * Fetch a simple Document from the Web. This is the first non-schema
-         * model loading test.
-         */
-
-        // There is no specially configured service for the WRML Document media type, so this will use the WWW (defaults to the web client)
-        final Service documentService = context.getService(documentMediaType);
-
-        // The test document's ID
-        final URI documentModelId = context.getStringTransformers().getTransformer(URI.class)
-                .bToA("http://www.wrml.org/test/docroot");
-
-        // GET the doc
-        final Model dynamicDocumentModel = (Model) documentService.get(documentModelId, null, documentMediaType, null);
-
-        // Make it static
-        final Document staticDocumentModel = (Document) dynamicDocumentModel.getStaticInterface();
-
-        
-        System.out.println("Static Document id: " + staticDocumentModel.getId());
-
+        testGetResourceModel(context, "org.wrml.model.Document");
+        testGetResourceModel(context, "org.wrml.model.api.Api");
+        testGetResourceModel(context, "org.wrml.model.Collection");
     }
 
     private static Config createConfig(String[] args) {
@@ -118,5 +66,33 @@ public class App {
          */
 
         return null;
+    }
+
+    private static Model getDynamicModel(final Context context, final String resourceIdString,
+            final String resourceSchemaName) throws ClassNotFoundException {
+
+        final URI resourceId = context.getStringTransformers().getTransformer(URI.class).bToA(resourceIdString);
+
+        final SystemTransformers systemTransformers = context.getSystemTransformers();
+        final MediaType responseType = systemTransformers.getMediaTypeToNativeTypeTransformer().bToA(
+                Class.forName(resourceSchemaName));
+        final Service service = context.getService(responseType);
+
+        return (Model) service.get(resourceId, null, responseType, null);
+    }
+
+    private static void testGetResourceModel(final Context context, final String resourceSchemaName)
+            throws ClassNotFoundException {
+
+        // Get a resource model
+        final Model dynamicModel = getDynamicModel(context, "http://www.wrml.org/test/" + resourceSchemaName,
+                resourceSchemaName);
+
+        System.out.println("Dynamic Model: " + dynamicModel);
+
+        // Make it static
+        final Model staticModel = dynamicModel.getStaticInterface();
+
+        System.out.println("Static Model (" + staticModel.getNativeType() + "): " + staticModel);
     }
 }

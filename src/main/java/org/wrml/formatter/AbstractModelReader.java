@@ -43,7 +43,7 @@ import org.wrml.util.observable.Observables;
 public abstract class AbstractModelReader implements ModelReader, Iterator<String> {
 
     private Stack<Model> _ModelStack;
-    
+
     public void close() throws Exception {
         _ModelStack = null;
     }
@@ -72,14 +72,14 @@ public abstract class AbstractModelReader implements ModelReader, Iterator<Strin
             if (fieldName == null) {
                 break;
             }
-            
+
             final Model currentModel = modelStack.peek();
 
             if ("links".equals(fieldName)) {
 
                 final List<Object> list = new ArrayList<Object>();
                 readListElements(context, Link.class, list);
-                ObservableList<Object> links = Observables.observableList(list);
+                final ObservableList<Object> links = Observables.observableList(list);
 
                 // TODO: Set the links on the model. 
                 //currentModel.getHyperLinks()
