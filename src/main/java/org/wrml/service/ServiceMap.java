@@ -22,18 +22,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.wrml.runtime.Context;
+import org.wrml.runtime.Contextual;
 
 /**
  * A base service class that provides some helpful reusable implementations of
  * the Service interface's methods.
  * 
  */
-public abstract class ServiceMap implements Service {
-
-    private final transient Context _Context;
+public abstract class ServiceMap extends Contextual implements Service {
 
     public ServiceMap(Context context) {
-        _Context = context;
+        super(context);
     }
 
     /*
@@ -58,10 +57,6 @@ public abstract class ServiceMap implements Service {
 
     public Object get(Object resourceId) {
         return get((URI) resourceId, null, null, null);
-    }
-
-    public final Context getContext() {
-        return _Context;
     }
 
     public boolean isEmpty() {

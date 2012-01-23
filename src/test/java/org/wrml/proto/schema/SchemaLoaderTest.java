@@ -16,21 +16,24 @@
 
 package org.wrml.proto.schema;
 
-
 /**
  * Tests for the behavior of SchemaLoader
  */
 public class SchemaLoaderTest {
 
     /*
-    @Ignore("ObservableMap needs an implementation. (This is no longer a unit test.)")
-    @Test
-    public void shouldLoadSimpleSchema() {
-        final SchemaLoader loader = new SchemaLoader();
-
-        final Schema schema = loader.load("classpath://simple.json");
-
-        assertThat("example schema field", schema.getFields().get("example"), is(notNullValue()));
-    }
-    */
+     * @Ignore(
+     * "ObservableMap needs an implementation. (This is no longer a unit test.)"
+     * )
+     * 
+     * @Test
+     * public void shouldLoadSimpleSchema() {
+     * final SchemaLoader loader = new SchemaLoader();
+     * 
+     * final Schema schema = loader.load("classpath://simple.json");
+     * 
+     * assertThat("example schema field", schema.getFields().get("example"),
+     * is(notNullValue()));
+     * }
+     */
 }

@@ -18,6 +18,10 @@ package org.wrml.bootstrap;
 
 public class FieldNames {
 
+    public static enum Constrainable {
+        constraints;
+    }
+
     public static enum Descriptive {
         description;
     }
@@ -56,10 +60,6 @@ public class FieldNames {
         baseSchemaIds,
         fields,
         links;
-    }
-
-    public static enum Constrainable {
-        constraints;
     }
 
     public static enum Titled {

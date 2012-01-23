@@ -86,6 +86,4 @@ public enum Type {
      */
     Double;
 
-
-
 }

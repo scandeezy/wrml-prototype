@@ -26,9 +26,9 @@ import org.wrml.util.observable.ObservableList;
 
 public interface ConstraintDefinition extends Named, Titled, Versioned, Descriptive, Document {
 
-    public ObservableList<CodeOnDemand> getEnforcers();
-
     public ConstraintType getConstraintType();
+
+    public ObservableList<CodeOnDemand> getEnforcers();
 
     public ConstraintType setConstraintType(ConstraintType constraintType);
 }

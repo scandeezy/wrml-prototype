@@ -26,6 +26,7 @@ import org.wrml.model.schema.Link;
 import org.wrml.model.schema.Schema;
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
+import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.util.observable.ObservableList;
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.util.observable.Observables;
@@ -82,10 +83,10 @@ public class BootstrapSchema extends BootstrapDocument<Schema> {
     private String _Name;
 
     public BootstrapSchema(Context context, URI id) {
-        super(context, Schema.class, null, id);
+        super(context, Schema.class, id);
 
         _BaseSchemaIds = Observables.observableList(new ArrayList<URI>());
-        _Constraints = Observables.observableList(new ArrayList<Constraint<Schema>>());                
+        _Constraints = Observables.observableList(new ArrayList<Constraint<Schema>>());
         _BootstrapFields = Observables.observableList(new ArrayList<BootstrapField>());
     }
 
@@ -111,7 +112,7 @@ public class BootstrapSchema extends BootstrapDocument<Schema> {
             return Observables.emptyList();
         }
 
-        List<Field> fields = new ArrayList<Field>();
+        final List<Field> fields = new ArrayList<Field>();
         for (final BootstrapField bootstrapField : _BootstrapFields) {
             fields.add((Field) bootstrapField.getStaticInterface());
         }
@@ -156,7 +157,8 @@ public class BootstrapSchema extends BootstrapDocument<Schema> {
     }
 
     protected final URI getSchemaId(String schemaFullName) {
-        return getContext().getSchemaIdToFullNameTransformer().bToA(schemaFullName);
+        final SystemTransformers systemTransformers = getContext().getSystemTransformers();
+        return systemTransformers.getSchemaIdToFullNameTransformer().bToA(schemaFullName);
     }
 
 }

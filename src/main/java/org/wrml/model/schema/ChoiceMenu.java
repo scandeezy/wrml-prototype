@@ -27,9 +27,9 @@ public interface ChoiceMenu extends Named, Versioned, Descriptive, Document {
 
     public int getDefaultChoiceIndex();
 
-    public ObservableList<String> getItems();
-
     public ObservableMap<String, String> getItemComment();
+
+    public ObservableList<String> getItems();
 
     public int setDefaultChoiceIndex(int defaultChoiceIndex);
 

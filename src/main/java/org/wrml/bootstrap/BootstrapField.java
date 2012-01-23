@@ -18,20 +18,14 @@ package org.wrml.bootstrap;
 
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Map;
 
-import org.wrml.Model;
-import org.wrml.TypeSystem;
-import org.wrml.event.FieldEventListener;
-import org.wrml.event.LinkEventListener;
-import org.wrml.event.ModelEventListener;
-import org.wrml.model.api.ResourceTemplate;
 import org.wrml.model.schema.Constraint;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Schema;
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
-import org.wrml.util.MediaType;
+import org.wrml.runtime.TypeSystem;
+import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.util.observable.ObservableList;
 import org.wrml.util.observable.Observables;
 
@@ -66,10 +60,11 @@ public class BootstrapField extends BootstrapModel<Field> {
 
         _Constraints = Observables.observableList(new ArrayList<Constraint<Field>>());
 
-        _DefaultValue = (Object) TypeSystem.instance.getDefaultValue(TypeSystem.instance.getTypeToClassTransformer()
-                .aToB(type));
+        final TypeSystem typeSystem = context.getTypeSystem();
+        final SystemTransformers systemTransformers = context.getSystemTransformers();
+        _DefaultValue = typeSystem.getDefaultValue(systemTransformers.getNativeTypeToTypeTransformer().bToA(type));
     }
-    
+
     public final ObservableList<Constraint<Field>> getConstraints() {
         return _Constraints;
     }
@@ -180,6 +175,5 @@ public class BootstrapField extends BootstrapModel<Field> {
     public String toString() {
         return getClass().getName() + " { name : \"" + _Name + "\", type : \"" + _Type + "\" }";
     }
-
 
 }

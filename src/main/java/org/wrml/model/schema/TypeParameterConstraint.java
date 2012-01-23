@@ -17,6 +17,5 @@
 package org.wrml.model.schema;
 
 public interface TypeParameterConstraint<T extends Constrainable<T>> extends Typed, Constraint<T> {
-    
 
 }

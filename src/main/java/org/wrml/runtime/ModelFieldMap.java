@@ -20,40 +20,29 @@ import java.net.URI;
 import java.util.Map;
 
 import org.wrml.Model;
-import org.wrml.TypeSystem;
 import org.wrml.model.CodeOnDemand;
 import org.wrml.model.schema.Constraint;
 import org.wrml.model.schema.Field;
-import org.wrml.model.schema.Type;
-import org.wrml.util.DelegatingFieldMap;
-import org.wrml.util.MediaType;
+import org.wrml.runtime.system.service.schema.Prototype;
 import org.wrml.util.observable.ObservableList;
 
 public class ModelFieldMap extends DelegatingFieldMap {
 
     private Model _Model;
 
-    public ModelFieldMap(final Map<String, Object> delegate) {
-        super(delegate);
-
+    public ModelFieldMap(final Context context, final Map<String, Object> delegate) {
+        super(context, delegate);
     }
 
-    public final Context getContext() {
-        return getModel().getContext();
+    public Model getModel() {
+        return _Model;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    protected <V> Class<V> getFieldType(String fieldName) {
-
-        final Prototype prototype = getContext().getPrototype(getMediaType());
-        final Type type = prototype.getFieldPrototype(fieldName).getType();
-        return (Class<V>) TypeSystem.instance.getTypeToClassTransformer().aToB(type);
-
-    }
-
-    private MediaType getMediaType() {
-        return getModel().getMediaType();
+    protected java.lang.reflect.Type getFieldNativeType(String fieldName) {
+        final java.lang.reflect.Type nativeType = getModel().getNativeType();
+        final Prototype prototype = getContext().getPrototype(nativeType);
+        return prototype.getFieldPrototype(fieldName).getNativeType();
     }
 
     @Override
@@ -64,7 +53,7 @@ public class ModelFieldMap extends DelegatingFieldMap {
         return false;
     }
 
-    @SuppressWarnings("unchecked")
+    @Override
     protected Object setRawFieldValue(final String fieldName, Object newValue) {
 
         /*
@@ -106,15 +95,23 @@ public class ModelFieldMap extends DelegatingFieldMap {
         return super.setRawFieldValue(fieldName, newValue);
     }
 
+    void setModel(Model model) {
+        if (_Model != null) {
+            throw new IllegalStateException("This " + getClass().getCanonicalName() + " (" + this
+                    + ") already has a model.");
+        }
+        _Model = model;
+    }
+
     private void enforceFieldConstraints(Field field) {
 
         final ObservableList<Constraint<Field>> fieldConstraints = field.getConstraints();
         if ((fieldConstraints != null) && (fieldConstraints.size() > 0)) {
-            for (Constraint<Field> fieldConstraint : fieldConstraints) {
-                ObservableList<CodeOnDemand> enforcerScripts = fieldConstraint.getDefinition().getEnforcers();
-                for (CodeOnDemand enforcerScript : enforcerScripts) {
+            for (final Constraint<Field> fieldConstraint : fieldConstraints) {
+                final ObservableList<CodeOnDemand> enforcerScripts = fieldConstraint.getDefinition().getEnforcers();
+                for (final CodeOnDemand enforcerScript : enforcerScripts) {
 
-                    URI codeUri = enforcerScript.getCodeUri();
+                    final URI codeUri = enforcerScript.getCodeUri();
 
                     /*
                      * TODO: Download and execute:
@@ -135,18 +132,6 @@ public class ModelFieldMap extends DelegatingFieldMap {
             }
         }
 
-    }
-
-    public Model getModel() {
-        return _Model;
-    }
-
-    void setModel(Model model) {
-        if (_Model != null) {
-            throw new IllegalStateException("This " + getClass().getCanonicalName() + " (" + this
-                    + ") already has a model.");
-        }
-        _Model = model;
     }
 
 }

@@ -19,7 +19,7 @@ package org.wrml.model.alert;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
-import org.wrml.util.http.Status;
+import org.wrml.www.http.Status;
 
 public interface Alert extends Named, Titled, Descriptive {
 

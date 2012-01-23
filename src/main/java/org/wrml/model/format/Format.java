@@ -23,8 +23,8 @@ import org.wrml.model.CodeOnDemand;
 import org.wrml.model.Descriptive;
 import org.wrml.model.Titled;
 import org.wrml.model.Versioned;
-import org.wrml.util.MediaType;
 import org.wrml.util.observable.ObservableList;
+import org.wrml.www.MediaType;
 
 public interface Format extends Titled, Versioned, Descriptive, Model {
 

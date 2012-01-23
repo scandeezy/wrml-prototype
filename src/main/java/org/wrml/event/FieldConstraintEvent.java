@@ -19,8 +19,8 @@ package org.wrml.event;
 import java.util.EventObject;
 
 import org.wrml.Model;
-import org.wrml.util.enforcer.EnforcementResult;
-import org.wrml.util.enforcer.FieldConstraintEnforcer;
+import org.wrml.enforcer.EnforcementResult;
+import org.wrml.enforcer.FieldConstraintEnforcer;
 
 public class FieldConstraintEvent extends EventObject {
 
@@ -29,7 +29,8 @@ public class FieldConstraintEvent extends EventObject {
     private final FieldConstraintEnforcer _FieldConstraintEnforcer;
     private final EnforcementResult _EnforcementResult;
 
-    public FieldConstraintEvent(Model source, FieldConstraintEnforcer fieldConstraintEnforcer, EnforcementResult enforcementResult) {
+    public FieldConstraintEvent(Model source, FieldConstraintEnforcer fieldConstraintEnforcer,
+            EnforcementResult enforcementResult) {
         super(source);
         _FieldConstraintEnforcer = fieldConstraintEnforcer;
         _EnforcementResult = enforcementResult;

@@ -26,16 +26,15 @@ import org.wrml.model.Collection;
 import org.wrml.model.api.Api;
 import org.wrml.model.api.LinkTemplate;
 
-final class HypermediaEngine {
+final class HypermediaEngine extends Contextual {
 
-    private final transient Context _Context;
     private final URI _ApiId;
     private final Map<URI, Resource> _Resources;
 
     private List<LinkTemplate> _LinkTemplates;
 
     public HypermediaEngine(Context context, URI apiId) {
-        _Context = context;
+        super(context);
         _ApiId = apiId;
         _Resources = new HashMap<URI, Resource>();
     }
@@ -46,10 +45,6 @@ final class HypermediaEngine {
 
     public URI getApiId() {
         return _ApiId;
-    }
-
-    public Context getContext() {
-        return _Context;
     }
 
     public List<LinkTemplate> getLinkTemplates() {

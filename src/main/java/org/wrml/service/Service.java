@@ -21,8 +21,8 @@ import java.util.Map;
 
 import org.wrml.Model;
 import org.wrml.runtime.Context;
-import org.wrml.util.MediaType;
-import org.wrml.util.transformer.Transformer;
+import org.wrml.transformer.Transformer;
+import org.wrml.www.MediaType;
 
 /**
  * This is the (still-evolving) core "backend connection" CRUD interface that is
@@ -36,6 +36,10 @@ public interface Service extends Map<URI, Object> {
 
     public Object create(URI collectionId, Object requestEntity, MediaType responseType, Model referrer);
 
+    // TODO: Refactor this design  
+    // Move params (Object cachedEntity, MediaType responseType, Model referrer) to a RequestOptions schema
+    // public Object get(URI resourceId, RequestOptions options);
+    // Do this for "create" and all overloads of the Map interface methods
     public Object get(URI resourceId, Object cachedEntity, MediaType responseType, Model referrer);
 
     public Context getContext();

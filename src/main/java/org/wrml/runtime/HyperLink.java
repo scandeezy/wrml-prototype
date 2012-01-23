@@ -25,10 +25,12 @@ import org.wrml.event.LinkEventListener;
 import org.wrml.model.api.LinkTemplate;
 import org.wrml.model.schema.Link;
 import org.wrml.model.schema.LinkRelation;
+import org.wrml.runtime.system.service.schema.Prototype;
+import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.service.Service;
-import org.wrml.util.MediaType;
+import org.wrml.transformer.Transformer;
 import org.wrml.util.observable.ObservableMap;
-import org.wrml.util.transformer.Transformer;
+import org.wrml.www.MediaType;
 
 /**
  * A Model instance's Link. This class represents a link "instance", that is
@@ -61,7 +63,7 @@ public final class HyperLink implements Serializable {
         // TODO Add an event listener
     }
 
-    public Object click(MediaType responseType, Object requestEntity, Map<String, String> hrefParams) {
+    public Object click(java.lang.reflect.Type nativeReturnType, Object requestEntity, Map<String, String> hrefParams) {
 
         // TODO: Fire the pre-Click Event
 
@@ -214,6 +216,13 @@ public final class HyperLink implements Serializable {
 
         final Model referrer = getReferrer();
         final Context context = referrer.getContext();
+        final SystemTransformers systemTransformers = context.getSystemTransformers();
+
+        final Transformer<MediaType, java.lang.reflect.Type> mediaTypeToNativeTypeTransformer = systemTransformers
+                .getMediaTypeToNativeTypeTransformer();
+
+        // Convert native response type to media type.
+        final MediaType responseType = mediaTypeToNativeTypeTransformer.bToA(nativeReturnType);
 
         if ((responseType != null) && !isGeneratableResponseType(responseType)) {
             // TODO: Preemptively throw "406 Not Acceptable" exception
@@ -228,9 +237,7 @@ public final class HyperLink implements Serializable {
 
         if (requestEntity != null) {
 
-            final Transformer<MediaType, Class<?>> mediaTypeToClassTransformer = context
-                    .getMediaTypeToClassTransformer();
-            requestType = mediaTypeToClassTransformer.bToA(requestEntity.getClass());
+            requestType = mediaTypeToNativeTypeTransformer.bToA(requestEntity.getClass());
 
             if ((requestType != null) && !isSupportedRequestType(requestType)) {
                 // TODO: Preemptively throw "415 Unsupported Media Type" exception
@@ -248,10 +255,12 @@ public final class HyperLink implements Serializable {
         Object responseEntity = null;
 
         final LinkRelation rel = getLinkRelation();
-        final org.wrml.util.http.Method method = rel.getMethod();
+        final org.wrml.www.http.Method method = rel.getMethod();
         switch (method) {
 
         // TODO: Handle collections here?
+
+        // TODO: It might be helpful to pass the nativeReturnType to the Service too?
 
         case GET:
             responseEntity = responseTypeService.get(href, null, responseType, referrer);
@@ -306,7 +315,8 @@ public final class HyperLink implements Serializable {
     public Link getLink() {
         final Model referrer = getReferrer();
         final Context context = referrer.getContext();
-        final Prototype prototype = context.getPrototype(referrer.getMediaType());
+        final java.lang.reflect.Type nativeType = referrer.getNativeType();
+        final Prototype prototype = context.getPrototype(nativeType);
 
         final ObservableMap<URI, Link> links = prototype.getLinksByRel();
         final URI rel = getLinkRelationId();
@@ -316,7 +326,9 @@ public final class HyperLink implements Serializable {
     public LinkRelation getLinkRelation() {
         final Model referrer = getReferrer();
         final Context context = referrer.getContext();
-        final MediaType linkRelationMediaType = context.getMediaTypeToClassTransformer().bToA(LinkRelation.class);
+        final SystemTransformers systemTransformers = context.getSystemTransformers();
+        final MediaType linkRelationMediaType = systemTransformers.getMediaTypeToNativeTypeTransformer().bToA(
+                LinkRelation.class);
         final Service service = context.getService(linkRelationMediaType);
         return (LinkRelation) ((Model) service.get(getLinkRelationId(), null, linkRelationMediaType, referrer))
                 .getStaticInterface();

@@ -35,14 +35,15 @@ import org.wrml.model.DocumentMetadata;
 import org.wrml.model.DocumentOptions;
 import org.wrml.model.api.ResourceTemplate;
 import org.wrml.model.schema.Schema;
+import org.wrml.runtime.system.service.schema.Prototype;
+import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.service.ProxyService;
 import org.wrml.service.Service;
-import org.wrml.util.FieldMap;
-import org.wrml.util.MediaType;
 import org.wrml.util.observable.MapEvent;
 import org.wrml.util.observable.MapEventListener;
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.util.observable.Observables;
+import org.wrml.www.MediaType;
 
 /**
  * <p>
@@ -51,9 +52,10 @@ import org.wrml.util.observable.Observables;
  * REST-based application framework.
  * </p>
  */
-public final class RuntimeModel implements Model {
+public final class RuntimeModel extends Contextual implements Model {
 
     private Model _StaticInterface;
+    private final java.lang.reflect.Type _NativeType;
 
     private static final long serialVersionUID = 1L;
 
@@ -62,30 +64,20 @@ public final class RuntimeModel implements Model {
 
     private transient FieldMapEventListener _FieldMapEventListener;
 
-    private final transient Context _Context;
-
-    private final MediaType _MediaType;
-
-    private URI _ResourceTemplateId;
-
-    private final List<URI> _EmbeddedLinkRelationIds;
     private transient List<ModelEventListener> _EventListeners;
     private transient Map<String, List<FieldEventListener>> _FieldEventListeners;
 
-    RuntimeModel(Context context, MediaType mediaType, List<URI> embeddedLinkRelationIds, FieldMap fieldMap,
-            Map<URI, HyperLink> linkMap) {
+    private MediaType _MediaType;
+    private URI _ResourceTemplateId;
 
-        if (context == null) {
-            throw new NullPointerException("Context cannot be null");
+    RuntimeModel(Context context, java.lang.reflect.Type nativeType, FieldMap fieldMap, Map<URI, HyperLink> linkMap) {
+        super(context);
+
+        if (nativeType == null) {
+            throw new NullPointerException("Static Interface Type cannot be null");
         }
 
-        if (mediaType == null) {
-            throw new NullPointerException("Media Type cannot be null");
-        }
-
-        _Context = context;
-        _MediaType = mediaType;
-        _EmbeddedLinkRelationIds = embeddedLinkRelationIds;
+        _NativeType = nativeType;
 
         _Fields = Observables.observableMap(fieldMap);
         _FieldMapEventListener = new FieldMapEventListener();
@@ -148,8 +140,8 @@ public final class RuntimeModel implements Model {
 
     }
 
-    @SuppressWarnings("unchecked")
-    public Object clickLink(URI rel, MediaType responseType, Object requestEntity, Map<String, String> hrefParams) {
+    public Object clickLink(URI rel, java.lang.reflect.Type nativeReturnType, Object requestEntity,
+            Map<String, String> hrefParams) {
         final HyperLink hyperLink = getHyperLink(rel);
 
         if (hyperLink == null) {
@@ -157,7 +149,7 @@ public final class RuntimeModel implements Model {
             return null;
         }
 
-        return hyperLink.click(responseType, requestEntity, hrefParams);
+        return hyperLink.click(nativeReturnType, requestEntity, hrefParams);
     }
 
     public void die() {
@@ -185,25 +177,10 @@ public final class RuntimeModel implements Model {
 
     }
 
-    private void extendFields(Model modelToExtend) {
-        final RuntimeModel modelToExtendDynamicInterface = (RuntimeModel) modelToExtend.getDynamicInterface();
-        final Map<String, Object> fieldsToExtend = modelToExtendDynamicInterface._Fields;
-        _Fields.putAll(fieldsToExtend);
-    }
-
-    public final Context getContext() {
-        return _Context;
-    }
-
     public Model getDynamicInterface() {
         return this;
     }
 
-    public final List<URI> getEmbeddedLinkRelationIds() {
-        return _EmbeddedLinkRelationIds;
-    }
-
-    @SuppressWarnings("unchecked")
     public Object getFieldValue(String fieldName) {
         return _Fields.get(fieldName);
     }
@@ -220,6 +197,16 @@ public final class RuntimeModel implements Model {
 
     public ObservableMap<URI, HyperLink> getLinkMap() {
         return _Links;
+    }
+
+    public MediaType getMediaType() {
+
+        if (_MediaType == null) {
+            _MediaType = getContext().getSystemTransformers().getMediaTypeToNativeTypeTransformer()
+                    .bToA(getNativeType());
+        }
+
+        return _MediaType;
     }
 
     public DocumentMetadata getMetadata() {
@@ -244,6 +231,16 @@ public final class RuntimeModel implements Model {
         return myService;
     }
 
+    public java.lang.reflect.Type getNativeType() {
+        return _NativeType;
+    }
+
+    public java.lang.reflect.Type[] getNativeTypeParameters() {
+        final Context context = getContext();
+        final TypeSystem typeSystem = context.getTypeSystem();
+        return typeSystem.getNativeTypeParameters(getNativeType());
+    }
+
     public DocumentOptions getOptions() {
         // TODO Auto-generated method stub
         return null;
@@ -252,6 +249,10 @@ public final class RuntimeModel implements Model {
     public Document getParent() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public Prototype getPrototype() {
+        return getContext().getPrototype(getNativeType());
     }
 
     public final Resource getResource() {
@@ -279,19 +280,10 @@ public final class RuntimeModel implements Model {
     }
 
     public final URI getSchemaId() {
-        final Context context = getContext();
-        return context.getSchemaIdToMediaTypeTransformer().bToA(getMediaType());
+        final SystemTransformers systemTransformers = getContext().getSystemTransformers();
+        return systemTransformers.getMediaTypeToSchemaIdTransformer().aToB(getMediaType());
     }
 
-    public MediaType getMediaType() {
-        return _MediaType;
-    }
-
-    public Prototype getPrototype() {
-        return getContext().getPrototype(getMediaType());
-    }
-
-    @SuppressWarnings("unchecked")
     public Model getStaticInterface() {
 
         if (Proxy.isProxyClass(this.getClass())) {
@@ -314,7 +306,8 @@ public final class RuntimeModel implements Model {
 
         final URI schemaId = getSchemaId();
         final Context context = getContext();
-        final URI modelSchemaURI = context.getSchemaIdToClassTransformer().bToA(Model.class);
+        final SystemTransformers systemTransformers = context.getSystemTransformers();
+        final URI modelSchemaURI = systemTransformers.getClassToSchemaIdTransformer().aToB(Model.class);
         if (modelSchemaURI.equals(schemaId)) {
 
             /*
@@ -328,13 +321,8 @@ public final class RuntimeModel implements Model {
              * No need to proxy.
              */
 
-            return (Model) this;
+            return this;
         }
-
-        // Get the Java class representing our schema
-        final Class<?> schemaInterface = context.getSchemaIdToClassTransformer().aToB(schemaId);
-
-        //System.err.println("====== getStaticInterface() schemaId : \"" + schemaId + "\" schemaInterface : \""  + schemaInterface + "\" (" + hashCode() + ")");
 
         /*
          * If we already implement the interface...
@@ -344,22 +332,24 @@ public final class RuntimeModel implements Model {
          * class has been subclassed? This may be needed if this class ever
          * becomes un-final. Not sure if it is harmful to keep here anyway.
          */
-        if (schemaInterface.isInstance(this)) {
-            _StaticInterface = (Model) schemaInterface.cast(this);
-        }
-        else {
+        //if (_NativeType.isInstance(this)) {
+        //    _StaticInterface = (Model) _NativeType.cast(this);
+        //}
+        //else {
 
-            /*
-             * Create a proxy that layers the static Java interface
-             * associated
-             * with this model's "declared" schema.
-             */
+        /*
+         * Create a proxy that layers the static Java interface
+         * associated
+         * with this model's "declared" schema.
+         */
 
-            final Class<?>[] schemaInterfaceArray = new Class<?>[] { schemaInterface };
-            final StaticInterfaceFacade facade = new StaticInterfaceFacade(this);
+        final Class<?> schemaInterfaceClass = systemTransformers.getNativeTypeToClassTransformer()
+                .aToB(getNativeType());
+        final Class<?>[] schemaInterfaceArray = new Class<?>[] { schemaInterfaceClass };
+        final StaticInterfaceFacade facade = new StaticInterfaceFacade(this);
 
-            _StaticInterface = (Model) Proxy.newProxyInstance(context, schemaInterfaceArray, facade);
-        }
+        _StaticInterface = (Model) Proxy.newProxyInstance(context, schemaInterfaceArray, facade);
+        //}
 
         /*
          * We are now able to return this same static interface repeatedly.
@@ -399,6 +389,11 @@ public final class RuntimeModel implements Model {
         fieldEventListenerList.remove(listener);
     }
 
+    public final void removeLinkEventListener(URI linkRelationId, LinkEventListener listener) {
+        // TODO Auto-generated method stub
+
+    }
+
     /*
      * public void save() {
      * 
@@ -411,11 +406,6 @@ public final class RuntimeModel implements Model {
      * needed?
      * }
      */
-
-    public final void removeLinkEventListener(URI linkRelationId, LinkEventListener listener) {
-        // TODO Auto-generated method stub
-
-    }
 
     public void setAllFieldsToDefaultValue() {
 
@@ -434,6 +424,10 @@ public final class RuntimeModel implements Model {
 
     }
 
+    public Object setFieldValue(String fieldName, Object newValue) {
+        return _Fields.put(fieldName, newValue);
+    }
+
     /*
      * public void refresh(boolean atomic) {
      * final URI id = getId();
@@ -448,11 +442,6 @@ public final class RuntimeModel implements Model {
      * become(newThis, atomic);
      * }
      */
-
-    @SuppressWarnings("unchecked")
-    public Object setFieldValue(String fieldName, Object newValue) {
-        return _Fields.put(fieldName, newValue);
-    }
 
     @Override
     public String toString() {
@@ -505,6 +494,12 @@ public final class RuntimeModel implements Model {
         //    setAllFieldsToDefaultValue();
     }
 
+    private void extendFields(Model modelToExtend) {
+        final RuntimeModel modelToExtendDynamicInterface = (RuntimeModel) modelToExtend.getDynamicInterface();
+        final Map<String, Object> fieldsToExtend = modelToExtendDynamicInterface._Fields;
+        _Fields.putAll(fieldsToExtend);
+    }
+
     private void fireConstraintViolated(final FieldEvent event) {
         final String fieldName = event.getFieldName();
         final List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
@@ -550,6 +545,10 @@ public final class RuntimeModel implements Model {
         }
 
         return _Links.get(rel);
+    }
+
+    private Class<?> getStaticInterfaceClass() {
+        return getContext().getSystemTransformers().getNativeTypeToClassTransformer().aToB(getNativeType());
     }
 
     private class FieldMapEventListener implements MapEventListener<String, Object> {

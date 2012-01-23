@@ -22,9 +22,9 @@ import org.wrml.model.Document;
 import org.wrml.model.UriTemplateParameter;
 import org.wrml.model.Versioned;
 import org.wrml.model.schema.LinkRelation;
-import org.wrml.util.MediaType;
 import org.wrml.util.observable.ObservableList;
 import org.wrml.util.observable.ObservableMap;
+import org.wrml.www.MediaType;
 
 /**
  * A Link template exists within a specific API's design metadata. It is part of
@@ -41,14 +41,8 @@ public interface LinkTemplate extends Versioned, Document {
 
     public URI getEndPointId();
 
-    // Generated from Field
-    //     Name: endPointParamDefaults 
-    //     Value: List[Schema[UriTemplateParameter]]
     public ObservableList<UriTemplateParameter> getEndPointParamDefaults();
 
-    // Generated from Field
-    //     Name: endPointParams 
-    //     Value: Map[ Key=Text[URI], Value=List[Schema[UriTemplateParameter]] ]
     public ObservableMap<URI, ObservableList<UriTemplateParameter>> getEndPointParams();
 
     public LinkRelation getLinkRelation();
@@ -59,30 +53,12 @@ public interface LinkTemplate extends Versioned, Document {
 
     public URI getReferrerId();
 
-    // Generated from Field
-    //     Name: requestTypes 
-    //     Value: List[Text[MediaType]]
     public ObservableList<MediaType> getRequestTypes();
 
-    // Generated from Field
-    //     Name: responseTypes 
-    //     Value: List[Text[MediaType]]    
     public ObservableList<MediaType> getResponseTypes();
 
-    // Generated from Link
-    //     Relation: restApiTemplate
-    //         Methods: GET 
-    //         ResponseSchema: Api
-    //     EnabledFormula: restApiTemplateId != null
-    //     DestinationUriTemplate: {restApiTemplateId} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["restApiTemplateId"]]
-    //     Href: <restApiTemplateId>
     public Api getRestApiTemplate();
 
-    // Generated from Field
-    //     Name: restApiTemplateId 
-    //     Value: Text[URI] 
-    //     Flags: Required, ReadOnly
     public URI getRestApiTemplateId();
 
     public URI setEndPointId(URI endPointId);

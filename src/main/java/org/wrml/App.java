@@ -20,11 +20,11 @@ import java.net.URI;
 
 import org.wrml.model.Document;
 import org.wrml.model.config.Config;
-import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Schema;
 import org.wrml.runtime.Context;
+import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.service.Service;
-import org.wrml.util.MediaType;
+import org.wrml.www.MediaType;
 
 /**
  * Greetings Program! http://www.moviesounds.com/tron/grtprgrm.wav
@@ -35,12 +35,10 @@ public class App {
 
         // Create a context for this simple test application
 
-        Config config = createConfig(args);
+        final Config config = createConfig(args);
 
         final Context context = new Context(config);
 
-        
-        
         /*
          * The above code exercised the "bootstrap" meta schema, which is
          * handled internally by the core framework implementation, without
@@ -51,37 +49,47 @@ public class App {
          * implemented as bootstrap classes. This means that they WILL be
          * fetched (remotely) from the schema service.
          */
-        
-        final MediaType schemaMediaType = context.getMediaTypeToClassTransformer().bToA(Schema.class);
+
+        final SystemTransformers systemTransformers = context.getSystemTransformers();
+        final MediaType schemaMediaType = systemTransformers.getMediaTypeToNativeTypeTransformer().bToA(Schema.class);
         final Service schemaService = context.getService(schemaMediaType);
-        
+
         // Get the media type representing the base Document: application/wrml; schema="http://.../org/wrml/model/Document" 
-        final MediaType documentMediaType = context.getMediaTypeToClassTransformer().bToA(Document.class);
+        final MediaType documentMediaType = systemTransformers.getMediaTypeToNativeTypeTransformer().bToA(
+                Document.class);
 
         // Get the schema id representing the base Document: http://.../org/wrml/model/Document
-        final URI documentSchemaId = context.getSchemaIdToMediaTypeTransformer().bToA(documentMediaType);
+        final URI documentSchemaId = systemTransformers.getMediaTypeToSchemaIdTransformer().aToB(documentMediaType);
 
         // Get the (remote) model representing the Document schema.
         final Model dynamicDocumentSchemaModel = (Model) schemaService.get(documentSchemaId, null, schemaMediaType,
                 null);
-        
+
         // Use the dynamic interface
-        System.out.println("Dynamic name: " + dynamicDocumentSchemaModel.getFieldValue("name"));
-        System.out.println("Dynamic id: " + dynamicDocumentSchemaModel.getFieldValue("id"));
-        System.out.println("Dynamic description: " + dynamicDocumentSchemaModel.getFieldValue("description"));
-        System.out.println("Dynamic baseSchemaIds: " + dynamicDocumentSchemaModel.getFieldValue("baseSchemaIds"));
-        System.out.println("Dynamic fields: " + dynamicDocumentSchemaModel.getFieldValue("fields"));
+        System.out.println("Dynamic Schema id: " + dynamicDocumentSchemaModel.getFieldValue("id"));
+        System.out.println("Dynamic Schema description: " + dynamicDocumentSchemaModel.getFieldValue("description"));
+        System.out
+                .println("Dynamic Schema baseSchemaIds: " + dynamicDocumentSchemaModel.getFieldValue("baseSchemaIds"));
+        System.out.println("Dynamic Schema fields: " + dynamicDocumentSchemaModel.getFieldValue("fields"));
 
         // Get the static interface
         final Schema staticDocumentSchemaModel = (Schema) dynamicDocumentSchemaModel.getStaticInterface();
 
         // Use the static interface
-        System.out.println("Static name: " + staticDocumentSchemaModel.getName());
-        System.out.println("Static id: " + staticDocumentSchemaModel.getId());
-        System.out.println("Static description: " + staticDocumentSchemaModel.getDescription());
-        System.out.println("Static baseSchemaIds: " + staticDocumentSchemaModel.getBaseSchemaIds());
+        System.out.println("Static Schema id: " + staticDocumentSchemaModel.getId());
+        System.out.println("Static Schema description: " + staticDocumentSchemaModel.getDescription());
+        System.out.println("Static Schema baseSchemaIds: " + staticDocumentSchemaModel.getBaseSchemaIds());
 
-        System.out.println("Static fields: " + staticDocumentSchemaModel.getFields());
+        System.out.println("Static Schema fields: " + staticDocumentSchemaModel.getFields());
+
+        final Service documentService = context.getService(documentMediaType);
+        final URI documentModelId = context.getStringTransformers().getTransformer(URI.class)
+                .bToA("http://www.wrml.org/test/docroot");
+        final Model dynamicDocumentModel = (Model) documentService.get(documentModelId, null, documentMediaType, null);
+        final Document staticDocumentModel = (Document) dynamicDocumentModel.getStaticInterface();
+
+        System.out.println("Static Document id: " + staticDocumentModel.getId());
+
     }
 
     private static Config createConfig(String[] args) {

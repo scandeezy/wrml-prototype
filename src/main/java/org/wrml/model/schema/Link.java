@@ -18,8 +18,8 @@ package org.wrml.model.schema;
 
 import java.net.URI;
 
-import org.wrml.util.MediaType;
 import org.wrml.util.observable.ObservableList;
+import org.wrml.www.MediaType;
 
 public interface Link extends SchemaMember<Link> {
 

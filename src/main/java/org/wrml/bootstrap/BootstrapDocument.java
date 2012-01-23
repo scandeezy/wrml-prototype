@@ -17,7 +17,6 @@
 package org.wrml.bootstrap;
 
 import java.net.URI;
-import java.util.List;
 
 import org.wrml.model.Document;
 import org.wrml.runtime.Context;
@@ -37,8 +36,8 @@ public class BootstrapDocument<D extends Document> extends BootstrapModel<D> {
     private boolean _ReadOnly;
     private Long _SecondsToLive;
 
-    public BootstrapDocument(Context context, Class<D> staticType, List<URI> embeddedLinkRelationIds, URI id) {
-        super(context, staticType, embeddedLinkRelationIds);
+    public BootstrapDocument(Context context, Class<D> staticType, URI id) {
+        super(context, staticType);
 
         setId(id);
 

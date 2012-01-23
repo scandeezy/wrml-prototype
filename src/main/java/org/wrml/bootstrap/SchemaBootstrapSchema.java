@@ -71,7 +71,7 @@ public class SchemaBootstrapSchema extends DocumentBootstrapSchema {
         fieldName = FieldNames.Schema.fields.toString();
         final BootstrapField fieldsField = createBootstrapField(fieldName, Type.List);
         fields.add(fieldsField);
-        
+
         // links
         fieldName = FieldNames.Schema.links.toString();
         final BootstrapField linksField = createBootstrapField(fieldName, Type.List);
@@ -81,7 +81,7 @@ public class SchemaBootstrapSchema extends DocumentBootstrapSchema {
         fieldName = FieldNames.Named.name.toString();
         final BootstrapField nameField = createBootstrapField(fieldName, Type.Text);
         fields.add(nameField);
-        
+
         // version
         fieldName = FieldNames.Versioned.version.toString();
         final BootstrapField versionField = createBootstrapField(fieldName, Type.Long);

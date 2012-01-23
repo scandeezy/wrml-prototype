@@ -16,7 +16,7 @@
 
 package org.wrml.model.schema;
 
-import org.wrml.util.MediaType;
+import org.wrml.www.MediaType;
 
 public interface MediaTypeConstraint<T extends Constrainable<T>> extends Constraint<T> {
 

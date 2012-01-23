@@ -18,7 +18,6 @@ package org.wrml;
 
 import java.io.Serializable;
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 
 import org.wrml.event.FieldEventListener;
@@ -27,7 +26,7 @@ import org.wrml.event.ModelEventListener;
 import org.wrml.model.api.ResourceTemplate;
 import org.wrml.model.schema.Schema;
 import org.wrml.runtime.Context;
-import org.wrml.util.MediaType;
+import org.wrml.www.MediaType;
 
 /**
  * <p>
@@ -35,16 +34,6 @@ import org.wrml.util.MediaType;
  * in both the design-time context of data "modeling" and the runtime context of
  * a client-server "Model" View Controller (MVC) Web application.
  * </p>
- * 
- * <blockquote>
- * "You're a problem solver. You’re one of these people who would pick up a
- * rope that's gotten all tangled up and spend an entire day untangling it.
- * Because it's a challenge, because it defies your sense of order in the
- * universe, and because you can."
- * <blockquote>
- * 
- * <span>-- Delenn, Babylon 5</span>
- * 
  */
 public interface Model extends Serializable {
 
@@ -54,7 +43,8 @@ public interface Model extends Serializable {
 
     public void addLinkEventListener(URI linkRelationId, LinkEventListener listener);
 
-    public Object clickLink(URI rel, MediaType responseType, Object requestEntity, Map<String, String> hrefParams);
+    public Object clickLink(URI rel, java.lang.reflect.Type nativeReturnType, Object requestEntity,
+            Map<String, String> hrefParams);
 
     /**
      * Die means that the model is gone but may not be deleted
@@ -67,11 +57,13 @@ public interface Model extends Serializable {
 
     public Model getDynamicInterface();
 
-    public List<URI> getEmbeddedLinkRelationIds();
-
     public Object getFieldValue(String fieldName);
 
     public MediaType getMediaType();
+
+    public java.lang.reflect.Type getNativeType();
+
+    public java.lang.reflect.Type[] getNativeTypeParameters();
 
     public ResourceTemplate getResourceTemplate();
 

@@ -20,8 +20,9 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.wrml.Model;
-import org.wrml.TypeSystem;
-import org.wrml.model.schema.Type;
+import org.wrml.runtime.system.service.schema.FieldPrototype;
+import org.wrml.runtime.system.service.schema.LinkPrototype;
+import org.wrml.runtime.system.service.schema.Prototype;
 import org.wrml.util.DelegatingInvocationHandler;
 
 public class StaticInterfaceFacade extends DelegatingInvocationHandler {
@@ -42,22 +43,22 @@ public class StaticInterfaceFacade extends DelegatingInvocationHandler {
 
         final Model model = getDelegateModel().getStaticInterface();
         final Context context = model.getContext();
-        final Prototype prototype = context.getPrototype(model.getMediaType());
+        final Prototype prototype = context.getPrototype(model.getNativeType());
 
-        final String methodKey = getMethodKey(method);
-        final String methodName = method.getName();
-
-        Type type = TypeSystem.instance.getTypeToClassTransformer().bToA(method.getReturnType());
-        final FieldPrototype fieldPrototype = prototype.getFieldPrototype(methodKey, methodName, type);
+        final String fieldName = getFieldName(method);
+        final FieldPrototype fieldPrototype = prototype.getFieldPrototype(fieldName);
         if (fieldPrototype != null) {
+            FieldAccessType fieldAccessType = FieldAccessType.GET;
             Object fieldValue = null;
-            if ((fieldPrototype.getAccessType() == FieldAccessType.SET) && (args != null) && (args.length > 0)) {
+            if (method.getName().startsWith("set") && (args != null) && (args.length > 0)) {
+                fieldAccessType = FieldAccessType.SET;
                 fieldValue = args[0];
             }
-            return fieldPrototype.accessField(model, fieldValue);
+            return fieldPrototype.accessField(model, fieldAccessType, fieldValue);
         }
 
-        final LinkPrototype linkPrototype = prototype.getLinkPrototype(methodKey, methodName, method.getReturnType());
+        final String methodKey = getMethodKey(method);
+        final LinkPrototype linkPrototype = prototype.getLinkPrototype(methodKey, method);
         if (linkPrototype != null) {
 
             final Object requestEntity = ((args != null) && (args.length > 0)) ? args[0] : null;
@@ -75,6 +76,28 @@ public class StaticInterfaceFacade extends DelegatingInvocationHandler {
 
     private Model getDelegateModel() {
         return (Model) getDelegate();
+    }
+
+    private String getFieldName(Method method) {
+
+        final String methodName = method.getName();
+        String possibleFieldName = null;
+        if (methodName.startsWith("get")) {
+            possibleFieldName = methodName.substring(3);
+        }
+        else if (methodName.startsWith("is")) {
+            possibleFieldName = methodName.substring(2);
+        }
+        else if (methodName.startsWith("set")) {
+            possibleFieldName = methodName.substring(3);
+        }
+
+        if (possibleFieldName != null) {
+
+            possibleFieldName = Character.toLowerCase(possibleFieldName.charAt(0)) + possibleFieldName.substring(1);
+        }
+
+        return possibleFieldName;
     }
 
 }

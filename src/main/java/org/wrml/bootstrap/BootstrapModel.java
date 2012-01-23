@@ -20,14 +20,14 @@ import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.wrml.Model;
 import org.wrml.runtime.Context;
+import org.wrml.runtime.Contextual;
 import org.wrml.runtime.HyperLink;
-import org.wrml.util.MediaType;
-import org.wrml.util.ReflectiveFieldMap;
+import org.wrml.runtime.ReflectiveFieldMap;
+import org.wrml.runtime.TypeSystem;
 
 /**
  * A bootstrap proxy-based implementation of WRML's Model interface.
@@ -35,23 +35,16 @@ import org.wrml.util.ReflectiveFieldMap;
  * @param <M>
  *            The Model type to proxy.
  */
-public class BootstrapModel<M extends Model> implements Serializable {
+public class BootstrapModel<M extends Model> extends Contextual implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final transient Context _Context;
-    private final Class<M> _StaticType;
+    private final Class<M> _StaticInterfaceClass;
     private M _StaticInterface;
-    private final List<URI> _EmbeddedLinkRelationIds;
 
-    public BootstrapModel(final Context context, final Class<M> staticType) {
-        this(context, staticType, null);
-    }
-
-    public BootstrapModel(final Context context, final Class<M> staticType, final List<URI> embeddedLinkRelationIds) {
-        _Context = context;
-        _StaticType = staticType;
-        _EmbeddedLinkRelationIds = embeddedLinkRelationIds;
+    public BootstrapModel(final Context context, final Class<M> staticInterfaceClass) {
+        super(context);
+        _StaticInterfaceClass = staticInterfaceClass;
     }
 
     @Override
@@ -59,12 +52,14 @@ public class BootstrapModel<M extends Model> implements Serializable {
         return super.equals(obj);
     }
 
-    public final Context getContext() {
-        return _Context;
+    public java.lang.reflect.Type getNativeType() {
+        return _StaticInterfaceClass;
     }
 
-    public final List<URI> getEmbeddedLinkRelationIds() {
-        return _EmbeddedLinkRelationIds;
+    public java.lang.reflect.Type[] getNativeTypeParameters() {
+        final Context context = getContext();
+        final TypeSystem typeSystem = context.getTypeSystem();
+        return typeSystem.getNativeTypeParameters(getNativeType());
     }
 
     @SuppressWarnings("unchecked")
@@ -76,27 +71,18 @@ public class BootstrapModel<M extends Model> implements Serializable {
 
         if (_StaticInterface == null) {
 
-            final Class<M> staticType = getStaticType();
             final Context context = getContext();
 
-            final MediaType mediaType = context.getMediaTypeToClassTransformer().bToA(staticType);
-
-            final List<URI> embeddedLinkRelationIds = getEmbeddedLinkRelationIds();
-
-            final ReflectiveFieldMap<M> fieldMap = new ReflectiveFieldMap<M>(this, staticType);
+            final ReflectiveFieldMap<M> fieldMap = new ReflectiveFieldMap<M>(context, this, _StaticInterfaceClass);
 
             final Map<URI, HyperLink> linkMap = new HashMap<URI, HyperLink>();
 
-            _StaticInterface = (M) context.instantiateModel(mediaType, embeddedLinkRelationIds, fieldMap, linkMap)
+            _StaticInterface = (M) context.instantiateModel(_StaticInterfaceClass, fieldMap, linkMap)
                     .getStaticInterface();
 
         }
 
         return _StaticInterface;
-    }
-
-    public final Class<M> getStaticType() {
-        return _StaticType;
     }
 
     @Override
@@ -106,7 +92,8 @@ public class BootstrapModel<M extends Model> implements Serializable {
 
     @Override
     public String toString() {
-        return getClass().getName() + " { staticType : \"" + _StaticType + "\", hashCode : " + hashCode() + "}";
+        return getClass().getName() + " { staticType : \"" + _StaticInterfaceClass + "\", hashCode : " + hashCode()
+                + "}";
     }
 
 }

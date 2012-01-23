@@ -21,9 +21,9 @@ import org.wrml.model.Document;
 import org.wrml.model.Named;
 import org.wrml.model.Titled;
 import org.wrml.model.Versioned;
-import org.wrml.util.MediaType;
-import org.wrml.util.http.Method;
 import org.wrml.util.observable.ObservableList;
+import org.wrml.www.MediaType;
+import org.wrml.www.http.Method;
 
 /**
  * Link relations are a big deal in WRML. They are a first class entity with

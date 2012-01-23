@@ -16,40 +16,37 @@
 
 package org.wrml.runtime;
 
+import java.io.InputStream;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
 
 import org.wrml.Model;
+import org.wrml.formatter.ModelReader;
+import org.wrml.formatter.json.JsonModelReader;
 import org.wrml.model.Container;
 import org.wrml.model.Document;
 import org.wrml.model.config.Config;
-import org.wrml.model.format.Format;
 import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Schema;
+import org.wrml.runtime.system.service.schema.Prototype;
+import org.wrml.runtime.system.service.schema.SystemSchemaService;
+import org.wrml.runtime.system.service.www.WebClient;
+import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.service.CachingService;
 import org.wrml.service.Service;
-import org.wrml.service.WebClient;
-import org.wrml.util.FieldMap;
-import org.wrml.util.MediaType;
+import org.wrml.transformer.CachingTransformer;
+import org.wrml.transformer.Transformer;
+import org.wrml.transformer.Transformers;
+import org.wrml.transformer.tostring.MediaTypeToStringTransformer;
+import org.wrml.transformer.tostring.UriToStringTransformer;
 import org.wrml.util.observable.DelegatingObservableMap;
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.util.observable.Observables;
-import org.wrml.util.transformer.CachingTransformer;
-import org.wrml.util.transformer.ClassToStringTransformer;
-import org.wrml.util.transformer.FormatIdToMediaTypeTransformer;
-import org.wrml.util.transformer.MediaTypeToClassTransformer;
-import org.wrml.util.transformer.MediaTypeToFormatTransformer;
-import org.wrml.util.transformer.MediaTypeToStringTransformer;
-import org.wrml.util.transformer.SchemaIdToClassTransformer;
-import org.wrml.util.transformer.SchemaIdToFullNameTransformer;
-import org.wrml.util.transformer.SchemaIdToMediaTypeTransformer;
-import org.wrml.util.transformer.Transformer;
-import org.wrml.util.transformer.UriToStringTransformer;
+import org.wrml.www.MediaType;
 
 /**
  * 
@@ -128,26 +125,20 @@ import org.wrml.util.transformer.UriToStringTransformer;
  */
 public class Context extends ClassLoader {
 
-    public static final URI DEFAULT_SCHEMA_API_DOCROOT = URI.create("http://api.schemas.wrml.org/");
-    public static final URI DEFAULT_FORMAT_API_DOCROOT = URI.create("http://api.formats.wrml.org/");
+    private final Config _Config;
 
     private final ObservableMap<MediaType, Service> _Services;
+    private final SystemSchemaService _SystemSchemaService;
 
-    private Transformer<MediaType, String> _MediaTypeToStringTransformer;
-    private Transformer<MediaType, Class<?>> _MediaTypeToClassTransformer;
-    private Transformer<URI, MediaType> _SchemaIdToMediaTypeTransformer;
-    private Transformer<URI, Class<?>> _SchemaIdToClassTransformer;
-    private Transformer<URI, String> _SchemaIdToFullNameTransformer;
-    private Transformer<URI, String> _UriToStringTransformer;
-    private Transformer<URI, MediaType> _FormatIdToMediaTypeTransformer;
-    private Transformer<MediaType, Format> _MediaTypeToFormatTransformer;
-
-    private final Config _Config;
     private Service _DefaultService;
 
     private final ObservableMap<URI, HypermediaEngine> _HypermediaEngines;
-    private SystemSchemaService _SystemSchemaService;
-    private Transformer<Class<?>, String> _ClassToStringTransformer;
+
+    private final Transformers<String> _StringTransformers;
+    private final SystemTransformers _SystemTransformers;
+    private final TypeSystem _TypeSystem;
+
+    private final Service _WWW;
 
     public Context(final Config config) {
         this(config, getSystemClassLoader());
@@ -157,122 +148,49 @@ public class Context extends ClassLoader {
         super(parent);
 
         _Config = config;
+
         _HypermediaEngines = Observables.observableMap(new HashMap<URI, HypermediaEngine>());
         _Services = Observables.observableMap(new HashMap<MediaType, Service>());
 
-        initSystemTransformers();
+        _StringTransformers = new Transformers<String>(this);
+
+        final Transformer<URI, String> uriToStringTransformer = CachingTransformer.create(new UriToStringTransformer(),
+                new WeakHashMap<URI, String>(), new WeakHashMap<String, URI>());
+
+        _StringTransformers.setTransformer(URI.class, uriToStringTransformer);
+
+        final Transformer<MediaType, String> mediaTypeToStringTransformer = CachingTransformer.create(
+                new MediaTypeToStringTransformer(), new WeakHashMap<MediaType, String>(),
+                new WeakHashMap<String, MediaType>());
+
+        _StringTransformers.setTransformer(MediaType.class, mediaTypeToStringTransformer);
+
+        _SystemTransformers = new SystemTransformers(this);
+        _TypeSystem = new TypeSystem(this);
+
+        _WWW = new WebClient(this);
+        final Service defaultService = instantiateCachingService(_WWW);
+        setDefaultService(defaultService);
+
+        _SystemSchemaService = new SystemSchemaService(this, _WWW);
+        setSchemaService(_SystemSchemaService);
 
         initTransformers();
-
-        initSystemServices();
 
         initServices();
 
         bootstrap();
-        
+
         // TODO: Do something interesting with the config...like loading WRML REST API definitions
     }
 
-    private void bootstrap() {
+    public ModelReader createModelReader(MediaType mediaType, InputStream inputStream) throws Exception {
 
-        // Get the media type: application/wrml; schema="http://.../org/wrml/model/schema/Schema"
-        final MediaType schemaMediaType = getMediaTypeToClassTransformer().bToA(Schema.class);
+        // TODO: Do not hardcode this, determine this based on the Media Type (and configured readers)
 
-        /*
-         * Get the Context-configured Service that is able to "service" requests
-         * for this media type.
-         * 
-         * In this instance we are testing a special case where the service
-         * is responsible for facilitating interactions with Schema resources.
-         */
-        final Service schemaService = getService(schemaMediaType);
-
-        /*
-         * Like all WRML Services, the Schema Service is a Map that is keyed on
-         * URI. If we want to get a Schema model (value) from the Schema Service
-         * (Map) then we need to know the Schema's id, its URI (key).
-         */
-
-        Transformer<URI, MediaType> schemaIdToMediaTypeTransformer = getSchemaIdToMediaTypeTransformer();
-
-        // Get the media type: application/wrml; schema="http://.../org/wrml/model/schema/Field"
-        final MediaType fieldMediaType = getMediaTypeToClassTransformer().bToA(Field.class);
-        final URI fieldSchemaId = schemaIdToMediaTypeTransformer.bToA(fieldMediaType);
-
-        // Use the Service's overloaded get method to request the Field Schema.
-        final Model dynamicFieldSchemaModel = (Model) schemaService.get(fieldSchemaId, null, schemaMediaType, null);
-
-
-        /*
-         * Using the model instance's dynamic (Map-like) Java API we can get
-         * field values (Objects) names based on their names (Strings).
-         * 
-         * Generally speaking accessing the fields of a model dynamically is
-         * appropriate in cases where the static type information is not
-         * necessary.
-         */
-        
-        System.out.println("Dynamic name: " + dynamicFieldSchemaModel.getFieldValue("name"));
-        System.out.println("Dynamic id: " + dynamicFieldSchemaModel.getFieldValue("id"));
-        System.out.println("Dynamic description: " + dynamicFieldSchemaModel.getFieldValue("description"));
-        System.out.println("Dynamic baseSchemaIds: " + dynamicFieldSchemaModel.getFieldValue("baseSchemaIds"));
-        //System.out.println("Dynamic fields: " + dynamicMetaSchemaModel.getFieldValue("fields"));
-        
-        /*
-         * In the Java implementation of WRML, models have two APIs.
-         * 
-         * First, as demonstrated above, there is the inner more "dynamic"
-         * interface with the getFieldValue, setFieldValue, and clickLink
-         * methods.
-         * 
-         * Second, there is a reflection proxy-based static interface that
-         * allows Java programs to address WRML models by their auto-generated
-         * Java interface. The interface reference that is returned is a thin
-         * "facade" over the model's dynamic interface, which ensures that
-         * behavior will be consistent between the two APIs.
-         * 
-         * In this example, we have the model that represents the schema for
-         * Schemas (like WRML's Class<Class<?>>).
-         */
-        final Schema staticFieldSchemaModel = (Schema) dynamicFieldSchemaModel.getStaticInterface();
-        
-        System.out.println("Static name: " + staticFieldSchemaModel.getName());
-        System.out.println("Static id: " + staticFieldSchemaModel.getId());
-        System.out.println("Static description: " + staticFieldSchemaModel.getDescription());
-        System.out.println("Static baseSchemaIds: " + staticFieldSchemaModel.getBaseSchemaIds());
-        
-        /*
-         * If we want to get the Schema that represents the form of all WRML
-         * models, then we are looking for the MetaSchema, which has an id value
-         * of "http://.../org/wrml/model/schema/Schema", which we know is part
-         * of the media type that we used to get the service. So we already have
-         * what we need to get the URI in the media type but we can use a
-         * pre-existing transformer to handle this conversion for us.
-         * 
-         * Using the right transformer, we can get the URI id of a given schema
-         * by starting with a WRML media type (with a schema param).
-         */
-        
-        final URI schemaSchemaId = schemaIdToMediaTypeTransformer.bToA(schemaMediaType);
-
-        // Use the Service's overloaded get method to request the MetaSchema.
-        final Model dynamicMetaSchemaModel = (Model) schemaService.get(schemaSchemaId, null, schemaMediaType, null);
-
-
-        System.out.println("Dynamic name: " + dynamicMetaSchemaModel.getFieldValue("name"));
-        System.out.println("Dynamic id: " + dynamicMetaSchemaModel.getFieldValue("id"));
-        System.out.println("Dynamic description: " + dynamicMetaSchemaModel.getFieldValue("description"));
-        System.out.println("Dynamic baseSchemaIds: " + dynamicMetaSchemaModel.getFieldValue("baseSchemaIds"));
-        //System.out.println("Dynamic fields: " + dynamicMetaSchemaModel.getFieldValue("fields"));
-
-        final Schema staticMetaSchemaModel = (Schema) dynamicMetaSchemaModel.getStaticInterface();
-
-        System.out.println("Static name: " + staticMetaSchemaModel.getName());
-        System.out.println("Static id: " + staticMetaSchemaModel.getId());
-        System.out.println("Static description: " + staticMetaSchemaModel.getDescription());
-        System.out.println("Static baseSchemaIds: " + staticMetaSchemaModel.getBaseSchemaIds());
-        //System.out.println("Static fields: " + staticModel.getFields());
-
+        final JsonModelReader reader = new JsonModelReader();
+        reader.open(inputStream);
+        return reader;
     }
 
     public final void fetchAllDocuments(Container<? extends Document> documents, List<? extends Document> allDocuments) {
@@ -286,10 +204,6 @@ public class Context extends ClassLoader {
 
     }
 
-    public final Transformer<Class<?>, String> getClassToStringTransformer() {
-        return _ClassToStringTransformer;
-    }
-
     public Config getConfig() {
         return _Config;
     }
@@ -297,16 +211,6 @@ public class Context extends ClassLoader {
     public Service getDefaultService() {
         return _DefaultService;
     }
-
-    public Transformer<URI, MediaType> getFormatIdToMediaTypeTransformer() {
-        return _FormatIdToMediaTypeTransformer;
-    }
-
-    /*
-     * TODO: Consider moving all of this voodoo to the SchemaService interface.
-     * Keep this class more universally useful to all apss - not just the
-     * bootstrapping of the WRML runtime "app".
-     */
 
     public final HypermediaEngine getHypermediaEngine(URI apiId) {
         if (!_HypermediaEngines.containsKey(apiId)) {
@@ -317,101 +221,19 @@ public class Context extends ClassLoader {
         return _HypermediaEngines.get(apiId);
     }
 
-    public Transformer<MediaType, Class<?>> getMediaTypeToClassTransformer() {
-        return _MediaTypeToClassTransformer;
-    }
-
-    public Transformer<MediaType, Format> getMediaTypeToFormatTransformer() {
-        return _MediaTypeToFormatTransformer;
-    }
-
-    public Transformer<MediaType, String> getMediaTypeToStringTransformer() {
-        return _MediaTypeToStringTransformer;
-    }
-
-    public final URI getMetaSchemaId() {
-        return getSchemaIdToClassTransformer().bToA(Schema.class);
-    }
-
-    public final Prototype getPrototype(MediaType mediaType) {
-        return _SystemSchemaService.getPrototype(mediaType);
+    public final Prototype getPrototype(java.lang.reflect.Type staticInterfaceType) {
+        return _SystemSchemaService.getPrototype(staticInterfaceType);
     }
 
     public final Schema getSchema(URI schemaId) {
-        final MediaType schemaMediaType = getMediaTypeToClassTransformer().bToA(Schema.class);
+        final MediaType schemaMediaType = getSystemTransformers().getMediaTypeToNativeTypeTransformer().bToA(
+                Schema.class);
         final Service schemaService = getService(schemaMediaType);
         return (Schema) ((Model) schemaService.get(schemaId, null, schemaMediaType, null)).getStaticInterface();
     }
 
-    /*
-     * private Prototype getMetaPrototype() {
-     * 
-     * if (_MetaPrototype == null) {
-     * _MetaPrototype = new Prototype(this, getMetaSchemaId(), true);
-     * }
-     * 
-     * return _MetaPrototype;
-     * }
-     */
-
-    public final Transformer<URI, Class<?>> getSchemaIdToClassTransformer() {
-        return _SchemaIdToClassTransformer;
-    }
-
-    public final Transformer<URI, String> getSchemaIdToFullNameTransformer() {
-        return _SchemaIdToFullNameTransformer;
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> void mapFieldsByFieldName(final Map<T, Field> fieldMap, final List<Field> fieldList,
-            final String fieldName) {
-        for (Field schemaField : fieldList) {
-            fieldMap.put((T) schemaField.getFieldValue(fieldName), schemaField);
-        }
-    }
-
-    public MediaType normalize(MediaType other) {
-        if (!other.isWrml()) {
-            return other;
-        }
-
-        ObservableMap<String, String> parameters = other.getParameters();
-
-        if (parameters != null && parameters.containsKey(MediaType.PARAMETER_NAME_FORMAT)) {
-
-            SortedMap<String, String> normalizedParameters = new TreeMap<String, String>(parameters);
-            normalizedParameters.remove(MediaType.PARAMETER_NAME_FORMAT);
-
-            String normalizedMediaTypeString = MediaType.createWrmlMediaTypeString(
-                    parameters.get(MediaType.PARAMETER_NAME_SCHEMA), normalizedParameters);
-
-            return getMediaTypeToStringTransformer().bToA(normalizedMediaTypeString);
-        }
-
-        return other;
-
-    }
-
-    public boolean schematicallyEquals(MediaType a, MediaType b) {
-        return normalize(a).equals(normalize(b));
-    }
-
-    /*
-     * public final StringTransformer<?>
-     * getStringTransformer(TextSyntaxConstraint textSyntaxConstraint) {
-     * // TODO: Implement this mapping with configuration-based mapping falling
-     * back to code on demand
-     * return null;
-     * 
-     * }
-     */
-
-    public final Transformer<URI, MediaType> getSchemaIdToMediaTypeTransformer() {
-        return _SchemaIdToMediaTypeTransformer;
-    }
-
-    public final Service getService(Class<?> clazz) {
-        final URI schemaId = getSchemaIdToClassTransformer().bToA(clazz);
+    public final Service getService(Class<?> schemaInterfaceType) {
+        final URI schemaId = getSystemTransformers().getClassToSchemaIdTransformer().aToB(schemaInterfaceType);
         return getService(schemaId);
     }
 
@@ -434,20 +256,38 @@ public class Context extends ClassLoader {
     }
 
     public final Service getService(String className) {
-        final URI schemaId = getSchemaIdToFullNameTransformer().bToA(className);
+        final URI schemaId = getSystemTransformers().getSchemaIdToFullNameTransformer().bToA(className);
         return getService(schemaId);
     }
 
+    /*
+     * public final StringTransformer<?>
+     * getStringTransformer(TextSyntaxConstraint textSyntaxConstraint) {
+     * // TODO: Implement this mapping with configuration-based mapping falling
+     * back to code on demand
+     * return null;
+     * 
+     * }
+     */
+
     public final Service getService(URI schemaId) {
-        return getService(getSchemaIdToMediaTypeTransformer().aToB(schemaId));
+        return getService(getSystemTransformers().getMediaTypeToSchemaIdTransformer().bToA(schemaId));
     }
 
     public final ObservableMap<MediaType, Service> getServices() {
         return _Services;
     }
 
-    public final Transformer<URI, String> getUriToStringTransformer() {
-        return _UriToStringTransformer;
+    public Transformers<String> getStringTransformers() {
+        return _StringTransformers;
+    }
+
+    public SystemTransformers getSystemTransformers() {
+        return _SystemTransformers;
+    }
+
+    public TypeSystem getTypeSystem() {
+        return _TypeSystem;
     }
 
     public final CachingService instantiateCachingService(Service originService) {
@@ -456,72 +296,39 @@ public class Context extends ClassLoader {
         return new CachingService(this, originService, observableModelCache);
     }
 
-    public final Model instantiateModel(Class<?> schemaClass) {
-        return instantiateModel(getMediaTypeToClassTransformer().bToA(schemaClass));
-    }
-
-    public final Model instantiateModel(URI schemaId) {
-        return instantiateModel(getSchemaIdToMediaTypeTransformer().aToB(schemaId));
-    }
-
-    public final Model instantiateModel(MediaType mediaType) {
+    public final Model instantiateModel(java.lang.reflect.Type staticInterfaceType) {
 
         final Map<String, Object> fieldBackingMap = new TreeMap<String, Object>();
         final Map<URI, HyperLink> linkBackingMap = new HashMap<URI, HyperLink>();
 
-        final ModelFieldMap modelFieldMap = new ModelFieldMap(fieldBackingMap);
+        final ModelFieldMap modelFieldMap = new ModelFieldMap(this, fieldBackingMap);
 
-        // TODO: Handle server-side link clicking
-        final List<URI> embeddedLinkRelationIds = null;
-
-        final Model model = instantiateModel(mediaType, embeddedLinkRelationIds, modelFieldMap, linkBackingMap);
+        final Model model = instantiateModel(staticInterfaceType, modelFieldMap, linkBackingMap);
         modelFieldMap.setModel(model);
 
         return model;
     }
 
-    public final Model instantiateModel(MediaType mediaType, List<URI> embeddedLinkRelationIds, FieldMap fieldMap,
+    public final Model instantiateModel(java.lang.reflect.Type staticInterfaceType, FieldMap fieldMap,
             Map<URI, HyperLink> linkMap) {
-
-        final RuntimeModel model = new RuntimeModel(this, mediaType, embeddedLinkRelationIds, fieldMap, linkMap);
-
+        final RuntimeModel model = new RuntimeModel(this, staticInterfaceType, fieldMap, linkMap);
         return model;
     }
 
-    public final void setClassToStringTransformer(Transformer<Class<?>, String> classToStringTransformer) {
-        _ClassToStringTransformer = classToStringTransformer;
+    public final Model instantiateModel(URI schemaId) {
+        return instantiateModel(getSystemTransformers().getClassToSchemaIdTransformer().bToA(schemaId));
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> void mapFieldsByFieldName(final Map<T, Field> fieldMap, final List<Field> fieldList,
+            final String fieldName) {
+        for (final Field schemaField : fieldList) {
+            fieldMap.put((T) schemaField.getFieldValue(fieldName), schemaField);
+        }
     }
 
     public final void setDefaultService(Service defaultService) {
         _DefaultService = defaultService;
-    }
-
-    public final void setFormatIdToMediaTypeTransformer(Transformer<URI, MediaType> formatIdToMediaTypeTransformer) {
-        _FormatIdToMediaTypeTransformer = formatIdToMediaTypeTransformer;
-    }
-
-    public final void setMediaTypeToClassTransformer(Transformer<MediaType, Class<?>> mediaTypeToClassTransformer) {
-        _MediaTypeToClassTransformer = mediaTypeToClassTransformer;
-    }
-
-    public final void setMediaTypeToFormatTransformer(Transformer<MediaType, Format> mediaTypeToFormatTransformer) {
-        _MediaTypeToFormatTransformer = mediaTypeToFormatTransformer;
-    }
-
-    public final void setMediaTypeToStringTransformer(Transformer<MediaType, String> mediaTypeToStringTransformer) {
-        _MediaTypeToStringTransformer = mediaTypeToStringTransformer;
-    }
-
-    public final void setSchemaIdToClassTransformer(Transformer<URI, Class<?>> schemaIdToClassTransformer) {
-        _SchemaIdToClassTransformer = schemaIdToClassTransformer;
-    }
-
-    public final void setSchemaIdToFullNameTransformer(Transformer<URI, String> schemaIdToFullNameTransformer) {
-        _SchemaIdToFullNameTransformer = schemaIdToFullNameTransformer;
-    }
-
-    public final void setSchemaIdToMediaTypeTransformer(Transformer<URI, MediaType> schemaIdToMediaTypeTransformer) {
-        _SchemaIdToMediaTypeTransformer = schemaIdToMediaTypeTransformer;
     }
 
     public final void setSchemaService(Service schemaService) {
@@ -529,13 +336,10 @@ public class Context extends ClassLoader {
         if (!(schemaService instanceof CachingService)) {
             schemaService = instantiateCachingService(schemaService);
         }
-        final MediaType schemaMediaType = getMediaTypeToClassTransformer().bToA(Schema.class);
+        final MediaType schemaMediaType = getSystemTransformers().getMediaTypeToNativeTypeTransformer().bToA(
+                Schema.class);
         _Services.put(schemaMediaType, schemaService);
 
-    }
-
-    public final void setUriToStringTransformer(Transformer<URI, String> uriToStringTransformer) {
-        _UriToStringTransformer = uriToStringTransformer;
     }
 
     @Override
@@ -552,36 +356,107 @@ public class Context extends ClassLoader {
         // For subclasses
     }
 
-    private void initSystemServices() {
-        final Service www = new WebClient(this);
-        final Service defaultService = instantiateCachingService(www);
-        setDefaultService(defaultService);
+    private void bootstrap() {
 
-        _SystemSchemaService = new SystemSchemaService(this, www);
-        setSchemaService(_SystemSchemaService);
+        final SystemTransformers systemTransformers = getSystemTransformers();
 
-    }
+        // Get the media type: application/wrml; schema="http://.../org/wrml/model/schema/Schema"
+        final MediaType schemaMediaType = systemTransformers.getMediaTypeToNativeTypeTransformer().bToA(Schema.class);
 
-    private void initSystemTransformers() {
+        /*
+         * Get the Context-configured Service that is able to "service" requests
+         * for this media type.
+         * 
+         * In this instance we are testing a special case where the service
+         * is responsible for facilitating interactions with Schema resources.
+         */
+        final Service schemaService = getService(schemaMediaType);
 
-        final Transformer<URI, String> uriToStringTransformer = CachingTransformer.create(new UriToStringTransformer(),
-                new WeakHashMap<URI, String>(), new WeakHashMap<String, URI>());
-        setUriToStringTransformer(uriToStringTransformer);
+        /*
+         * Like all WRML Services, the Schema Service is a Map that is keyed on
+         * URI. If we want to get a Schema model (value) from the Schema Service
+         * (Map) then we need to know the Schema's id, its URI (key).
+         */
 
-        final Transformer<Class<?>, String> classToStringTransformer = CachingTransformer.create(
-                new ClassToStringTransformer(), new WeakHashMap<Class<?>, String>(),
-                new WeakHashMap<String, Class<?>>());
-        setClassToStringTransformer(classToStringTransformer);
+        final Transformer<MediaType, URI> mediaTypeToSchemaIdTransformer = systemTransformers
+                .getMediaTypeToSchemaIdTransformer();
 
-        setMediaTypeToStringTransformer(CachingTransformer.create(new MediaTypeToStringTransformer()));
-        setMediaTypeToClassTransformer(CachingTransformer.create(new MediaTypeToClassTransformer(this)));
-        setSchemaIdToMediaTypeTransformer(CachingTransformer.create(new SchemaIdToMediaTypeTransformer(this)));
-        setSchemaIdToFullNameTransformer(CachingTransformer.create(new SchemaIdToFullNameTransformer(
-                DEFAULT_SCHEMA_API_DOCROOT)));
-        setFormatIdToMediaTypeTransformer(CachingTransformer.create(new FormatIdToMediaTypeTransformer(this,
-                DEFAULT_FORMAT_API_DOCROOT)));
-        setSchemaIdToClassTransformer(CachingTransformer.create(new SchemaIdToClassTransformer(this)));
-        setMediaTypeToFormatTransformer(CachingTransformer.create(new MediaTypeToFormatTransformer(this)));
+        // Get the media type: application/wrml; schema="http://.../org/wrml/model/schema/Field"
+        final MediaType fieldMediaType = systemTransformers.getMediaTypeToNativeTypeTransformer().bToA(Field.class);
+        final URI fieldSchemaId = mediaTypeToSchemaIdTransformer.aToB(fieldMediaType);
+
+        // Use the Service's overloaded get method to request the Field Schema.
+        final Model dynamicFieldSchemaModel = (Model) schemaService.get(fieldSchemaId, null, schemaMediaType, null);
+
+        /*
+         * Using the model instance's dynamic (Map-like) Java API we can get
+         * field values (Objects) names based on their names (Strings).
+         * 
+         * Generally speaking accessing the fields of a model dynamically is
+         * appropriate in cases where the static type information is not
+         * necessary.
+         */
+
+        System.out.println("Dynamic name: " + dynamicFieldSchemaModel.getFieldValue("name"));
+        System.out.println("Dynamic id: " + dynamicFieldSchemaModel.getFieldValue("id"));
+        System.out.println("Dynamic description: " + dynamicFieldSchemaModel.getFieldValue("description"));
+        System.out.println("Dynamic baseSchemaIds: " + dynamicFieldSchemaModel.getFieldValue("baseSchemaIds"));
+        //System.out.println("Dynamic fields: " + dynamicMetaSchemaModel.getFieldValue("fields"));
+
+        /*
+         * In the Java implementation of WRML, models have two APIs.
+         * 
+         * First, as demonstrated above, there is the inner more "dynamic"
+         * interface with the getFieldValue, setFieldValue, and clickLink
+         * methods.
+         * 
+         * Second, there is a reflection proxy-based static interface that
+         * allows Java programs to address WRML models by their auto-generated
+         * Java interface. The interface reference that is returned is a thin
+         * "facade" over the model's dynamic interface, which ensures that
+         * behavior will be consistent between the two APIs.
+         * 
+         * In this example, we have the model that represents the schema for
+         * Schemas (like WRML's Class<Class<?>>).
+         */
+        final Schema staticFieldSchemaModel = (Schema) dynamicFieldSchemaModel.getStaticInterface();
+
+        System.out.println("Static name: " + staticFieldSchemaModel.getName());
+        System.out.println("Static id: " + staticFieldSchemaModel.getId());
+        System.out.println("Static description: " + staticFieldSchemaModel.getDescription());
+        System.out.println("Static baseSchemaIds: " + staticFieldSchemaModel.getBaseSchemaIds());
+
+        /*
+         * If we want to get the Schema that represents the form of all WRML
+         * models, then we are looking for the MetaSchema, which has an id value
+         * of "http://.../org/wrml/model/schema/Schema", which we know is part
+         * of the media type that we used to get the service. So we already have
+         * what we need to get the URI in the media type but we can use a
+         * pre-existing transformer to handle this conversion for us.
+         * 
+         * Using the right transformer, we can get the URI id of a given schema
+         * by starting with a WRML media type (with a schema param).
+         */
+
+        final URI schemaSchemaId = mediaTypeToSchemaIdTransformer.aToB(schemaMediaType);
+
+        // Use the Service's overloaded get method to request the MetaSchema.
+        final Model dynamicMetaSchemaModel = (Model) schemaService.get(schemaSchemaId, null, schemaMediaType, null);
+
+        System.out.println("Dynamic name: " + dynamicMetaSchemaModel.getFieldValue("name"));
+        System.out.println("Dynamic id: " + dynamicMetaSchemaModel.getFieldValue("id"));
+        System.out.println("Dynamic description: " + dynamicMetaSchemaModel.getFieldValue("description"));
+        System.out.println("Dynamic baseSchemaIds: " + dynamicMetaSchemaModel.getFieldValue("baseSchemaIds"));
+        //System.out.println("Dynamic fields: " + dynamicMetaSchemaModel.getFieldValue("fields"));
+
+        final Schema staticMetaSchemaModel = (Schema) dynamicMetaSchemaModel.getStaticInterface();
+
+        System.out.println("Static name: " + staticMetaSchemaModel.getName());
+        System.out.println("Static id: " + staticMetaSchemaModel.getId());
+        System.out.println("Static description: " + staticMetaSchemaModel.getDescription());
+        System.out.println("Static baseSchemaIds: " + staticMetaSchemaModel.getBaseSchemaIds());
+        //System.out.println("Static fields: " + staticModel.getFields());
+
     }
 
 }

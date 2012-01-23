@@ -26,64 +26,22 @@ import org.wrml.Model;
 // Generated from a Web Resource Schema
 public interface Document extends Model {
 
-    // Generated from Link
-    //     Relation: delete
-    //         Methods: DELETE 
-    //         ResponseSchema: Document
-    //     EnabledFormula: id != null
-    //     DestinationUriTemplate: {id} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
-    //     Href: <id>
     public void delete();
 
     public String getEtag();
 
     public URI getId();
 
-    // Generated from Link
-    //     Relation: metadata
-    //         Methods: HEAD 
-    //         ResponseSchema: DocumentMetadata
-    //     EnabledFormula: id != null
-    //     DestinationUriTemplate: {id} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
-    //     Href: <id>
     public DocumentMetadata getMetadata();
 
-    // Generated from Link
-    //     Relation: options
-    //         Methods: OPTIONS 
-    //         ResponseSchema: DocumentOptions
-    //     EnabledFormula: id != null
-    //     DestinationUriTemplate: {id} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
-    //     Href: <id>
     public DocumentOptions getOptions();
 
-    // Generated from Link
-    //     Relation: parent
-    //         Methods: GET 
-    //         ResponseSchema: Document
-    //     EnabledFormula: parentId != null
-    //     DestinationUriTemplate: {parentId} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["parentId"]]
-    //     Href: <parentId>
     public Document getParent();
 
     public Long getSecondsToLive();
 
-    // Generated from Link
-    //     Relation: self
-    //         Methods: GET 
-    //         ResponseSchema: Document
-    //     EnabledFormula: id != null
-    //     DestinationUriTemplate: {id} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
-    //     Href: <id>
     public Document getSelf();
 
-    // Generated from Field
-    //     Name: readOnly 
     public boolean isReadOnly();
 
     public String setEtag(String etag);
@@ -94,14 +52,6 @@ public interface Document extends Model {
 
     public Long setSecondsToLive(Long secondsToLive);
 
-    // Generated from Link
-    //     Relation: update
-    //         Methods: PUT
-    //         ResponseSchema: Document
-    //     EnabledFormula: id != null
-    //     DestinationUriTemplate: {id} 
-    //     DestinationUriTemplateParameters: [FieldUriTemplateParameter["id"]]
-    //     Href: <id>
     public Document update();
 
 }

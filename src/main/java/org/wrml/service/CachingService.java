@@ -22,8 +22,8 @@ import java.util.Map;
 import org.wrml.Model;
 import org.wrml.model.Document;
 import org.wrml.runtime.Context;
-import org.wrml.util.MediaType;
 import org.wrml.util.observable.ObservableMap;
+import org.wrml.www.MediaType;
 
 public class CachingService extends ProxyService {
 
