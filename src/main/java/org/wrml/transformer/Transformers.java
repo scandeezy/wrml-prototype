@@ -19,11 +19,11 @@ package org.wrml.transformer;
 import java.util.HashMap;
 
 import org.wrml.runtime.Context;
-import org.wrml.runtime.Contextual;
+import org.wrml.runtime.RuntimeObject;
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.util.observable.Observables;
 
-public final class Transformers<B> extends Contextual {
+public final class Transformers<B> extends RuntimeObject {
 
     private final ObservableMap<Class<?>, Transformer<?, B>> _ToBTransformers;
 

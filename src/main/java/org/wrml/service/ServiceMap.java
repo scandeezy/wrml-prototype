@@ -22,14 +22,14 @@ import java.util.Map;
 import java.util.Set;
 
 import org.wrml.runtime.Context;
-import org.wrml.runtime.Contextual;
+import org.wrml.runtime.RuntimeObject;
 
 /**
  * A base service class that provides some helpful reusable implementations of
  * the Service interface's methods.
  * 
  */
-public abstract class ServiceMap extends Contextual implements Service {
+public abstract class ServiceMap extends RuntimeObject implements Service {
 
     public ServiceMap(Context context) {
         super(context);

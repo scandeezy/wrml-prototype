@@ -14,16 +14,21 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime.system.transformer;
+package org.wrml.runtime;
 
-import org.wrml.runtime.Context;
-import org.wrml.runtime.Contextual;
-import org.wrml.transformer.Transformer;
+public class RuntimeObject implements Contextual {
 
-public abstract class ContextualTransformer<A, B> extends Contextual implements Transformer<A, B> {
+    private final transient Context _Context;
 
-    public ContextualTransformer(final Context context) {
-        super(context);
+    public RuntimeObject(final Context context) {
+        if (context == null) {
+            throw new NullPointerException("Context cannot be null");
+        }
+
+        _Context = context;
     }
 
+    public final Context getContext() {
+        return _Context;
+    }
 }

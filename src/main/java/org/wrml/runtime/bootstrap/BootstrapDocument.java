@@ -20,6 +20,7 @@ import java.net.URI;
 
 import org.wrml.model.Document;
 import org.wrml.runtime.Context;
+import org.wrml.runtime.ModelGraph;
 
 /**
  * A bootstrap proxy-based implementation of WRML's Document schema.
@@ -36,8 +37,8 @@ public class BootstrapDocument<D extends Document> extends BootstrapModel<D> {
     private boolean _ReadOnly;
     private Long _SecondsToLive;
 
-    public BootstrapDocument(Context context, Class<D> staticType, URI id) {
-        super(context, staticType);
+    public BootstrapDocument(Context context, Class<D> staticType, ModelGraph modelGraph, URI id) {
+        super(context, staticType, modelGraph);
 
         setId(id);
 

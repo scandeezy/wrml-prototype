@@ -14,24 +14,19 @@
  * limitations under the License.
  */
 
-package org.wrml.event;
+package org.wrml.runtime.event;
 
-import org.wrml.model.schema.Link;
-import org.wrml.util.CancelableEvent;
+import java.util.EventListener;
 
 /**
- * Used to communicate the change in a Link's state.
+ * An event listener that can watch Links to follow their availability status.
  */
-public final class LinkEvent extends CancelableEvent {
+public interface LinkEventListener extends EventListener {
 
-    private static final long serialVersionUID = -3145602918059087982L;
+    public void clicked(LinkEvent event);
 
-    public LinkEvent(Link link, boolean cancelable) {
-        super(link, cancelable);
-    }
+    public void enabledStateChanged(LinkEvent event);
 
-    public Link getLink() {
-        return (Link) getSource();
-    }
+    public void hrefChanged(LinkEvent event);
 
 }

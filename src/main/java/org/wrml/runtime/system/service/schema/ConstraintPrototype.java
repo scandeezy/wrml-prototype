@@ -18,6 +18,8 @@ package org.wrml.runtime.system.service.schema;
 
 import org.wrml.model.schema.Constrainable;
 import org.wrml.model.schema.Constraint;
+import org.wrml.runtime.Context;
+import org.wrml.runtime.RuntimeObject;
 
 /**
  * The ability to add Constraints to Schemas can have serve a few different
@@ -33,11 +35,12 @@ import org.wrml.model.schema.Constraint;
  * @return
  */
 
-public final class ConstraintPrototype<T extends Constrainable<T>> {
+public final class ConstraintPrototype<T extends Constrainable<T>> extends RuntimeObject {
 
     private final Constraint<T> _Constraint;
 
-    public ConstraintPrototype(Constraint<T> constraint) {
+    public ConstraintPrototype(Context context, Constraint<T> constraint) {
+        super(context);
         _Constraint = constraint;
     }
 

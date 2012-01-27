@@ -25,8 +25,9 @@ import java.util.Map;
 import org.wrml.HyperLink;
 import org.wrml.Model;
 import org.wrml.runtime.Context;
-import org.wrml.runtime.Contextual;
+import org.wrml.runtime.ModelGraph;
 import org.wrml.runtime.ReflectiveFieldMap;
+import org.wrml.runtime.RuntimeObject;
 import org.wrml.runtime.TypeSystem;
 
 /**
@@ -35,16 +36,18 @@ import org.wrml.runtime.TypeSystem;
  * @param <M>
  *            The Model type to proxy.
  */
-public class BootstrapModel<M extends Model> extends Contextual implements Serializable {
+public class BootstrapModel<M extends Model> extends RuntimeObject implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private final Class<M> _StaticInterfaceClass;
     private M _StaticInterface;
+    private transient final ModelGraph _ModelGraph;
 
-    public BootstrapModel(final Context context, final Class<M> staticInterfaceClass) {
+    public BootstrapModel(final Context context, final Class<M> staticInterfaceClass, ModelGraph modelGraph) {
         super(context);
         _StaticInterfaceClass = staticInterfaceClass;
+        _ModelGraph = modelGraph;
     }
 
     @Override
@@ -58,6 +61,10 @@ public class BootstrapModel<M extends Model> extends Contextual implements Seria
      * return _HyperLinks;
      * }
      */
+
+    public ModelGraph getModelGraph() {
+        return _ModelGraph;
+    }
 
     public java.lang.reflect.Type getNativeType() {
         return _StaticInterfaceClass;
@@ -84,9 +91,9 @@ public class BootstrapModel<M extends Model> extends Contextual implements Seria
 
             final Map<URI, HyperLink> linkMap = new HashMap<URI, HyperLink>();
 
-            _StaticInterface = (M) context.instantiateModel(_StaticInterfaceClass, fieldMap, linkMap)
-                    .getStaticInterface();
-
+            final ModelGraph modelGraph = getModelGraph();
+            final Model dynamicModel = context.instantiateModel(_StaticInterfaceClass, modelGraph, fieldMap, linkMap);
+            _StaticInterface = (M) dynamicModel.getStaticInterface();
         }
 
         return _StaticInterface;

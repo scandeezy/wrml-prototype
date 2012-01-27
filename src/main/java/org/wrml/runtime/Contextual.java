@@ -16,19 +16,7 @@
 
 package org.wrml.runtime;
 
-public class Contextual {
+public interface Contextual {
 
-    private final transient Context _Context;
-
-    public Contextual(final Context context) {
-        if (context == null) {
-            throw new NullPointerException("Context cannot be null");
-        }
-
-        _Context = context;
-    }
-
-    public final Context getContext() {
-        return _Context;
-    }
+    public Context getContext();
 }

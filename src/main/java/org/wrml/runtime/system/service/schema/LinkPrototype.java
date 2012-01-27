@@ -20,13 +20,16 @@ import java.net.URI;
 import java.util.Map;
 
 import org.wrml.Model;
+import org.wrml.runtime.Context;
+import org.wrml.runtime.RuntimeObject;
 
-public final class LinkPrototype {
+public final class LinkPrototype extends RuntimeObject {
 
     private final URI _Rel;
     private final java.lang.reflect.Type _NativeReturnType;
 
-    public LinkPrototype(final URI rel, java.lang.reflect.Type nativeReturnType) {
+    public LinkPrototype(Context context, final URI rel, java.lang.reflect.Type nativeReturnType) {
+        super(context);
         _Rel = rel;
         _NativeReturnType = nativeReturnType;
     }

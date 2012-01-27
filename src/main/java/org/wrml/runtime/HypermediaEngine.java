@@ -26,7 +26,7 @@ import org.wrml.model.Collection;
 import org.wrml.model.api.Api;
 import org.wrml.model.api.LinkTemplate;
 
-final class HypermediaEngine extends Contextual {
+final class HypermediaEngine extends RuntimeObject {
 
     private final URI _ApiId;
     private final Map<URI, Resource> _Resources;

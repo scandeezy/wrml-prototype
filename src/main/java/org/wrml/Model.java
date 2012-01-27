@@ -20,12 +20,13 @@ import java.io.Serializable;
 import java.net.URI;
 import java.util.Map;
 
-import org.wrml.event.FieldEventListener;
-import org.wrml.event.LinkEventListener;
-import org.wrml.event.ModelEventListener;
 import org.wrml.model.api.ResourceTemplate;
 import org.wrml.model.schema.Schema;
 import org.wrml.runtime.Context;
+import org.wrml.runtime.ModelGraph;
+import org.wrml.runtime.event.FieldEventListener;
+import org.wrml.runtime.event.LinkEventListener;
+import org.wrml.runtime.event.ModelEventListener;
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.www.MediaType;
 
@@ -63,6 +64,8 @@ public interface Model extends Serializable {
     public ObservableMap<URI, HyperLink> getHyperLinks();
 
     public MediaType getMediaType();
+
+    public ModelGraph getModelGraph();
 
     public java.lang.reflect.Type getNativeType();
 

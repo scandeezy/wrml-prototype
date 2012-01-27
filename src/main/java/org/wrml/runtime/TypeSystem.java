@@ -31,7 +31,7 @@ import org.wrml.transformer.Transformers;
 import org.wrml.util.observable.ObservableMap;
 import org.wrml.www.MediaType;
 
-public final class TypeSystem extends Contextual {
+public final class TypeSystem extends RuntimeObject {
 
     // This could grow large from Enums
     private final Map<java.lang.reflect.Type, Object> _DefaultValues;
@@ -99,6 +99,17 @@ public final class TypeSystem extends Contextual {
         _DefaultValues.put(fieldNativeType, defaultValue);
 
         return defaultValue;
+    }
+
+    public <T extends Enum<T>> T getEnumFromString(Class<T> enumType, String name) {
+        if ((enumType != null) && (name != null)) {
+            try {
+                return Enum.valueOf(enumType, name);
+            }
+            catch (final IllegalArgumentException ex) {
+            }
+        }
+        return null;
     }
 
     public java.lang.reflect.Type getNativeReturnType(Method method, java.lang.reflect.Type type) {

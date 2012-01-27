@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.event;
+package org.wrml.runtime.event;
 
 import java.util.EventObject;
 

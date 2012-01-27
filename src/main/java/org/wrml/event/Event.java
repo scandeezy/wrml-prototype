@@ -14,16 +14,23 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime.system.transformer;
+package org.wrml.event;
 
-import org.wrml.runtime.Context;
-import org.wrml.transformer.ConstantTransformation;
+import java.util.EventObject;
 
-public abstract class ConstantTransformer<A, B> extends CommonBasisTransformer<A, B> implements
-        ConstantTransformation<A, B> {
+public class Event<S extends EventSource<?>> extends EventObject {
 
-    public ConstantTransformer(final Context context) {
-        super(context);
+    private static final long serialVersionUID = 1L;
+
+    private final S _Source;
+
+    public Event(S source) {
+        super(source);
+        _Source = source;
     }
 
+    @Override
+    public S getSource() {
+        return _Source;
+    }
 }

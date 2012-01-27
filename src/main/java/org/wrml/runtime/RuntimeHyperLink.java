@@ -16,16 +16,15 @@
 
 package org.wrml.runtime;
 
-import java.io.Serializable;
 import java.net.URI;
 import java.util.Map;
 
 import org.wrml.HyperLink;
 import org.wrml.Model;
-import org.wrml.event.LinkEventListener;
 import org.wrml.model.api.LinkTemplate;
 import org.wrml.model.schema.Link;
 import org.wrml.model.schema.LinkRelation;
+import org.wrml.runtime.event.LinkEventListener;
 import org.wrml.runtime.system.service.schema.Prototype;
 import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.service.Service;
@@ -46,9 +45,7 @@ import org.wrml.www.MediaType;
  * LinkFormula
  * relies upon.
  */
-public final class RuntimeHyperLink implements Serializable, HyperLink {
-
-    private static final long serialVersionUID = -6235652220661484935L;
+public final class RuntimeHyperLink extends RuntimeObject implements HyperLink {
 
     private final Model _Referrer;
     private final URI _Rel;
@@ -56,6 +53,7 @@ public final class RuntimeHyperLink implements Serializable, HyperLink {
     private boolean _Enabled;
 
     public RuntimeHyperLink(Model referrer, URI rel) {
+        super(referrer.getContext());
         _Referrer = referrer;
         _Rel = rel;
     }

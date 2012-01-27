@@ -26,6 +26,7 @@ import org.wrml.model.schema.Link;
 import org.wrml.model.schema.Schema;
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
+import org.wrml.runtime.ModelGraph;
 import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.util.observable.ObservableList;
 import org.wrml.util.observable.ObservableMap;
@@ -82,8 +83,8 @@ public class BootstrapSchema extends BootstrapDocument<Schema> {
     private final ObservableList<BootstrapField> _BootstrapFields;
     private String _Name;
 
-    public BootstrapSchema(Context context, URI id) {
-        super(context, Schema.class, id);
+    public BootstrapSchema(Context context, ModelGraph modelGraph, URI id) {
+        super(context, Schema.class, modelGraph, id);
 
         _BaseSchemaIds = Observables.observableList(new ArrayList<URI>());
         _Constraints = Observables.observableList(new ArrayList<Constraint<Schema>>());
@@ -113,8 +114,11 @@ public class BootstrapSchema extends BootstrapDocument<Schema> {
         }
 
         final List<Field> fields = new ArrayList<Field>();
+        final ModelGraph modelGraph = getModelGraph();
         for (final BootstrapField bootstrapField : _BootstrapFields) {
+            modelGraph.setInitCursorFocusRelationShipName(bootstrapField.getName());
             fields.add((Field) bootstrapField.getStaticInterface());
+            modelGraph.popInitCursorBack();
         }
 
         return Observables.observableList(fields);
@@ -153,7 +157,11 @@ public class BootstrapSchema extends BootstrapDocument<Schema> {
     }
 
     protected final BootstrapField createBootstrapField(String name, Type type) {
-        return new BootstrapField(getContext(), this, name, type);
+
+        final ModelGraph modelGraph = getModelGraph();
+        modelGraph.setInitCursorFocusRelationShipName(name);
+        final BootstrapField bootstrapField = new BootstrapField(getContext(), modelGraph, this, name, type);
+        return bootstrapField;
     }
 
     protected final URI getSchemaId(String schemaFullName) {

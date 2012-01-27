@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
+import org.wrml.runtime.ModelGraph;
 
 public class DocumentBootstrapSchema extends BootstrapSchema {
 
@@ -28,8 +29,8 @@ public class DocumentBootstrapSchema extends BootstrapSchema {
 
     private static final long serialVersionUID = 1L;
 
-    public DocumentBootstrapSchema(Context context, URI id) {
-        super(context, id);
+    public DocumentBootstrapSchema(Context context, ModelGraph modelGraph, URI id) {
+        super(context, modelGraph, id);
 
         // Set some document fields
         setName(DOCUMENT_SCHEMA_NAME);

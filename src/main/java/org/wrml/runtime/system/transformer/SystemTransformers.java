@@ -22,13 +22,13 @@ import java.util.WeakHashMap;
 import org.wrml.model.format.Format;
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
-import org.wrml.runtime.Contextual;
+import org.wrml.runtime.RuntimeObject;
 import org.wrml.transformer.CachingTransformer;
 import org.wrml.transformer.ConstantTransformation;
 import org.wrml.transformer.Transformer;
 import org.wrml.www.MediaType;
 
-public final class SystemTransformers extends Contextual {
+public final class SystemTransformers extends RuntimeObject {
 
     public static final URI DEFAULT_FORMAT_API_DOCROOT = URI.create("http://api.formats.wrml.org/");
     public static final URI DEFAULT_SCHEMA_API_DOCROOT = URI.create("http://api.schemas.wrml.org/");

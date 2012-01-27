@@ -23,7 +23,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 
-public abstract class FieldMap extends Contextual implements Map<String, Object> {
+public abstract class FieldMap extends RuntimeObject implements Map<String, Object> {
 
     public FieldMap(final Context context) {
         super(context);

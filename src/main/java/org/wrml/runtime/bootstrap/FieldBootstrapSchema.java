@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
+import org.wrml.runtime.ModelGraph;
 
 public class FieldBootstrapSchema extends BootstrapSchema {
 
@@ -28,8 +29,8 @@ public class FieldBootstrapSchema extends BootstrapSchema {
 
     private static final long serialVersionUID = 1L;
 
-    public FieldBootstrapSchema(Context context, URI id) {
-        super(context, id);
+    public FieldBootstrapSchema(Context context, ModelGraph modelGraph, URI id) {
+        super(context, modelGraph, id);
 
         setName(FIELD_SCHEMA_NAME);
 

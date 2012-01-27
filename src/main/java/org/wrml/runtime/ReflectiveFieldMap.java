@@ -288,8 +288,18 @@ public class ReflectiveFieldMap<T> extends FieldMap implements Delegating<Object
         final Method method = getMethod(FieldAccessType.GET, fieldName);
 
         if (method == null) {
-            throw new NullPointerException("There is no \"getter\" for field: " + fieldName + " in static interface: "
-                    + staticInterface);
+            /*
+             * throw new
+             * NullPointerException("There is no \"getter\" for field: " +
+             * fieldName + " in static interface: "
+             * + staticInterface);
+             * 
+             * An Exception initially seemed logical here but then I realized
+             * that it killed the dynamic interface's ability to accept random
+             * field name inquiry's and respond with Java's version of
+             * "Go Fish!"
+             */
+            return null;
         }
 
         return accessField(staticInterface, method, FieldAccessType.GET, null);

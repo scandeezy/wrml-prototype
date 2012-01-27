@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package org.wrml.event;
+package org.wrml.runtime.event;
 
-public interface ModelEventListener {
+import java.util.EventListener;
 
-    public void fieldConstraintViolated(FieldEvent event);
+/**
+ * An event listener for events related to a Model field.
+ * 
+ * @param <T>
+ */
+public interface FieldEventListener extends EventListener {
 
-    public void fieldValueChanged(FieldEvent event);
+    public void constraintViolated(FieldEvent event);
 
-    public void fieldValueInitialized(FieldEvent event);
+    public void valueChanged(FieldEvent event);
 
-    public void linkEnabledStateChanged(LinkEvent event);
+    public void valueInitialized(FieldEvent event);
 }

@@ -25,6 +25,7 @@ import java.util.Map;
 import org.wrml.Model;
 import org.wrml.model.schema.Field;
 import org.wrml.runtime.Context;
+import org.wrml.runtime.ModelGraph;
 import org.wrml.runtime.bootstrap.BootstrapSchema;
 import org.wrml.runtime.bootstrap.FieldBootstrapSchema;
 import org.wrml.runtime.bootstrap.FieldNames;
@@ -67,9 +68,11 @@ public final class SystemSchemaService extends ProxyService implements Service {
         _Prototypes = Observables.observableMap(new HashMap<Type, Prototype>());
 
         final Transformer<URI, String> idTransformer = getIdTransformer();
+        final URI metaSchemaId = idTransformer.bToA(SCHEMA_SCHEMA_FULL_NAME);
+        _SchemaBootstrapSchema = new SchemaBootstrapSchema(context, new ModelGraph(context), metaSchemaId);
 
-        _FieldBootstrapSchema = new FieldBootstrapSchema(context, idTransformer.bToA(FIELD_SCHEMA_FULL_NAME));
-        _SchemaBootstrapSchema = new SchemaBootstrapSchema(context, idTransformer.bToA(SCHEMA_SCHEMA_FULL_NAME));
+        final URI fieldSchemaId = idTransformer.bToA(FIELD_SCHEMA_FULL_NAME);
+        _FieldBootstrapSchema = new FieldBootstrapSchema(context, new ModelGraph(context), fieldSchemaId);
     }
 
     @Override

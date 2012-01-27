@@ -30,6 +30,8 @@ import org.wrml.www.MediaType;
 public class App {
 
     public static void main(String[] args) throws Throwable {
+        System.out
+                .println("<a rel=\"greeting\" href=\"http://www.moviesounds.com/tron/grtprgrm.wav\">Greetings Program!</a>");
 
         // Create a context for this simple test application
 
@@ -48,9 +50,11 @@ public class App {
          * fetched (remotely) from the schema service.
          */
 
-        testGetResourceModel(context, "org.wrml.model.Document");
-        testGetResourceModel(context, "org.wrml.model.api.Api");
-        testGetResourceModel(context, "org.wrml.model.Collection");
+        final Model document = testGetResourceModel(context, "org.wrml.model.Document");
+        final Model api = testGetResourceModel(context, "org.wrml.model.api.Api");
+        final Model collection = testGetResourceModel(context, "org.wrml.model.Collection");
+
+        System.out.println("End of line.");
     }
 
     private static Config createConfig(String[] args) {
@@ -81,7 +85,7 @@ public class App {
         return (Model) service.get(resourceId, null, responseType, null);
     }
 
-    private static void testGetResourceModel(final Context context, final String resourceSchemaName)
+    private static Model testGetResourceModel(final Context context, final String resourceSchemaName)
             throws ClassNotFoundException {
 
         // Get a resource model
@@ -94,5 +98,7 @@ public class App {
         final Model staticModel = dynamicModel.getStaticInterface();
 
         System.out.println("Static Model (" + staticModel.getNativeType() + "): " + staticModel);
+
+        return staticModel;
     }
 }

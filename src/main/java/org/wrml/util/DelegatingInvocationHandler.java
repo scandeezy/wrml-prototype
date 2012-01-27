@@ -125,7 +125,8 @@ public class DelegatingInvocationHandler implements Delegating<Object>, Invocati
 
     @Override
     public String toString() {
-        return getClass().getName() + " : { " + (_Delegate != null ? "delegate : { " + _Delegate : " }") + " }";
+        final Object delegate = getDelegate();
+        return getClass().getName() + " : { " + (delegate != null ? "delegate : { " + delegate : " }") + " }";
     }
 
     /**
@@ -187,7 +188,8 @@ public class DelegatingInvocationHandler implements Delegating<Object>, Invocati
     protected final Object baseInvoke(Object proxy, Method method, Object[] args) throws Throwable {
 
         final String methodKey = getMethodKey(method);
-        return _DelegateMethods.get(methodKey).invoke(_Delegate, args);
+        final Map<String, Method> delegateMethods = getDelegateMethods();
+        return delegateMethods.get(methodKey).invoke(getDelegate(), args);
     }
 
     /**

@@ -14,16 +14,24 @@
  * limitations under the License.
  */
 
-package org.wrml.runtime.system.transformer;
+package org.wrml.runtime.event;
 
-import org.wrml.runtime.Context;
-import org.wrml.transformer.ConstantTransformation;
+import org.wrml.model.schema.Link;
+import org.wrml.util.CancelableEvent;
 
-public abstract class ConstantTransformer<A, B> extends CommonBasisTransformer<A, B> implements
-        ConstantTransformation<A, B> {
+/**
+ * Used to communicate the change in a Link's state.
+ */
+public final class LinkEvent extends CancelableEvent {
 
-    public ConstantTransformer(final Context context) {
-        super(context);
+    private static final long serialVersionUID = -3145602918059087982L;
+
+    public LinkEvent(Link link, boolean cancelable) {
+        super(link, cancelable);
+    }
+
+    public Link getLink() {
+        return (Link) getSource();
     }
 
 }

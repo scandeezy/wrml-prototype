@@ -19,12 +19,12 @@ package org.wrml.runtime.system.service.schema;
 import org.wrml.Model;
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
-import org.wrml.runtime.Contextual;
 import org.wrml.runtime.FieldAccessType;
+import org.wrml.runtime.RuntimeObject;
 import org.wrml.runtime.TypeSystem;
 import org.wrml.runtime.system.transformer.SystemTransformers;
 
-public final class FieldPrototype extends Contextual {
+public final class FieldPrototype extends RuntimeObject {
 
     private final String _FieldName;
     private final java.lang.reflect.Type _NativeType;

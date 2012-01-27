@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package org.wrml.event;
+package org.wrml.runtime.system.transformer;
 
-import java.util.EventListener;
+import org.wrml.runtime.Context;
+import org.wrml.runtime.RuntimeObject;
+import org.wrml.transformer.Transformer;
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
+public abstract class CommonBasisTransformer<A, B> extends RuntimeObject implements Transformer<A, B> {
 
-    public void clicked(LinkEvent event);
-
-    public void enabledStateChanged(LinkEvent event);
-
-    public void hrefChanged(LinkEvent event);
+    public CommonBasisTransformer(final Context context) {
+        super(context);
+    }
 
 }

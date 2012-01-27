@@ -35,7 +35,8 @@ import org.wrml.model.schema.Link;
 import org.wrml.model.schema.Schema;
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
-import org.wrml.runtime.Contextual;
+import org.wrml.runtime.ModelGraph;
+import org.wrml.runtime.RuntimeObject;
 import org.wrml.runtime.TypeSystem;
 import org.wrml.runtime.bootstrap.FieldNames;
 import org.wrml.runtime.system.transformer.SystemTransformers;
@@ -52,7 +53,7 @@ import org.wrml.www.MediaType;
  * wishes to remote prototypes then this class will need to be refactored
  * somehow.
  */
-public final class Prototype extends Contextual {
+public final class Prototype extends RuntimeObject {
 
     private final java.lang.reflect.Type _NativeType;
     private MediaType _MediaType;
@@ -272,8 +273,10 @@ public final class Prototype extends Contextual {
                 if (possibleFieldName != null) {
                     possibleFieldName = Character.toLowerCase(possibleFieldName.charAt(0))
                             + possibleFieldName.substring(1);
+
                     if (fieldName.equals(possibleFieldName)) {
                         fieldMethod = method;
+                        break;
                     }
                 }
             }
@@ -345,7 +348,7 @@ public final class Prototype extends Contextual {
                     final Context context = getContext();
                     final TypeSystem typeSystem = context.getTypeSystem();
                     final Class<?> nativeType = (Class<?>) typeSystem.getNativeReturnType(method, _NativeType);
-                    linkPrototype = new LinkPrototype(link.getRelId(), nativeType);
+                    linkPrototype = new LinkPrototype(context, link.getRelId(), nativeType);
                 }
             }
 
@@ -528,7 +531,8 @@ public final class Prototype extends Contextual {
 
         final String fieldName = FieldNames.Schema.fields.toString();
         final List<Field> fields = (List<Field>) baseSchema.getFieldValue(fieldName);
-        new PrototypicalExtension<String, Field>(allYourFields, fields, Field.class, FieldNames.Named.name.toString());
+        prototypicalExtension(baseSchema.getModelGraph(), allYourFields, fields, Field.class,
+                FieldNames.Named.name.toString());
     }
 
     @SuppressWarnings("unchecked")
@@ -536,38 +540,35 @@ public final class Prototype extends Contextual {
 
         final String fieldName = FieldNames.Schema.links.toString();
         final List<Link> links = (List<Link>) baseSchema.getFieldValue(fieldName);
-        new PrototypicalExtension<URI, Link>(allYourLinks, links, Link.class, FieldNames.Link.relId.toString());
+
+        prototypicalExtension(baseSchema.getModelGraph(), allYourLinks, links, Link.class,
+                FieldNames.Link.relId.toString());
     }
 
-    private class PrototypicalExtension<K, M extends Model> {
+    @SuppressWarnings("unchecked")
+    private <K, M extends Model> void prototypicalExtension(final ModelGraph modelGraph, final Map<K, M> allModels,
+            final List<M> extensionModels, Class<?> staticInterfaceType, String keyFieldName) {
 
-        public PrototypicalExtension(final Map<K, M> allModels, final List<M> extensionModels,
-                Class<?> staticInterfaceType, String keyFieldName) {
-
-            if (extensionModels != null) {
-                for (final M extensionModel : extensionModels) {
-                    extend(allModels, extensionModel, staticInterfaceType, keyFieldName);
-                }
-            }
+        if (extensionModels == null) {
+            return;
         }
 
-        @SuppressWarnings("unchecked")
-        private void extend(final Map<K, M> allModels, M extensionModel, Class<?> staticInterfaceType,
-                String keyFieldName) {
+        for (final M extensionModel : extensionModels) {
 
             final K modelKey = (K) extensionModel.getFieldValue(keyFieldName);
+
             M model = allModels.get(modelKey);
 
             if (model == null) {
 
                 final Context context = getContext();
-                model = (M) context.instantiateModel(staticInterfaceType).getStaticInterface();
+                modelGraph.setInitCursorFocusRelationShipName(String.valueOf(modelKey));
+                model = (M) context.instantiateModel(staticInterfaceType, modelGraph).getStaticInterface();
+                modelGraph.popInitCursorBack();
                 allModels.put(modelKey, model);
-
             }
 
             model.extend(extensionModel);
-
         }
 
     }

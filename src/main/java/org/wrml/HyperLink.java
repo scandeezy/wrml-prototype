@@ -19,10 +19,10 @@ package org.wrml;
 import java.net.URI;
 import java.util.Map;
 
-import org.wrml.event.LinkEventListener;
 import org.wrml.model.api.LinkTemplate;
 import org.wrml.model.schema.Link;
 import org.wrml.model.schema.LinkRelation;
+import org.wrml.runtime.event.LinkEventListener;
 
 public interface HyperLink {
 

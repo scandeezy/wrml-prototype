@@ -24,6 +24,7 @@ import org.wrml.model.schema.Field;
 import org.wrml.model.schema.Schema;
 import org.wrml.model.schema.Type;
 import org.wrml.runtime.Context;
+import org.wrml.runtime.ModelGraph;
 import org.wrml.runtime.TypeSystem;
 import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.util.observable.ObservableList;
@@ -51,8 +52,9 @@ public class BootstrapField extends BootstrapModel<Field> {
     private boolean _Local;
     private final ObservableList<Constraint<Field>> _Constraints;
 
-    public BootstrapField(Context context, BootstrapSchema owner, final String name, final Type type) {
-        super(context, Field.class);
+    public BootstrapField(Context context, ModelGraph modelGraph, BootstrapSchema owner, final String name,
+            final Type type) {
+        super(context, Field.class, modelGraph);
 
         _Owner = owner;
         _Type = type;

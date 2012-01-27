@@ -26,16 +26,16 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.wrml.HyperLink;
 import org.wrml.Model;
-import org.wrml.event.FieldEvent;
-import org.wrml.event.FieldEventListener;
-import org.wrml.event.LinkEventListener;
-import org.wrml.event.ModelEventListener;
 import org.wrml.model.Document;
 import org.wrml.model.DocumentMetadata;
 import org.wrml.model.DocumentOptions;
 import org.wrml.model.api.ResourceTemplate;
 import org.wrml.model.schema.Schema;
 import org.wrml.runtime.bootstrap.FieldNames;
+import org.wrml.runtime.event.FieldEvent;
+import org.wrml.runtime.event.FieldEventListener;
+import org.wrml.runtime.event.LinkEventListener;
+import org.wrml.runtime.event.ModelEventListener;
 import org.wrml.runtime.system.service.schema.Prototype;
 import org.wrml.runtime.system.transformer.SystemTransformers;
 import org.wrml.service.ProxyService;
@@ -53,12 +53,13 @@ import org.wrml.www.MediaType;
  * REST-based application framework.
  * </p>
  */
-public final class RuntimeModel extends Contextual implements Model {
-
-    private Model _StaticInterface;
-    private final java.lang.reflect.Type _NativeType;
+public final class RuntimeModel extends RuntimeObject implements Model {
 
     private static final long serialVersionUID = 1L;
+
+    private transient final ModelGraph _ModelGraph;
+    private transient Model _StaticInterface;
+    private transient final java.lang.reflect.Type _NativeType;
 
     private final ObservableMap<String, Object> _Fields;
     private final ObservableMap<URI, HyperLink> _HyperLinks;
@@ -69,9 +70,10 @@ public final class RuntimeModel extends Contextual implements Model {
     private transient Map<String, List<FieldEventListener>> _FieldEventListeners;
 
     private MediaType _MediaType;
-    private URI _ResourceTemplateId;
+    private transient URI _ResourceTemplateId;
 
-    RuntimeModel(Context context, java.lang.reflect.Type nativeType, FieldMap fieldMap, Map<URI, HyperLink> linkMap) {
+    RuntimeModel(Context context, java.lang.reflect.Type nativeType, ModelGraph modelGraph, FieldMap fieldMap,
+            Map<URI, HyperLink> linkMap) {
         super(context);
 
         if (nativeType == null) {
@@ -80,13 +82,20 @@ public final class RuntimeModel extends Contextual implements Model {
 
         _NativeType = nativeType;
 
+        if (modelGraph == null) {
+            throw new NullPointerException("ModelGraph cannot be null");
+        }
+
         _Fields = Observables.observableMap(fieldMap);
         _FieldMapEventListener = new FieldMapEventListener();
         _Fields.addMapEventListener(_FieldMapEventListener);
 
         _HyperLinks = Observables.observableMap(linkMap);
 
-        init();
+        _ModelGraph = modelGraph;
+        _ModelGraph.pushInitCursorIn(this);
+
+        //init();
 
         // TODO: Self-register for ID changes so that we can figure out where we are in the API.
         // Use the Context to gain access to the configured APIs which will then tell you which 
@@ -213,6 +222,10 @@ public final class RuntimeModel extends Contextual implements Model {
     public DocumentMetadata getMetadata() {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    public ModelGraph getModelGraph() {
+        return _ModelGraph;
     }
 
     public final Service getMyOriginService() {
@@ -390,11 +403,6 @@ public final class RuntimeModel extends Contextual implements Model {
         fieldEventListenerList.remove(listener);
     }
 
-    public final void removeLinkEventListener(URI linkRelationId, LinkEventListener listener) {
-        // TODO Auto-generated method stub
-
-    }
-
     /*
      * public void save() {
      * 
@@ -407,6 +415,11 @@ public final class RuntimeModel extends Contextual implements Model {
      * needed?
      * }
      */
+
+    public final void removeLinkEventListener(URI linkRelationId, LinkEventListener listener) {
+        // TODO Auto-generated method stub
+
+    }
 
     public void setAllFieldsToDefaultValue() {
 
@@ -425,10 +438,6 @@ public final class RuntimeModel extends Contextual implements Model {
 
     }
 
-    public Object setFieldValue(String fieldName, Object newValue) {
-        return _Fields.put(fieldName, newValue);
-    }
-
     /*
      * public void refresh(boolean atomic) {
      * final URI id = getId();
@@ -443,6 +452,10 @@ public final class RuntimeModel extends Contextual implements Model {
      * become(newThis, atomic);
      * }
      */
+
+    public Object setFieldValue(String fieldName, Object newValue) {
+        return _Fields.put(fieldName, newValue);
+    }
 
     @Override
     public String toString() {
@@ -491,9 +504,9 @@ public final class RuntimeModel extends Contextual implements Model {
     /**
      * Called to initialize the Model.
      */
-    protected void init() {
-        //    setAllFieldsToDefaultValue();
-    }
+    //protected void init() {
+    //    setAllFieldsToDefaultValue();
+    //}
 
     private void extendFields(Model modelToExtend) {
         final RuntimeModel modelToExtendDynamicInterface = (RuntimeModel) modelToExtend.getDynamicInterface();

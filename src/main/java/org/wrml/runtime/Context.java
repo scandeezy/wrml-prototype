@@ -27,7 +27,7 @@ import java.util.WeakHashMap;
 import org.wrml.HyperLink;
 import org.wrml.Model;
 import org.wrml.formatter.ModelReader;
-import org.wrml.formatter.json.JsonModelReader;
+import org.wrml.formatter.json.JsonParserModelReader;
 import org.wrml.model.Container;
 import org.wrml.model.Document;
 import org.wrml.model.config.Config;
@@ -180,7 +180,7 @@ public class Context extends ClassLoader {
 
         initServices();
 
-        bootstrap();
+        //bootstrap();
 
         // TODO: Do something interesting with the config...like loading WRML REST API definitions
     }
@@ -189,7 +189,7 @@ public class Context extends ClassLoader {
 
         // TODO: Do not hardcode this, determine this based on the Media Type (and configured readers)
 
-        final JsonModelReader reader = new JsonModelReader();
+        final JsonParserModelReader reader = new JsonParserModelReader();
         reader.open(inputStream);
         return reader;
     }
@@ -297,27 +297,27 @@ public class Context extends ClassLoader {
         return new CachingService(this, originService, observableModelCache);
     }
 
-    public final Model instantiateModel(java.lang.reflect.Type staticInterfaceType) {
+    public final Model instantiateModel(java.lang.reflect.Type staticInterfaceType, ModelGraph modelGraph) {
 
         final Map<String, Object> fieldBackingMap = new TreeMap<String, Object>();
         final Map<URI, HyperLink> linkBackingMap = new HashMap<URI, HyperLink>();
 
         final ModelFieldMap modelFieldMap = new ModelFieldMap(this, fieldBackingMap);
 
-        final Model model = instantiateModel(staticInterfaceType, modelFieldMap, linkBackingMap);
+        final Model model = instantiateModel(staticInterfaceType, modelGraph, modelFieldMap, linkBackingMap);
         modelFieldMap.setModel(model);
 
         return model;
     }
 
-    public final Model instantiateModel(java.lang.reflect.Type staticInterfaceType, FieldMap fieldMap,
-            Map<URI, HyperLink> linkMap) {
-        final RuntimeModel model = new RuntimeModel(this, staticInterfaceType, fieldMap, linkMap);
+    public final Model instantiateModel(java.lang.reflect.Type staticInterfaceType, ModelGraph modelGraph,
+            FieldMap fieldMap, Map<URI, HyperLink> linkMap) {
+        final RuntimeModel model = new RuntimeModel(this, staticInterfaceType, modelGraph, fieldMap, linkMap);
         return model;
     }
 
-    public final Model instantiateModel(URI schemaId) {
-        return instantiateModel(getSystemTransformers().getClassToSchemaIdTransformer().bToA(schemaId));
+    public final Model instantiateModel(URI schemaId, ModelGraph modelGraph) {
+        return instantiateModel(getSystemTransformers().getClassToSchemaIdTransformer().bToA(schemaId), modelGraph);
     }
 
     @SuppressWarnings("unchecked")
@@ -382,51 +382,6 @@ public class Context extends ClassLoader {
         final Transformer<MediaType, URI> mediaTypeToSchemaIdTransformer = systemTransformers
                 .getMediaTypeToSchemaIdTransformer();
 
-        // Get the media type: application/wrml; schema="http://.../org/wrml/model/schema/Field"
-        final MediaType fieldMediaType = systemTransformers.getMediaTypeToNativeTypeTransformer().bToA(Field.class);
-        final URI fieldSchemaId = mediaTypeToSchemaIdTransformer.aToB(fieldMediaType);
-
-        // Use the Service's overloaded get method to request the Field Schema.
-        final Model dynamicFieldSchemaModel = (Model) schemaService.get(fieldSchemaId, null, schemaMediaType, null);
-
-        /*
-         * Using the model instance's dynamic (Map-like) Java API we can get
-         * field values (Objects) names based on their names (Strings).
-         * 
-         * Generally speaking accessing the fields of a model dynamically is
-         * appropriate in cases where the static type information is not
-         * necessary.
-         */
-
-        System.out.println("Dynamic name: " + dynamicFieldSchemaModel.getFieldValue("name"));
-        System.out.println("Dynamic id: " + dynamicFieldSchemaModel.getFieldValue("id"));
-        System.out.println("Dynamic description: " + dynamicFieldSchemaModel.getFieldValue("description"));
-        System.out.println("Dynamic baseSchemaIds: " + dynamicFieldSchemaModel.getFieldValue("baseSchemaIds"));
-        //System.out.println("Dynamic fields: " + dynamicMetaSchemaModel.getFieldValue("fields"));
-
-        /*
-         * In the Java implementation of WRML, models have two APIs.
-         * 
-         * First, as demonstrated above, there is the inner more "dynamic"
-         * interface with the getFieldValue, setFieldValue, and clickLink
-         * methods.
-         * 
-         * Second, there is a reflection proxy-based static interface that
-         * allows Java programs to address WRML models by their auto-generated
-         * Java interface. The interface reference that is returned is a thin
-         * "facade" over the model's dynamic interface, which ensures that
-         * behavior will be consistent between the two APIs.
-         * 
-         * In this example, we have the model that represents the schema for
-         * Schemas (like WRML's Class<Class<?>>).
-         */
-        final Schema staticFieldSchemaModel = (Schema) dynamicFieldSchemaModel.getStaticInterface();
-
-        System.out.println("Static name: " + staticFieldSchemaModel.getName());
-        System.out.println("Static id: " + staticFieldSchemaModel.getId());
-        System.out.println("Static description: " + staticFieldSchemaModel.getDescription());
-        System.out.println("Static baseSchemaIds: " + staticFieldSchemaModel.getBaseSchemaIds());
-
         /*
          * If we want to get the Schema that represents the form of all WRML
          * models, then we are looking for the MetaSchema, which has an id value
@@ -444,19 +399,24 @@ public class Context extends ClassLoader {
         // Use the Service's overloaded get method to request the MetaSchema.
         final Model dynamicMetaSchemaModel = (Model) schemaService.get(schemaSchemaId, null, schemaMediaType, null);
 
-        System.out.println("Dynamic name: " + dynamicMetaSchemaModel.getFieldValue("name"));
-        System.out.println("Dynamic id: " + dynamicMetaSchemaModel.getFieldValue("id"));
-        System.out.println("Dynamic description: " + dynamicMetaSchemaModel.getFieldValue("description"));
-        System.out.println("Dynamic baseSchemaIds: " + dynamicMetaSchemaModel.getFieldValue("baseSchemaIds"));
-        //System.out.println("Dynamic fields: " + dynamicMetaSchemaModel.getFieldValue("fields"));
+        /*
+         * In the Java implementation of WRML, models have two APIs.
+         * 
+         * First, as demonstrated above, there is the inner more "dynamic"
+         * interface with the getFieldValue, setFieldValue, and clickLink
+         * methods.
+         * 
+         * Second, there is a reflection proxy-based static interface that
+         * allows Java programs to address WRML models by their auto-generated
+         * Java interface. The interface reference that is returned is a thin
+         * "facade" over the model's dynamic interface, which ensures that
+         * behavior will be consistent between the two APIs.
+         * 
+         * In this example, we have the model that represents the schema for
+         * Schemas (like WRML's Class<Class<?>>).
+         */
 
         final Schema staticMetaSchemaModel = (Schema) dynamicMetaSchemaModel.getStaticInterface();
-
-        System.out.println("Static name: " + staticMetaSchemaModel.getName());
-        System.out.println("Static id: " + staticMetaSchemaModel.getId());
-        System.out.println("Static description: " + staticMetaSchemaModel.getDescription());
-        System.out.println("Static baseSchemaIds: " + staticMetaSchemaModel.getBaseSchemaIds());
-        //System.out.println("Static fields: " + staticModel.getFields());
 
     }
 
