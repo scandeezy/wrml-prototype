@@ -19,7 +19,7 @@ require_once(DOCROOT . '/runtime/StaticSchema.php');
 require_once(DOCROOT . '/runtime/StaticConstraint.php');
 require_once(DOCROOT . '/runtime/StaticLink.php');
 
-define('__DOCUMENT_SCHEMA_PATH__', '/org/wrml/model/' . Context::DOCUMENT_SCHEMA_NAME);
+define('__DOCUMENT_SCHEMA_PATH__', '/org/wrml/core/model/' . Context::DOCUMENT_SCHEMA_NAME);
 define('__JSON_FORMAT_ID__', Context::FORMAT_API_DOCROOT . '/application/json');
 
 class Context {
@@ -35,13 +35,13 @@ class Context {
     const VALIDATORS_API_DOCROOT = 'http://api.validators.wrml.org';    
     
     const JSON_FORMAT_ID = __JSON_FORMAT_ID__;
-
+    
     public function getRequestPath() {
-        if(!isset($_SERVER['REQUEST_URI'])){
-            $path = $_SERVER['PHP_SELF'];
+        if(isset($_SERVER['REQUEST_URI'])){
+            $path = $_SERVER['REQUEST_URI'];            
         }
         else{
-            $path = $_SERVER['REQUEST_URI'];
+            $path = $_SERVER['PHP_SELF'];
         }
         
         return $path;
@@ -65,7 +65,7 @@ class Context {
             // TODO: Implement support for Formats
             //header("Content-type: application/wrml; schema=\"" . $schema->getId() . "\"; format=\"" . //Context::JSON_FORMAT_ID . "\"");
                         
-            header("Content-type: application/wrml; schema=\"" . $this->getRequestUri('/org/wrml/model/schema/Schema') . "\"");
+            header("Content-type: application/wrml; schema=\"" . $this->getRequestUri('/org/wrml/core/model/schema/Schema') . "\"");
 
         }
         else {            

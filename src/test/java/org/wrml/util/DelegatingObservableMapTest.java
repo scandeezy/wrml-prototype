@@ -30,10 +30,10 @@ import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
-import org.wrml.util.observable.DelegatingObservableMap;
-import org.wrml.util.observable.MapEvent;
-import org.wrml.util.observable.MapEventListener;
-import org.wrml.util.observable.ObservableMap;
+import org.wrml.core.util.observable.DelegatingObservableMap;
+import org.wrml.core.util.observable.MapEvent;
+import org.wrml.core.util.observable.MapEventListener;
+import org.wrml.core.util.observable.ObservableMap;
 
 public class DelegatingObservableMapTest {
 

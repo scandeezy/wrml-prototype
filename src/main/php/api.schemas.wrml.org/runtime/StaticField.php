@@ -16,7 +16,7 @@
  */
 
 require_once(DOCROOT . '/runtime/Model.php');
-require_once(DOCROOT . '/org/wrml/model/schema/Type.php');
+require_once(DOCROOT . '/org/wrml/core/model/schema/Type.php');
 
 class StaticField extends Model {
     
