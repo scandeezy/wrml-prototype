@@ -18,6 +18,12 @@ package org.wrml.core.model;
 
 import java.net.URI;
 
+/**
+ * A child of a Document
+ * 
+ * @param <D>
+ *            the Document parent's exact type.
+ */
 public interface Child<D extends Document> {
 
     public D getParent();

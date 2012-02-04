@@ -20,7 +20,7 @@ import java.net.URI;
 
 import org.wrml.core.Model;
 
-/*
+/**
  * WRML's Java framework should have a generalized design for how to
  * incorporate hooks to non-model (executable) Java code. Everything from
  * how it is packaged (Jar, Manifest file, etc) and design a REST API-based

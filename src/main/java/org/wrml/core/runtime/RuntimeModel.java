@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.wrml.core.HyperLink;
+import org.wrml.core.Hyperlink;
 import org.wrml.core.Model;
 import org.wrml.core.model.Document;
 import org.wrml.core.model.DocumentMetadata;
@@ -62,7 +62,7 @@ public final class RuntimeModel extends RuntimeObject implements Model {
     private transient final java.lang.reflect.Type _NativeType;
 
     private final ObservableMap<String, Object> _Fields;
-    private final ObservableMap<URI, HyperLink> _HyperLinks;
+    private final ObservableMap<URI, Hyperlink> _Hyperlinks;
 
     private transient FieldMapEventListener _FieldMapEventListener;
 
@@ -73,7 +73,7 @@ public final class RuntimeModel extends RuntimeObject implements Model {
     private transient URI _ResourceTemplateId;
 
     RuntimeModel(Context context, java.lang.reflect.Type nativeType, ModelGraph modelGraph, FieldMap fieldMap,
-            Map<URI, HyperLink> linkMap) {
+            Map<URI, Hyperlink> linkMap) {
         super(context);
 
         if (nativeType == null) {
@@ -90,7 +90,7 @@ public final class RuntimeModel extends RuntimeObject implements Model {
         _FieldMapEventListener = new FieldMapEventListener();
         _Fields.addMapEventListener(_FieldMapEventListener);
 
-        _HyperLinks = Observables.observableMap(linkMap);
+        _Hyperlinks = Observables.observableMap(linkMap);
 
         _ModelGraph = modelGraph;
         _ModelGraph.pushInitCursorIn(this);
@@ -152,7 +152,7 @@ public final class RuntimeModel extends RuntimeObject implements Model {
 
     public Object clickLink(URI rel, java.lang.reflect.Type nativeReturnType, Object requestEntity,
             Map<String, String> hrefParams) {
-        final HyperLink runtimeHyperLink = getHyperLink(rel);
+        final Hyperlink runtimeHyperLink = getHyperLink(rel);
 
         if (runtimeHyperLink == null) {
             // TODO: Error here instead?
@@ -195,8 +195,8 @@ public final class RuntimeModel extends RuntimeObject implements Model {
         return _Fields.get(fieldName);
     }
 
-    public ObservableMap<URI, HyperLink> getHyperLinks() {
-        return _HyperLinks;
+    public ObservableMap<URI, Hyperlink> getHyperLinks() {
+        return _Hyperlinks;
     }
 
     public final HypermediaEngine getHypermediaEngine() {
@@ -551,14 +551,14 @@ public final class RuntimeModel extends RuntimeObject implements Model {
         }
     }
 
-    private HyperLink getHyperLink(URI rel) {
+    private Hyperlink getHyperLink(URI rel) {
 
-        if (!_HyperLinks.containsKey(rel)) {
-            final HyperLink link = new RuntimeHyperLink(this, rel);
-            _HyperLinks.put(rel, link);
+        if (!_Hyperlinks.containsKey(rel)) {
+            final Hyperlink link = new RuntimeHyperlink(this, rel);
+            _Hyperlinks.put(rel, link);
         }
 
-        return _HyperLinks.get(rel);
+        return _Hyperlinks.get(rel);
     }
 
     private Class<?> getStaticInterfaceClass() {

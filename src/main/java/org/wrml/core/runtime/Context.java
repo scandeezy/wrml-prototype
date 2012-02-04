@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import java.util.WeakHashMap;
 
-import org.wrml.core.HyperLink;
+import org.wrml.core.Hyperlink;
 import org.wrml.core.Model;
 import org.wrml.core.formatter.ModelReader;
 import org.wrml.core.formatter.json.JsonParserModelReader;
@@ -300,7 +300,7 @@ public class Context extends ClassLoader {
     public final Model instantiateModel(java.lang.reflect.Type staticInterfaceType, ModelGraph modelGraph) {
 
         final Map<String, Object> fieldBackingMap = new TreeMap<String, Object>();
-        final Map<URI, HyperLink> linkBackingMap = new HashMap<URI, HyperLink>();
+        final Map<URI, Hyperlink> linkBackingMap = new HashMap<URI, Hyperlink>();
 
         final ModelFieldMap modelFieldMap = new ModelFieldMap(this, fieldBackingMap);
 
@@ -311,7 +311,7 @@ public class Context extends ClassLoader {
     }
 
     public final Model instantiateModel(java.lang.reflect.Type staticInterfaceType, ModelGraph modelGraph,
-            FieldMap fieldMap, Map<URI, HyperLink> linkMap) {
+            FieldMap fieldMap, Map<URI, Hyperlink> linkMap) {
         final RuntimeModel model = new RuntimeModel(this, staticInterfaceType, modelGraph, fieldMap, linkMap);
         return model;
     }

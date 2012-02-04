@@ -24,22 +24,44 @@ import org.wrml.core.model.Named;
 import org.wrml.core.model.Titled;
 
 /**
- * This interface holds the REST API's metadata and the docroot of the
- * API's resource model.
+ * A REST API.
  */
-
-// Generated from a Web Resource Schema
 public interface Api extends Named, Titled, Document {
 
-    // Note: Added to Field
-    //     Name: name 
-    //     Constraints: TextSyntax - Mixed-Upper Case
-
+    /**
+     * Get the {@link ResourceTemplate} that is the root of the Api's
+     * hierarchical resource model tree. Conventionally, the docroot resource
+     * has an empty path segment value, meaning that its full URI path value is
+     * simply "/".
+     * 
+     * @return the ResourceTemplate that describes this Api's docroot
+     * 
+     * @see ResourceTemplate#getPathSegment()
+     */
     public ResourceTemplate getDocroot();
 
+    /**
+     * Get the id of the {@link ResourceTemplate} that is the root of this Api.
+     * 
+     * @return the docroot ResourceTemplate's id
+     */
     public URI getDocrootId();
 
+    /**
+     * Get the Api's {@link Collection} of {@link LinkTemplate}s, which, when
+     * laid on top of the Api's {@link ResourceTemplate} tree, form a hypermedia
+     * graph of interrelated ResourceTemplates.
+     * 
+     * @return the list of LinkTemplates that describe all of the
+     *         relationships between the Api's ResourceTemplates.
+     */
     public Collection<LinkTemplate> getLinkTemplates();
 
+    /**
+     * Get the id of the {@link Collection} which lists the Api's
+     * {@link LinkTemplate}s.
+     * 
+     * @return the id of the LinkTemplate Collection.
+     */
     public URI getLinkTemplatesCollectionId();
 }

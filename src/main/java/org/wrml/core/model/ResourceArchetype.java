@@ -17,7 +17,7 @@
 package org.wrml.core.model;
 
 /**
- * Enumeration that captures the resource archetypes.
+ * Enumeration that captures WRML's core resource archetypes.
  */
 //Generated from a Web Resource Schema
 public enum ResourceArchetype {

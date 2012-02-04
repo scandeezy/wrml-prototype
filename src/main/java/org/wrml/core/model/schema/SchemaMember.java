@@ -18,6 +18,13 @@ package org.wrml.core.model.schema;
 
 import org.wrml.core.model.Owned;
 
+/**
+ * A common base interface for the components of a {@link Schema}, which are
+ * {@link Constrainable} and {@link Owned} (by a Schema).
+ * 
+ * @param <M>
+ *            a sub-interface of this interface
+ */
 public interface SchemaMember<M extends SchemaMember<M>> extends Constrainable<M>, Owned<Schema> {
 
 }

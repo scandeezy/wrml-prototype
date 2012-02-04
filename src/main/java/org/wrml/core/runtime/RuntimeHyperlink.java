@@ -19,7 +19,7 @@ package org.wrml.core.runtime;
 import java.net.URI;
 import java.util.Map;
 
-import org.wrml.core.HyperLink;
+import org.wrml.core.Hyperlink;
 import org.wrml.core.Model;
 import org.wrml.core.model.api.LinkTemplate;
 import org.wrml.core.model.schema.Link;
@@ -34,25 +34,16 @@ import org.wrml.core.www.MediaType;
 
 /**
  * A Model instance's Link. This class represents a link "instance", that is
- * a
- * link with a fully qualified href URI value that can be used to interact.
- * 
- * A link is enabled if the Model's schema's associated link formula
- * evaluates
- * to true. Instances of this class are responsible for managing their
- * enabled
- * state changes by listening to events from the fields that their
- * LinkFormula
- * relies upon.
+ * a link with a fully qualified href URI value that can be used to interact.
  */
-public final class RuntimeHyperLink extends RuntimeObject implements HyperLink {
+public final class RuntimeHyperlink extends RuntimeObject implements Hyperlink {
 
     private final Model _Referrer;
     private final URI _Rel;
     private URI _Href;
     private boolean _Enabled;
 
-    public RuntimeHyperLink(Model referrer, URI rel) {
+    public RuntimeHyperlink(Model referrer, URI rel) {
         super(referrer.getContext());
         _Referrer = referrer;
         _Rel = rel;

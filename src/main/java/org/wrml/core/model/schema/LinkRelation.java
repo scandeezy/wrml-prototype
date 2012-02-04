@@ -34,16 +34,78 @@ import org.wrml.core.www.http.Method;
  * Their uniqueness is used liberally in WRML Java application's as they form
  * the key between the object model's data and metadata layers.
  * 
+ * A unique, yet highly generic LinkRelation may be shared by many different
+ * instances of an A---->B relationship. For example a "Person" schema and a
+ * "Node" schema may both want to link to their "parent".
+ * 
+ * The re-use of the same LinkRelation is common within the same domain, like
+ * building a Web site about Movies that uses many different APIs that share the
+ * same domain-specific language (DSL). Common, domain-specific-relationships
+ * like "genre" and "cast" might appear in the application-specific APIs that
+ * directly power a set of Web apps.
+ * 
  * Note: This is a metadata class - instances should be edited with tools and
  * persisted for reuse.
  */
 public interface LinkRelation extends Named, Titled, Versioned, Descriptive, Document {
 
+    /**
+     * Gets the HTTP {@link Method} to invoke on the HREF associated with this
+     * LinkRelation.
+     * 
+     * @return the HTTP Method used to "click through" this LinkRelation.
+     */
     public Method getMethod();
 
+    /**
+     * The list of {@link MediaType}s that this LinkRelation is known to
+     * accept as "Content Types" in the *request* message's body.
+     * 
+     * Given the nature of HTTP's methods, this list only applies to
+     * LinkRelation's that describe a PUT or POST-based relationship.
+     * LinkRelation instances using other methods will return <code>null</code>.
+     * 
+     * Highly reusable LinkRelations may be shared across APIs and thus they are
+     * unlikely to know about all of the different application's
+     * {@link MediaType}s, and in such cases this method will return
+     * <code>null</code>.
+     * 
+     * @return the list of content types allowed in request bodies associated
+     *         with clicks using this LinkRelation. Returns <code>null</code> in
+     *         some cases (see above).
+     */
     public ObservableList<MediaType> getRequestMediaTypes();
 
+    /**
+     * The list of {@link MediaType}s that this LinkRelation is known to
+     * return as "Content Types" in the *response* message's body.
+     * 
+     * Given the nature of HTTP, this list only applies to LinkRelation's that
+     * describe an interaction which is expected to result in a response message
+     * containing some content in its body. LinkRelation instances which
+     * describe interactions that are expected to result in response messages
+     * with zero byte bodies will return <code>null</code>.
+     * 
+     * Highly reusable LinkRelations may be shared across APIs and thus they are
+     * unlikely to know about all of the different application's
+     * {@link MediaType}s, and in such cases this method will return
+     * <code>null</code>.
+     * 
+     * @return the list of content types allowed in request bodies associated
+     *         with clicks using this LinkRelation. Returns <code>null</code> in
+     *         some cases (see above).
+     */
     public ObservableList<MediaType> getResponseMediaTypes();
 
+    /**
+     * Sets the HTTP {@link Method} field, which is described in
+     * {@link LinkRelation#getMethod()}
+     * 
+     * @param method
+     *            the {@link Method} to associate with this LinkRelation.
+     * 
+     * @return the {@link Method} that used to be associated, before the caller
+     *         called.
+     */
     public Method setMethod(Method method);
 }

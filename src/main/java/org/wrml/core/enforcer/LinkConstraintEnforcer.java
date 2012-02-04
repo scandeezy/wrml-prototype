@@ -16,13 +16,13 @@
 
 package org.wrml.core.enforcer;
 
-import org.wrml.core.HyperLink;
+import org.wrml.core.Hyperlink;
 import org.wrml.core.Model;
 import org.wrml.core.model.schema.Constraint;
 import org.wrml.core.model.schema.Link;
 
 public interface LinkConstraintEnforcer {
 
-    public EnforcementResult enforceConstraint(Constraint<Link> constraint, Model model, HyperLink link);
+    public EnforcementResult enforceConstraint(Constraint<Link> constraint, Model model, Hyperlink link);
 
 }

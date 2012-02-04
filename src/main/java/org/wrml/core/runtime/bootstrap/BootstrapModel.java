@@ -22,7 +22,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.wrml.core.HyperLink;
+import org.wrml.core.Hyperlink;
 import org.wrml.core.Model;
 import org.wrml.core.runtime.Context;
 import org.wrml.core.runtime.ModelGraph;
@@ -57,7 +57,7 @@ public class BootstrapModel<M extends Model> extends RuntimeObject implements Se
 
     // TODO: Does the bootstrap model need links?
     /*
-     * public ObservableMap<URI, HyperLink> getHyperLinks() {
+     * public ObservableMap<URI, Hyperlink> getHyperLinks() {
      * return _HyperLinks;
      * }
      */
@@ -89,7 +89,7 @@ public class BootstrapModel<M extends Model> extends RuntimeObject implements Se
 
             final ReflectiveFieldMap<M> fieldMap = new ReflectiveFieldMap<M>(context, this, _StaticInterfaceClass);
 
-            final Map<URI, HyperLink> linkMap = new HashMap<URI, HyperLink>();
+            final Map<URI, Hyperlink> linkMap = new HashMap<URI, Hyperlink>();
 
             final ModelGraph modelGraph = getModelGraph();
             final Model dynamicModel = context.instantiateModel(_StaticInterfaceClass, modelGraph, fieldMap, linkMap);
