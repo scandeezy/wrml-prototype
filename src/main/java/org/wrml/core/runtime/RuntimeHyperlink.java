@@ -25,7 +25,7 @@ import org.wrml.core.model.api.LinkTemplate;
 import org.wrml.core.model.schema.Link;
 import org.wrml.core.model.schema.LinkRelation;
 import org.wrml.core.runtime.event.LinkEventListener;
-import org.wrml.core.runtime.system.service.schema.Prototype;
+import org.wrml.core.runtime.system.Prototype;
 import org.wrml.core.runtime.system.transformer.SystemTransformers;
 import org.wrml.core.service.Service;
 import org.wrml.core.transformer.Transformer;

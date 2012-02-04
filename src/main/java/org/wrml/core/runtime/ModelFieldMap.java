@@ -23,7 +23,7 @@ import org.wrml.core.Model;
 import org.wrml.core.model.CodeOnDemand;
 import org.wrml.core.model.schema.Constraint;
 import org.wrml.core.model.schema.Field;
-import org.wrml.core.runtime.system.service.schema.Prototype;
+import org.wrml.core.runtime.system.Prototype;
 import org.wrml.core.util.observable.ObservableList;
 
 public class ModelFieldMap extends DelegatingFieldMap {

@@ -26,16 +26,15 @@ import java.util.WeakHashMap;
 
 import org.wrml.core.Hyperlink;
 import org.wrml.core.Model;
-import org.wrml.core.formatter.ModelReader;
-import org.wrml.core.formatter.json.JsonParserModelReader;
+import org.wrml.core.io.JsonParserModelReader;
+import org.wrml.core.io.ModelReader;
 import org.wrml.core.model.Container;
 import org.wrml.core.model.Document;
 import org.wrml.core.model.config.Config;
 import org.wrml.core.model.schema.Field;
 import org.wrml.core.model.schema.Schema;
-import org.wrml.core.runtime.system.service.schema.Prototype;
-import org.wrml.core.runtime.system.service.schema.SystemSchemaService;
-import org.wrml.core.runtime.system.service.www.WebClient;
+import org.wrml.core.runtime.system.Prototype;
+import org.wrml.core.runtime.system.SystemSchemaService;
 import org.wrml.core.runtime.system.transformer.SystemTransformers;
 import org.wrml.core.service.CachingService;
 import org.wrml.core.service.Service;
@@ -48,6 +47,7 @@ import org.wrml.core.util.observable.DelegatingObservableMap;
 import org.wrml.core.util.observable.ObservableMap;
 import org.wrml.core.util.observable.Observables;
 import org.wrml.core.www.MediaType;
+import org.wrml.core.www.WebClient;
 
 /**
  * 

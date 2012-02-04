@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.core.runtime.system.service.www;
+package org.wrml.core.www;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -39,18 +39,17 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 
 import org.wrml.core.Model;
-import org.wrml.core.formatter.DefaultFormatter;
-import org.wrml.core.formatter.Formatter;
 import org.wrml.core.model.format.Format;
 import org.wrml.core.runtime.Context;
 import org.wrml.core.service.ServiceMap;
 import org.wrml.core.transformer.PassthroughTransformer;
 import org.wrml.core.transformer.Transformer;
 import org.wrml.core.transformer.Transformers;
-import org.wrml.core.www.MediaType;
 import org.wrml.core.www.http.AcceptHeader;
 import org.wrml.core.www.http.Body;
+import org.wrml.core.www.http.DefaultFormatter;
 import org.wrml.core.www.http.Entity;
+import org.wrml.core.www.http.Formatter;
 import org.wrml.core.www.http.Headers;
 import org.wrml.core.www.http.HttpVersion;
 import org.wrml.core.www.http.Message;

@@ -36,7 +36,7 @@ import org.wrml.core.runtime.event.FieldEvent;
 import org.wrml.core.runtime.event.FieldEventListener;
 import org.wrml.core.runtime.event.LinkEventListener;
 import org.wrml.core.runtime.event.ModelEventListener;
-import org.wrml.core.runtime.system.service.schema.Prototype;
+import org.wrml.core.runtime.system.Prototype;
 import org.wrml.core.runtime.system.transformer.SystemTransformers;
 import org.wrml.core.service.ProxyService;
 import org.wrml.core.service.Service;

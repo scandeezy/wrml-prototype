@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.core.formatter;
+package org.wrml.core.io;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,15 +24,15 @@ import java.util.List;
 import org.wrml.core.Model;
 import org.wrml.core.event.Event;
 import org.wrml.core.event.EventSource;
-import org.wrml.core.formatter.FieldIterativeModelReader.EventListener;
-import org.wrml.core.formatter.FieldIterativeModelReader.EventListener.EventNames;
+import org.wrml.core.io.FieldIterativeModelReader.EventListener;
+import org.wrml.core.io.FieldIterativeModelReader.EventListener.EventNames;
 import org.wrml.core.model.schema.Link;
 import org.wrml.core.model.schema.Type;
 import org.wrml.core.runtime.Context;
 import org.wrml.core.runtime.ModelGraph;
 import org.wrml.core.runtime.TypeSystem;
-import org.wrml.core.runtime.system.service.schema.FieldPrototype;
-import org.wrml.core.runtime.system.service.schema.Prototype;
+import org.wrml.core.runtime.system.FieldPrototype;
+import org.wrml.core.runtime.system.Prototype;
 import org.wrml.core.runtime.system.transformer.SystemTransformers;
 import org.wrml.core.transformer.Transformer;
 import org.wrml.core.transformer.Transformers;

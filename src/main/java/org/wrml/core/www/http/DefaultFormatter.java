@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package org.wrml.core.formatter;
+package org.wrml.core.www.http;
 
 import java.io.InputStream;
 import java.lang.reflect.Type;
 
 import org.wrml.core.Model;
+import org.wrml.core.io.ModelReader;
 import org.wrml.core.runtime.Context;
 import org.wrml.core.runtime.system.transformer.SystemTransformers;
 import org.wrml.core.www.MediaType;
-import org.wrml.core.www.http.Body;
-import org.wrml.core.www.http.Entity;
-import org.wrml.core.www.http.Message;
 
 public class DefaultFormatter implements Formatter {
 

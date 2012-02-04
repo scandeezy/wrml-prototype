@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.core.runtime.system.service.schema;
+package org.wrml.core.runtime.system;
 
 import org.wrml.core.Model;
 import org.wrml.core.model.schema.Type;

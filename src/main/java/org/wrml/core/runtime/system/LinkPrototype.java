@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.core.runtime.system.service.schema;
+package org.wrml.core.runtime.system;
 
 import java.net.URI;
 import java.util.Map;

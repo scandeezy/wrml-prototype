@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.wrml.core.formatter.json;
+package org.wrml.core.io;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,8 +29,7 @@ import org.codehaus.jackson.JsonToken;
 
 import org.wrml.core.Model;
 import org.wrml.core.event.Event;
-import org.wrml.core.formatter.FieldIterativeModelReader;
-import org.wrml.core.formatter.FieldIterativeModelReader.EventListener.EventNames;
+import org.wrml.core.io.FieldIterativeModelReader.EventListener.EventNames;
 import org.wrml.core.runtime.Context;
 import org.wrml.core.runtime.ModelGraph;
 import org.wrml.core.util.observable.ObservableMap;

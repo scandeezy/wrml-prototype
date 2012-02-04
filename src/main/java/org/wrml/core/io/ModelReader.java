@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package org.wrml.core.formatter;
+package org.wrml.core.io;
+
+import java.io.InputStream;
+import java.lang.reflect.Type;
 
 import org.wrml.core.Model;
 import org.wrml.core.runtime.Context;
-import org.wrml.core.www.http.Message;
 
-public interface Formatter {
+public interface ModelReader {
 
-    public Model read(Context context, Message requestMessage, Message responseMessage) throws Exception;
+    public void close() throws Exception;
 
-    public void write(Context context, Message requestMessage, Model model) throws Exception;
+    public void open(InputStream inputStream) throws Exception;
+
+    public Model readModel(Context context, Type staticInterfaceType) throws Exception;
+
 }

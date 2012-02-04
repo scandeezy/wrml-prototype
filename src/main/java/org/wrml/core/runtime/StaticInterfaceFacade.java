@@ -20,9 +20,9 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.wrml.core.Model;
-import org.wrml.core.runtime.system.service.schema.FieldPrototype;
-import org.wrml.core.runtime.system.service.schema.LinkPrototype;
-import org.wrml.core.runtime.system.service.schema.Prototype;
+import org.wrml.core.runtime.system.FieldPrototype;
+import org.wrml.core.runtime.system.LinkPrototype;
+import org.wrml.core.runtime.system.Prototype;
 import org.wrml.core.util.DelegatingInvocationHandler;
 
 public class StaticInterfaceFacade extends DelegatingInvocationHandler {
