@@ -64,7 +64,7 @@ public interface Link extends SchemaMember<Link> {
      * 
      * By default this list is <code>null</code> because the Link's associated
      * {@link LinkRelation} already may have captured the information in
-     * {@link LinkRelation#getRequestMediaTypes()}.
+     * {@link LinkRelation#getRequestTypes()}.
      * 
      * Given the nature of HTTP, this list only applies to Link's that
      * describe a PUT or POST-based relationship. Link instances using
@@ -74,7 +74,7 @@ public interface Link extends SchemaMember<Link> {
      *         with clicks using this Link. Returns <code>null</code> in some
      *         cases (see above).
      */
-    public ObservableList<MediaType> getRequestMediaTypes();
+    public ObservableList<MediaType> getRequestTypes();
 
     /**
      * The list of {@link MediaType}s that this Link is known to return as
@@ -82,7 +82,7 @@ public interface Link extends SchemaMember<Link> {
      * 
      * By default this list is <code>null</code> because the Link's associated
      * {@link LinkRelation} already may have captured the information in
-     * {@link LinkRelation#getResponseMediaTypes()}.
+     * {@link LinkRelation#getResponseTypes()}.
      * 
      * Given the nature of HTTP, this list only applies to Link's that describe
      * an interaction which is expected to result in a response message
@@ -94,7 +94,7 @@ public interface Link extends SchemaMember<Link> {
      *         with clicks using this Link. Returns <code>null</code> in some
      *         cases (see above).
      */
-    public ObservableList<MediaType> getResponseMediaTypes();
+    public ObservableList<MediaType> getResponseTypes();
 
     /**
      * Set the default href, assuming that it can be known to identify some

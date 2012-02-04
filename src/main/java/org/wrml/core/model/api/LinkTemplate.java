@@ -167,7 +167,7 @@ public interface LinkTemplate extends Versioned, Document {
      * 
      * By default this list is <code>null</code> because the LinkTemplate's
      * associated {@link LinkRelation} already may have captured the information
-     * in {@link LinkRelation#getRequestMediaTypes()}.
+     * in {@link LinkRelation#getRequestTypes()}.
      * 
      * Given the nature of HTTP, this list only applies to LinkTemplates's that
      * describe a PUT or POST-based relationship. LinkTemplate instances using
@@ -177,7 +177,7 @@ public interface LinkTemplate extends Versioned, Document {
      *         with clicks using this LinkTemplate. Returns <code>null</code> in
      *         some cases (see above).
      */
-    public ObservableList<MediaType> getRequestMediaTypes();
+    public ObservableList<MediaType> getRequestTypes();
 
     /**
      * The list of {@link MediaType}s that a link with this LinkTemplate is
@@ -186,7 +186,7 @@ public interface LinkTemplate extends Versioned, Document {
      * 
      * By default this list is <code>null</code> because the LinkTemplate's
      * associated {@link LinkRelation} already may have captured the information
-     * in {@link LinkRelation#getResponseMediaTypes()}.
+     * in {@link LinkRelation#getResponseTypes()}.
      * 
      * Given the nature of HTTP, this list only applies to LinkTemplate's that
      * describe an interaction which is expected to result in a response message
@@ -198,7 +198,7 @@ public interface LinkTemplate extends Versioned, Document {
      *         with clicks using this LinkTemplate. Returns <code>null</code> in
      *         some cases (see above).
      */
-    public ObservableList<MediaType> getResponseMediaTypes();
+    public ObservableList<MediaType> getResponseTypes();
 
     /**
      * If this LinkTemplate describes R---->E, then this method sets E's id.

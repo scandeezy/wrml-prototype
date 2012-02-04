@@ -74,7 +74,7 @@ public interface LinkRelation extends Named, Titled, Versioned, Descriptive, Doc
      *         with clicks using this LinkRelation. Returns <code>null</code> in
      *         some cases (see above).
      */
-    public ObservableList<MediaType> getRequestMediaTypes();
+    public ObservableList<MediaType> getRequestTypes();
 
     /**
      * The list of {@link MediaType}s that this LinkRelation is known to
@@ -95,7 +95,7 @@ public interface LinkRelation extends Named, Titled, Versioned, Descriptive, Doc
      *         with clicks using this LinkRelation. Returns <code>null</code> in
      *         some cases (see above).
      */
-    public ObservableList<MediaType> getResponseMediaTypes();
+    public ObservableList<MediaType> getResponseTypes();
 
     /**
      * Sets the HTTP {@link Method} field, which is described in
