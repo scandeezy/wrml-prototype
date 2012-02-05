@@ -20,7 +20,7 @@ import java.util.List;
 
 public interface ObservableList<E> extends List<E> {
 
-    void addListEventListener(ListEventListener<E> listEventListener);
+    public boolean addEventListener(ListEventListener listEventListener);
 
-    void removeListEventListener(ListEventListener<E> listEventListener);
+    public boolean removeEventListener(ListEventListener listEventListener);
 }

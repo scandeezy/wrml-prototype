@@ -27,60 +27,121 @@ public class DelegatingObservableList<E> extends AbstractObservableList<E> imple
 
     private final List<E> _Delegate;
 
-    public DelegatingObservableList(List<E> delegate) {
+    public DelegatingObservableList(Class<ListEventListener> listenerClass, List<E> delegate) {
+        super(listenerClass);
         _Delegate = delegate;
     }
 
-    public boolean add(E e) {
-        final ListEvent<E> insertingEvent = new ListEvent<E>(this, true, e, null);
-        fireInsertingElementEvent(insertingEvent);
+    public DelegatingObservableList(List<E> delegate) {
+        this(ListEventListener.class, delegate);
+    }
 
-        if (insertingEvent.isCancelled()) {
+    public boolean add(E insertionElement) {
+
+        if (isEventHearable() && !fireListInsertingElement(new CancelableListEvent(this, insertionElement, null))) {
             return false;
         }
 
-        final boolean result = _Delegate.add(e);
-        fireElementInsertedEvent(new ListEvent<E>(this, false, e, null));
-        return result;
+        final boolean added = _Delegate.add(insertionElement);
+
+        if (added && isEventHearable()) {
+            fireListElementInserted(new ListEvent(this, insertionElement, null));
+        }
+
+        return added;
     }
 
-    public void add(int i, E e) {
-        _Delegate.add(i, e);
-    }
+    public void add(int index, E insertionElement) {
 
-    public boolean addAll(Collection<? extends E> es) {
-        return _Delegate.addAll(es);
-    }
+        if (isEventHearable()
+                && !fireListInsertingElement(new CancelableListEvent(this, insertionElement, null, index))) {
+            return;
+        }
 
-    public boolean addAll(int i, Collection<? extends E> es) {
-        return _Delegate.addAll(i, es);
-    }
+        _Delegate.add(index, insertionElement);
 
-    public void clear() {
-        final ListEvent<E> clearingEvent = new ListEvent<E>(this, true);
-        fireClearingEvent(clearingEvent);
-
-        if (!clearingEvent.isCancelled()) {
-            _Delegate.clear();
-            fireClearedEvent(new ListEvent<E>(this, false));
+        if (isEventHearable()) {
+            fireListElementInserted(new ListEvent(this, insertionElement, null, index));
         }
     }
 
-    public boolean contains(Object o) {
-        return _Delegate.contains(o);
+    public boolean addAll(Collection<? extends E> insertionElements) {
+
+        if (isEventHearable()) {
+            int elementIndex = 0;
+            for (final Object insertionElement : insertionElements) {
+                if (!fireListInsertingElement(new CancelableListEvent(this, insertionElement, null, elementIndex++))) {
+                    // TODO: Filter out the unwanted elements and build a list of acceptable ones instead?
+                    return false;
+                }
+            }
+        }
+
+        final boolean added = _Delegate.addAll(insertionElements);
+
+        if (added && isEventHearable()) {
+            int elementIndex = 0;
+            for (final Object insertionElement : insertionElements) {
+                fireListElementInserted(new ListEvent(this, insertionElement, null, elementIndex++));
+            }
+        }
+
+        return added;
+
     }
 
-    public boolean containsAll(Collection<?> objects) {
-        return _Delegate.containsAll(objects);
+    public boolean addAll(int index, Collection<? extends E> insertionElements) {
+
+        if (isEventHearable()) {
+            int elementIndex = index;
+            for (final Object insertionElement : insertionElements) {
+                if (!fireListInsertingElement(new CancelableListEvent(this, insertionElement, null, elementIndex++))) {
+                    // TODO: Filter out the unwanted elements and build a list of acceptable ones instead?
+                    return false;
+                }
+            }
+        }
+
+        final boolean added = _Delegate.addAll(index, insertionElements);
+
+        if (added && isEventHearable()) {
+            int elementIndex = index;
+            for (final Object insertionElement : insertionElements) {
+                fireListElementInserted(new ListEvent(this, insertionElement, null, elementIndex++));
+            }
+        }
+
+        return added;
+    }
+
+    public void clear() {
+
+        if (isEventHearable() && !fireListClearing(new CancelableListEvent(this))) {
+            return;
+        }
+
+        _Delegate.clear();
+
+        if (isEventHearable()) {
+            fireListCleared(new ListEvent(this));
+        }
+    }
+
+    public boolean contains(Object element) {
+        return _Delegate.contains(element);
+    }
+
+    public boolean containsAll(Collection<?> elements) {
+        return _Delegate.containsAll(elements);
     }
 
     @Override
-    public boolean equals(Object o) {
-        return _Delegate.equals(o);
+    public boolean equals(Object otherList) {
+        return _Delegate.equals(otherList);
     }
 
-    public E get(int i) {
-        return _Delegate.get(i);
+    public E get(int indexOfElement) {
+        return _Delegate.get(indexOfElement);
     }
 
     public List<E> getDelegate() {
@@ -92,8 +153,8 @@ public class DelegatingObservableList<E> extends AbstractObservableList<E> imple
         return _Delegate.hashCode();
     }
 
-    public int indexOf(Object o) {
-        return _Delegate.indexOf(o);
+    public int indexOf(Object element) {
+        return _Delegate.indexOf(element);
     }
 
     public boolean isEmpty() {
@@ -104,63 +165,119 @@ public class DelegatingObservableList<E> extends AbstractObservableList<E> imple
         return _Delegate.iterator();
     }
 
-    public int lastIndexOf(Object o) {
-        return _Delegate.lastIndexOf(o);
+    public int lastIndexOf(Object element) {
+        return _Delegate.lastIndexOf(element);
     }
 
     public ListIterator<E> listIterator() {
         return _Delegate.listIterator();
     }
 
-    public ListIterator<E> listIterator(int i) {
-        return _Delegate.listIterator(i);
+    public ListIterator<E> listIterator(int iterationStartIndex) {
+        return _Delegate.listIterator(iterationStartIndex);
     }
 
-    public E remove(int i) {
-        return _Delegate.remove(i);
+    public E remove(int indexOfElement) {
+
+        E removalElement = null;
+
+        if (isEventHearable()) {
+            removalElement = get(indexOfElement);
+            if (!fireListRemovingElement(new CancelableListEvent(this, null, removalElement, indexOfElement))) {
+                return null;
+            }
+        }
+
+        removalElement = _Delegate.remove(indexOfElement);
+
+        if (isEventHearable()) {
+            fireListElementRemoved(new ListEvent(this, null, removalElement, indexOfElement));
+        }
+
+        return removalElement;
     }
 
-    public boolean remove(Object o) {
-        final ListEvent<E> removingEvent = new ListEvent<E>(this, true, null, (E) o);
-        fireRemovingElementEvent(removingEvent);
-        if (removingEvent.isCancelled()) {
+    public boolean remove(Object removalElement) {
+
+        if (isEventHearable() && !fireListRemovingElement(new CancelableListEvent(this, null, removalElement))) {
             return false;
         }
-        final boolean result = _Delegate.remove(o);
-        fireElementRemovedEvent(new ListEvent<E>(this, false, null, (E) o));
-        return result;
+
+        final boolean removed = _Delegate.remove(removalElement);
+
+        if (removed && isEventHearable()) {
+            fireListElementRemoved(new ListEvent(this, null, removalElement));
+        }
+
+        return removed;
     }
 
-    public boolean removeAll(Collection<?> objects) {
-        return _Delegate.removeAll(objects);
+    public boolean removeAll(Collection<?> removalElements) {
+
+        if (isEventHearable()) {
+            int elementIndex = 0;
+            for (final Object removalElement : removalElements) {
+                if (!fireListRemovingElement(new CancelableListEvent(this, null, removalElement, elementIndex++))) {
+                    // TODO: Filter out the unwanted elements and build a list of acceptable ones instead?
+                    return false;
+                }
+            }
+        }
+
+        final boolean removed = _Delegate.removeAll(removalElements);
+
+        if (removed && isEventHearable()) {
+            int elementIndex = 0;
+            for (final Object removalElement : removalElements) {
+                fireListElementRemoved(new ListEvent(this, null, removalElement, elementIndex++));
+            }
+        }
+
+        return removed;
     }
 
-    public boolean retainAll(Collection<?> objects) {
-        return _Delegate.retainAll(objects);
+    public boolean retainAll(Collection<?> elements) {
+        return _Delegate.retainAll(elements);
     }
 
-    public E set(int i, E e) {
-        return _Delegate.set(i, e);
+    public E set(int indexOfElement, E insertionElement) {
+
+        E removalElement = null;
+        if (isEventHearable()) {
+            removalElement = get(indexOfElement);
+            if (!fireListUpdatingElement(new CancelableListEvent(this, insertionElement, removalElement, indexOfElement))) {
+                return null;
+            }
+        }
+
+        removalElement = _Delegate.set(indexOfElement, insertionElement);
+
+        if (isEventHearable()) {
+            fireListElementUpdated(new ListEvent(this, insertionElement, removalElement, indexOfElement));
+        }
+
+        return removalElement;
     }
 
     public int size() {
         return _Delegate.size();
     }
 
-    public List<E> subList(int i, int i1) {
-        return _Delegate.subList(i, i1);
+    public List<E> subList(int fromIndex, int toIndex) {
+        return _Delegate.subList(fromIndex, toIndex);
     }
 
     public Object[] toArray() {
         return _Delegate.toArray();
     }
 
-    public <T> T[] toArray(T[] ts) {
-        return _Delegate.toArray(ts);
+    public <T> T[] toArray(T[] arrayToHoldElements) {
+        return _Delegate.toArray(arrayToHoldElements);
     }
 
     @Override
     public String toString() {
         return getClass().getName() + " [" + (_Delegate != null ? "Delegate=" + _Delegate : "") + "]";
     }
+
 }

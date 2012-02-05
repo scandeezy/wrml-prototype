@@ -21,13 +21,11 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.WeakHashMap;
 
-import org.wrml.core.Hyperlink;
 import org.wrml.core.Model;
-import org.wrml.core.io.JsonParserModelReader;
-import org.wrml.core.io.ModelReader;
+import org.wrml.core.io.JsonParserModelGraphReader;
+import org.wrml.core.io.ModelGraphReader;
 import org.wrml.core.model.Container;
 import org.wrml.core.model.Document;
 import org.wrml.core.model.config.Config;
@@ -43,7 +41,6 @@ import org.wrml.core.transformer.Transformer;
 import org.wrml.core.transformer.Transformers;
 import org.wrml.core.transformer.tostring.MediaTypeToStringTransformer;
 import org.wrml.core.transformer.tostring.UriToStringTransformer;
-import org.wrml.core.util.observable.DelegatingObservableMap;
 import org.wrml.core.util.observable.ObservableMap;
 import org.wrml.core.util.observable.Observables;
 import org.wrml.core.www.MediaType;
@@ -128,7 +125,15 @@ public class Context extends ClassLoader {
 
     private final Config _Config;
 
+    private final ModelHeap _ModelHeap;
+
+    /*
+     * TODO: I would like to replace this simple map with a regex mapping that
+     * allows media types to be specified as regex patterns, so that a single
+     * call can be made to map a set of media types to a single Service.
+     */
     private final ObservableMap<MediaType, Service> _Services;
+
     private final SystemSchemaService _SystemSchemaService;
 
     private Service _DefaultService;
@@ -150,6 +155,8 @@ public class Context extends ClassLoader {
 
         _Config = config;
 
+        _ModelHeap = new ModelHeap(this);
+
         _HypermediaEngines = Observables.observableMap(new HashMap<URI, HypermediaEngine>());
         _Services = Observables.observableMap(new HashMap<MediaType, Service>());
 
@@ -170,8 +177,7 @@ public class Context extends ClassLoader {
         _TypeSystem = new TypeSystem(this);
 
         _WWW = new WebClient(this);
-        final Service defaultService = instantiateCachingService(_WWW);
-        setDefaultService(defaultService);
+        setDefaultService(_WWW);
 
         _SystemSchemaService = new SystemSchemaService(this, _WWW);
         setSchemaService(_SystemSchemaService);
@@ -185,11 +191,11 @@ public class Context extends ClassLoader {
         // TODO: Do something interesting with the config...like loading WRML REST API definitions
     }
 
-    public ModelReader createModelReader(MediaType mediaType, InputStream inputStream) throws Exception {
+    public ModelGraphReader createModelReader(MediaType mediaType, InputStream inputStream) throws Exception {
 
         // TODO: Do not hardcode this, determine this based on the Media Type (and configured readers)
 
-        final JsonParserModelReader reader = new JsonParserModelReader();
+        final JsonParserModelGraphReader reader = new JsonParserModelGraphReader();
         reader.open(inputStream);
         return reader;
     }
@@ -220,6 +226,10 @@ public class Context extends ClassLoader {
         }
 
         return _HypermediaEngines.get(apiId);
+    }
+
+    public ModelHeap getModelHeap() {
+        return _ModelHeap;
     }
 
     public final Prototype getPrototype(java.lang.reflect.Type staticInterfaceType) {
@@ -256,11 +266,6 @@ public class Context extends ClassLoader {
         return getDefaultService();
     }
 
-    public final Service getService(String className) {
-        final URI schemaId = getSystemTransformers().getSchemaIdToFullNameTransformer().bToA(className);
-        return getService(schemaId);
-    }
-
     /*
      * public final StringTransformer<?>
      * getStringTransformer(TextSyntaxConstraint textSyntaxConstraint) {
@@ -270,6 +275,11 @@ public class Context extends ClassLoader {
      * 
      * }
      */
+
+    public final Service getService(String className) {
+        final URI schemaId = getSystemTransformers().getSchemaIdToFullNameTransformer().bToA(className);
+        return getService(schemaId);
+    }
 
     public final Service getService(URI schemaId) {
         return getService(getSystemTransformers().getMediaTypeToSchemaIdTransformer().bToA(schemaId));
@@ -291,35 +301,6 @@ public class Context extends ClassLoader {
         return _TypeSystem;
     }
 
-    public final CachingService instantiateCachingService(Service originService) {
-        final Map<URI, Object> rawModelMap = new HashMap<URI, Object>();
-        final ObservableMap<URI, Object> observableModelCache = new DelegatingObservableMap<URI, Object>(rawModelMap);
-        return new CachingService(this, originService, observableModelCache);
-    }
-
-    public final Model instantiateModel(java.lang.reflect.Type staticInterfaceType, ModelGraph modelGraph) {
-
-        final Map<String, Object> fieldBackingMap = new TreeMap<String, Object>();
-        final Map<URI, Hyperlink> linkBackingMap = new HashMap<URI, Hyperlink>();
-
-        final ModelFieldMap modelFieldMap = new ModelFieldMap(this, fieldBackingMap);
-
-        final Model model = instantiateModel(staticInterfaceType, modelGraph, modelFieldMap, linkBackingMap);
-        modelFieldMap.setModel(model);
-
-        return model;
-    }
-
-    public final Model instantiateModel(java.lang.reflect.Type staticInterfaceType, ModelGraph modelGraph,
-            FieldMap fieldMap, Map<URI, Hyperlink> linkMap) {
-        final RuntimeModel model = new RuntimeModel(this, staticInterfaceType, modelGraph, fieldMap, linkMap);
-        return model;
-    }
-
-    public final Model instantiateModel(URI schemaId, ModelGraph modelGraph) {
-        return instantiateModel(getSystemTransformers().getClassToSchemaIdTransformer().bToA(schemaId), modelGraph);
-    }
-
     @SuppressWarnings("unchecked")
     public <T> void mapFieldsByFieldName(final Map<T, Field> fieldMap, final List<Field> fieldList,
             final String fieldName) {
@@ -335,7 +316,7 @@ public class Context extends ClassLoader {
     public final void setSchemaService(Service schemaService) {
 
         if (!(schemaService instanceof CachingService)) {
-            schemaService = instantiateCachingService(schemaService);
+            schemaService = _ModelHeap.getShard(Schema.class).newModelCachingService(schemaService);
         }
         final MediaType schemaMediaType = getSystemTransformers().getMediaTypeToNativeTypeTransformer().bToA(
                 Schema.class);

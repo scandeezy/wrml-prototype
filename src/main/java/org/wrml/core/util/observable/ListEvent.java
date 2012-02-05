@@ -16,44 +16,48 @@
 
 package org.wrml.core.util.observable;
 
-import org.wrml.core.util.CancelableEvent;
+import java.util.EventObject;
 
 /**
  * Fired from an ObservableList whenever its contents are altered.
- * 
- * @param <K>
- *            The key type
- * @param <V>
- *            The value type
  */
-public final class ListEvent<T> extends CancelableEvent {
+public class ListEvent extends EventObject {
 
-    private static final long serialVersionUID = 3666047515348093100L;
+    private static final long serialVersionUID = 1L;
 
-    private final T _NewValue;
-    private final T _OldValue;
+    private final int _Index;
+    private final Object _InsertionElement;
+    private final Object _RemovalElement;
 
-    public ListEvent(ObservableList<T> list, boolean cancelable) {
-        this(list, cancelable, null, null);
+    public ListEvent(ObservableList<?> list) {
+        this(list, null, null);
     }
 
-    public ListEvent(ObservableList<T> list, boolean cancelable, T newValue, T oldValue) {
-        super(list, cancelable);
-        _NewValue = newValue;
-        _OldValue = oldValue;
+    public ListEvent(ObservableList<?> list, Object insertionElement, Object removalElement) {
+        this(list, insertionElement, removalElement, -1);
     }
 
-    @SuppressWarnings("unchecked")
-    public ObservableList<T> getList() {
-        return (ObservableList<T>) getSource();
+    public ListEvent(ObservableList<?> list, Object insertionElement, Object removalElement, int index) {
+        super(list);
+        _InsertionElement = insertionElement;
+        _RemovalElement = removalElement;
+        _Index = index;
     }
 
-    public T getNewValue() {
-        return _NewValue;
+    public int getIndex() {
+        return _Index;
     }
 
-    public T getOldValue() {
-        return _OldValue;
+    public Object getInsertionElement() {
+        return _InsertionElement;
+    }
+
+    public ObservableList<?> getList() {
+        return (ObservableList<?>) getSource();
+    }
+
+    public Object getRemovalElement() {
+        return _RemovalElement;
     }
 
 }

@@ -61,9 +61,7 @@ import org.wrml.core.www.http.Status;
 import org.wrml.core.www.http.StatusLine;
 
 /*
- * Implements the service interface with a REST API client.
- * 
- * TODO: This is all still very "alpha" - optimize at will.
+ * Implements the service interface with an HTTP client.
  */
 public class WebClient extends ServiceMap {
 
@@ -76,12 +74,14 @@ public class WebClient extends ServiceMap {
     public WebClient(Context context) {
         super(context);
 
-        // TODO: Make this configurable
         final ThreadSafeClientConnManager connectionManager = new ThreadSafeClientConnManager();
+
+        // TODO: Make this configurable
         connectionManager.setMaxTotal(100);
 
         _HttpClient = new DefaultHttpClient(connectionManager);
 
+        // TODO: Make this configurable
         _DefaultFormatter = new DefaultFormatter();
     }
 
@@ -174,6 +174,11 @@ public class WebClient extends ServiceMap {
             return model;
         }
         else {
+
+            // TODO: Handle this better? (to allow for reading JSON and passing it through)
+
+            // TODO: Allow for caching of responses?
+
             // If responseType is *NOT* a WRML type, then return the response message body's InputStream.     
             return responseInputStream;
         }

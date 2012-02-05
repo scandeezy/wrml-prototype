@@ -17,6 +17,7 @@
 package org.wrml.core.util.observable;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
@@ -26,26 +27,35 @@ public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> i
 
     private final Map<K, V> _Delegate;
 
-    public DelegatingObservableMap(Map<K, V> delegate) {
+    public DelegatingObservableMap(Class<MapEventListener> listenerClass, Map<K, V> delegate) {
+        super(listenerClass);
         _Delegate = delegate;
     }
 
+    public DelegatingObservableMap(Map<K, V> delegate) {
+        this(MapEventListener.class, delegate);
+    }
+
     public void clear() {
-        final MapEvent<K, V> clearingEvent = new MapEvent<K, V>(this, true);
-        fireClearingEvent(clearingEvent);
 
-        if (!clearingEvent.isCancelled()) {
-            _Delegate.clear();
-            fireClearedEvent(new MapEvent<K, V>(this, false));
+        if (isEventHearable() && !fireMapClearing(new CancelableMapEvent(this))) {
+            return;
         }
+
+        _Delegate.clear();
+
+        if (isEventHearable()) {
+            fireMapCleared(new MapEvent(this));
+        }
+
     }
 
-    public boolean containsKey(Object o) {
-        return _Delegate.containsKey(o);
+    public boolean containsKey(Object key) {
+        return _Delegate.containsKey(key);
     }
 
-    public boolean containsValue(Object o) {
-        return _Delegate.containsValue(o);
+    public boolean containsValue(Object value) {
+        return _Delegate.containsValue(value);
     }
 
     public Set<Entry<K, V>> entrySet() {
@@ -53,12 +63,12 @@ public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> i
     }
 
     @Override
-    public boolean equals(Object o) {
-        return _Delegate.equals(o);
+    public boolean equals(Object otherMap) {
+        return _Delegate.equals(otherMap);
     }
 
-    public V get(Object o) {
-        return _Delegate.get(o);
+    public V get(Object key) {
+        return _Delegate.get(key);
     }
 
     public Map<K, V> getDelegate() {
@@ -78,41 +88,64 @@ public class DelegatingObservableMap<K, V> extends AbstractObservableMap<K, V> i
         return _Delegate.keySet();
     }
 
-    public V put(K k, V v) {
+    public V put(K key, V newValue) {
 
-        final V old = _Delegate.get(k);
-        final MapEvent<K, V> event = new MapEvent<K, V>(this, true, k, v, old);
-        fireUpdatingEntryEvent(event);
-
-        if (!event.isCancelled()) {
-            final V updated = _Delegate.put(k, v);
-            fireEntryUpdatedEvent(new MapEvent<K, V>(this, false, k, v, updated));
-            return updated;
+        V oldValue = null;
+        if (isEventHearable()) {
+            oldValue = get(key);
+            if (!fireMapUpdatingEntry(new CancelableMapEvent(this, key, newValue, oldValue))) {
+                return null;
+            }
         }
 
-        return old;
+        oldValue = _Delegate.put(key, newValue);
+
+        if (isEventHearable()) {
+            fireMapEntryUpdated(new MapEvent(this, key, newValue, oldValue));
+        }
+
+        return oldValue;
     }
 
     public void putAll(Map<? extends K, ? extends V> map) {
 
-        // TODO: May need to loop here to fire individual events or 
-        // fire a big mega "container" event
+        Map<? extends K, ? extends V> oldValues = null;
+        if (isEventHearable()) {
+            oldValues = new HashMap<K, V>(this);
+            for (final K key : map.keySet()) {
+                if (!fireMapUpdatingEntry(new CancelableMapEvent(this, key, map.get(key), oldValues.get(key)))) {
+                    // TODO: Filter out the unwanted elements and build a list of acceptable ones instead?
+                    return;
+                }
+            }
+        }
 
         _Delegate.putAll(map);
+
+        if (isEventHearable() && (oldValues != null)) {
+            for (final K key : map.keySet()) {
+                fireMapEntryUpdated(new MapEvent(this, key, map.get(key), oldValues.get(key)));
+            }
+        }
     }
 
     public V remove(Object key) {
 
-        final MapEvent<K, V> removingEvent = new MapEvent<K, V>(this, true, (K) key);
-        fireRemovingEntryEvent(removingEvent);
-
-        if (removingEvent.isCancelled()) {
-            return null;
+        V oldValue = null;
+        if (isEventHearable()) {
+            oldValue = get(key);
+            if (!fireMapRemovingEntry(new CancelableMapEvent(this, key, null, oldValue))) {
+                return null;
+            }
         }
 
-        final V removed = _Delegate.remove(key);
-        fireEntryRemovedEvent(new MapEvent<K, V>(this, false, (K) key, null, removed));
-        return removed;
+        oldValue = _Delegate.remove(key);
+
+        if (isEventHearable()) {
+            fireMapEntryRemoved(new MapEvent(this, key, null, oldValue));
+        }
+
+        return oldValue;
     }
 
     public int size() {

@@ -16,101 +16,53 @@
 
 package org.wrml.core.util.observable;
 
-import java.util.LinkedList;
-import java.util.List;
+import org.wrml.core.event.EventSource;
+import org.wrml.core.util.observable.ListEventListener.ListEventName;
 
-public abstract class AbstractObservableList<E> implements ObservableList<E> {
+public abstract class AbstractObservableList<E> extends EventSource<ListEventListener> implements ObservableList<E> {
 
-    private final List<ListEventListener<E>> listeners = new LinkedList<ListEventListener<E>>();
-
-    public void addListEventListener(ListEventListener<E> listener) {
-        listeners.add(listener);
+    public AbstractObservableList() {
+        this(ListEventListener.class);
     }
 
-    public void removeListEventListener(ListEventListener<E> listener) {
-        listeners.remove(listener);
+    public AbstractObservableList(Class<ListEventListener> listenerClass) {
+        super(listenerClass);
     }
 
-    protected final void fireClearedEvent(ListEvent<E> event) {
-        fireEvent(event, new ListEventHandler<E>() {
-
-            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
-                listener.cleared(event);
-            }
-        });
+    protected void fireListCleared(ListEvent event) {
+        fireEvent(ListEventName.listCleared, event);
     }
 
-    protected final void fireClearingEvent(ListEvent<E> event) {
-        fireEvent(event, new ListEventHandler<E>() {
-
-            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
-                listener.clearing(event);
-            }
-        });
+    protected boolean fireListClearing(CancelableListEvent event) {
+        fireEvent(ListEventName.listClearing, event);
+        return !event.isCancelled();
     }
 
-    protected final void fireElementInsertedEvent(ListEvent<E> event) {
-        fireEvent(event, new ListEventHandler<E>() {
-
-            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
-                listener.elementInserted(event);
-            }
-        });
+    protected void fireListElementInserted(ListEvent event) {
+        fireEvent(ListEventName.listElementInserted, event);
     }
 
-    protected final void fireElementRemovedEvent(ListEvent<E> event) {
-        fireEvent(event, new ListEventHandler<E>() {
-
-            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
-                listener.elementRemoved(event);
-            }
-        });
+    protected void fireListElementRemoved(ListEvent event) {
+        fireEvent(ListEventName.listElementRemoved, event);
     }
 
-    protected final void fireElementUpdatedEvent(ListEvent<E> event) {
-        fireEvent(event, new ListEventHandler<E>() {
-
-            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
-                listener.elementUpdated(event);
-            }
-        });
+    protected void fireListElementUpdated(ListEvent event) {
+        fireEvent(ListEventName.listElementUpdated, event);
     }
 
-    protected void fireEvent(ListEvent<E> event, ListEventHandler handler) {
-        for (final ListEventListener<E> listener : listeners) {
-            handler.handleEvent(event, listener);
-        }
+    protected boolean fireListInsertingElement(CancelableListEvent event) {
+        fireEvent(ListEventName.listInsertingElement, event);
+        return !event.isCancelled();
     }
 
-    protected final void fireInsertingElementEvent(ListEvent<E> event) {
-        fireEvent(event, new ListEventHandler<E>() {
-
-            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
-                listener.insertingElement(event);
-            }
-        });
+    protected boolean fireListRemovingElement(CancelableListEvent event) {
+        fireEvent(ListEventName.listRemovingElement, event);
+        return !event.isCancelled();
     }
 
-    protected final void fireRemovingElementEvent(ListEvent<E> event) {
-        fireEvent(event, new ListEventHandler<E>() {
-
-            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
-                listener.removingElement(event);
-            }
-        });
+    protected boolean fireListUpdatingElement(CancelableListEvent event) {
+        fireEvent(ListEventName.listUpdatingElement, event);
+        return !event.isCancelled();
     }
 
-    protected final void fireUpdatingElementEvent(ListEvent<E> event) {
-        fireEvent(event, new ListEventHandler<E>() {
-
-            public void handleEvent(ListEvent<E> event, ListEventListener<E> listener) {
-                listener.updatingElement(event);
-            }
-        });
-    }
-
-    private interface ListEventHandler<E> {
-
-        void handleEvent(ListEvent<E> event, ListEventListener<E> listener);
-    }
 }

@@ -19,13 +19,12 @@ package org.wrml.core.runtime;
 import java.lang.reflect.Proxy;
 import java.net.URI;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.wrml.core.Hyperlink;
 import org.wrml.core.Model;
+import org.wrml.core.event.EventSource;
 import org.wrml.core.model.Document;
 import org.wrml.core.model.DocumentMetadata;
 import org.wrml.core.model.DocumentOptions;
@@ -34,12 +33,16 @@ import org.wrml.core.model.schema.Schema;
 import org.wrml.core.runtime.bootstrap.FieldNames;
 import org.wrml.core.runtime.event.FieldEvent;
 import org.wrml.core.runtime.event.FieldEventListener;
+import org.wrml.core.runtime.event.FieldEventListener.FieldEventName;
 import org.wrml.core.runtime.event.LinkEventListener;
+import org.wrml.core.runtime.event.ModelEvent;
 import org.wrml.core.runtime.event.ModelEventListener;
 import org.wrml.core.runtime.system.Prototype;
 import org.wrml.core.runtime.system.transformer.SystemTransformers;
 import org.wrml.core.service.ProxyService;
 import org.wrml.core.service.Service;
+import org.wrml.core.util.Cancelable;
+import org.wrml.core.util.observable.CancelableMapEvent;
 import org.wrml.core.util.observable.MapEvent;
 import org.wrml.core.util.observable.MapEventListener;
 import org.wrml.core.util.observable.ObservableMap;
@@ -66,11 +69,12 @@ public final class RuntimeModel extends RuntimeObject implements Model {
 
     private transient FieldMapEventListener _FieldMapEventListener;
 
-    private transient List<ModelEventListener> _EventListeners;
-    private transient Map<String, List<FieldEventListener>> _FieldEventListeners;
-
     private MediaType _MediaType;
     private transient URI _ResourceTemplateId;
+
+    private transient EventSource<ModelEventListener> _ModelEventSource;
+    private transient Map<String, EventSource<FieldEventListener>> _FieldEventSources;
+    private transient Map<URI, EventSource<LinkEventListener>> _LinkEventSources;
 
     RuntimeModel(Context context, java.lang.reflect.Type nativeType, ModelGraph modelGraph, FieldMap fieldMap,
             Map<URI, Hyperlink> linkMap) {
@@ -88,7 +92,7 @@ public final class RuntimeModel extends RuntimeObject implements Model {
 
         _Fields = Observables.observableMap(fieldMap);
         _FieldMapEventListener = new FieldMapEventListener();
-        _Fields.addMapEventListener(_FieldMapEventListener);
+        _Fields.addEventListener(_FieldMapEventListener);
 
         _Hyperlinks = Observables.observableMap(linkMap);
 
@@ -107,26 +111,9 @@ public final class RuntimeModel extends RuntimeObject implements Model {
 
     }
 
-    public void addEventListener(ModelEventListener listener) {
-        if (_EventListeners == null) {
-            _EventListeners = new CopyOnWriteArrayList<ModelEventListener>();
-        }
+    public void absorb(Model modelToAbsorb, Model... additionalModelsToAbsorb) {
+        // TODO Auto-generated method stub
 
-        _EventListeners.add(listener);
-    }
-
-    public void addFieldEventListener(String fieldName, FieldEventListener listener) {
-        if (_FieldEventListeners == null) {
-            _FieldEventListeners = new HashMap<String, List<FieldEventListener>>();
-        }
-
-        List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
-        if (fieldEventListenerList == null) {
-            fieldEventListenerList = new CopyOnWriteArrayList<FieldEventListener>();
-            _FieldEventListeners.put(fieldName, fieldEventListenerList);
-        }
-
-        fieldEventListenerList.add(listener);
     }
 
     /*
@@ -145,8 +132,41 @@ public final class RuntimeModel extends RuntimeObject implements Model {
      * }
      */
 
-    public void addLinkEventListener(URI linkRelationId, LinkEventListener listener) {
-        // TODO Auto-generated method stub
+    public boolean addEventListener(ModelEventListener listener) {
+        if (_ModelEventSource == null) {
+            _ModelEventSource = new EventSource<ModelEventListener>(ModelEventListener.class);
+        }
+        return _ModelEventSource.addEventListener(listener);
+    }
+
+    public boolean addFieldEventListener(String fieldName, FieldEventListener listener) {
+
+        if (_FieldEventSources == null) {
+            _FieldEventSources = new HashMap<String, EventSource<FieldEventListener>>();
+        }
+
+        EventSource<FieldEventListener> fieldEventSource = _FieldEventSources.get(fieldName);
+        if (fieldEventSource == null) {
+            fieldEventSource = new EventSource<FieldEventListener>(FieldEventListener.class);
+            _FieldEventSources.put(fieldName, fieldEventSource);
+        }
+
+        return fieldEventSource.addEventListener(listener);
+    }
+
+    public boolean addLinkEventListener(URI linkRelationId, LinkEventListener listener) {
+
+        if (_LinkEventSources == null) {
+            _LinkEventSources = new HashMap<URI, EventSource<LinkEventListener>>();
+        }
+
+        EventSource<LinkEventListener> linkEventSource = _LinkEventSources.get(linkRelationId);
+        if (linkEventSource == null) {
+            linkEventSource = new EventSource<LinkEventListener>(LinkEventListener.class);
+            _LinkEventSources.put(linkRelationId, linkEventSource);
+        }
+
+        return linkEventSource.addEventListener(listener);
 
     }
 
@@ -160,16 +180,6 @@ public final class RuntimeModel extends RuntimeObject implements Model {
         }
 
         return runtimeHyperLink.click(nativeReturnType, requestEntity, hrefParams);
-    }
-
-    public void die() {
-        // TODO: Fire an event about vanishing
-
-        // TODO: Unregister all listeners
-
-        // TODO: Clear caches or do caches auto-clear from an 
-        // vanish event notification?
-
     }
 
     @Override
@@ -187,12 +197,63 @@ public final class RuntimeModel extends RuntimeObject implements Model {
 
     }
 
+    public void free() {
+
+        if (_ModelEventSource != null) {
+            _ModelEventSource.fireEvent(ModelEventListener.ModelEventName.modelFreed, new ModelEvent(this));
+            _ModelEventSource.free();
+        }
+
+        if (_FieldEventSources != null) {
+            for (final String fieldName : _FieldEventSources.keySet()) {
+                final EventSource<FieldEventListener> fieldEventSource = _FieldEventSources.get(fieldName);
+                if (fieldEventSource != null) {
+                    fieldEventSource.free();
+                }
+            }
+
+            _FieldEventSources.clear();
+            _FieldEventSources = null;
+        }
+
+        _Fields.removeEventListener(_FieldMapEventListener);
+
+        if (_LinkEventSources != null) {
+            for (final URI relId : _LinkEventSources.keySet()) {
+                final EventSource<LinkEventListener> linkEventSource = _LinkEventSources.get(relId);
+                if (linkEventSource != null) {
+                    linkEventSource.free();
+                }
+            }
+
+            _LinkEventSources.clear();
+            _LinkEventSources = null;
+        }
+
+        for (final URI relId : _Hyperlinks.keySet()) {
+            final Hyperlink hyperlink = _Hyperlinks.get(relId);
+            hyperlink.free();
+        }
+
+    }
+
     public Model getDynamicInterface() {
         return this;
     }
 
     public Object getFieldValue(String fieldName) {
         return _Fields.get(fieldName);
+    }
+
+    public final URI getHeapId() {
+
+        final Object idFieldValue = getFieldValue(FieldNames.Document.id.name());
+        if (idFieldValue instanceof URI) {
+            final URI id = (URI) idFieldValue;
+            return id;
+        }
+
+        return null;
     }
 
     public ObservableMap<URI, Hyperlink> getHyperLinks() {
@@ -378,31 +439,6 @@ public final class RuntimeModel extends RuntimeObject implements Model {
         return super.hashCode();
     }
 
-    public boolean isFieldValueSet(String fieldName) {
-        return (_Fields != null) && _Fields.containsKey(fieldName);
-    }
-
-    public final void removeEventListener(ModelEventListener listener) {
-        if (_EventListeners == null) {
-            return;
-        }
-
-        _EventListeners.remove(listener);
-    }
-
-    public final void removeFieldEventListener(String fieldName, FieldEventListener listener) {
-        if (_FieldEventListeners == null) {
-            return;
-        }
-
-        final List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
-        if (fieldEventListenerList == null) {
-            return;
-        }
-
-        fieldEventListenerList.remove(listener);
-    }
-
     /*
      * public void save() {
      * 
@@ -416,10 +452,59 @@ public final class RuntimeModel extends RuntimeObject implements Model {
      * }
      */
 
-    public final void removeLinkEventListener(URI linkRelationId, LinkEventListener listener) {
-        // TODO Auto-generated method stub
-
+    public boolean isFieldValueSet(String fieldName) {
+        return (_Fields != null) && _Fields.containsKey(fieldName);
     }
+
+    public final boolean removeEventListener(ModelEventListener listener) {
+
+        if (_ModelEventSource == null) {
+            return false;
+        }
+
+        return _ModelEventSource.removeEventListener(listener);
+    }
+
+    public final boolean removeFieldEventListener(String fieldName, FieldEventListener listener) {
+        if (_FieldEventSources == null) {
+            return false;
+        }
+
+        final EventSource<FieldEventListener> fieldEventSource = _FieldEventSources.get(fieldName);
+        if (fieldEventSource == null) {
+            return false;
+        }
+
+        return fieldEventSource.removeEventListener(listener);
+    }
+
+    public final boolean removeLinkEventListener(URI linkRelationId, LinkEventListener listener) {
+        if (_LinkEventSources == null) {
+            return false;
+        }
+
+        final EventSource<LinkEventListener> linkEventSource = _LinkEventSources.get(linkRelationId);
+        if (linkEventSource == null) {
+            return false;
+        }
+
+        return linkEventSource.removeEventListener(listener);
+    }
+
+    /*
+     * public void refresh(boolean atomic) {
+     * final URI id = getId();
+     * if (id == null) {
+     * return;
+     * }
+     * 
+     * // Go all the way to the origin to force a re-GET of "self"
+     * final Service myOriginService = getMyOriginService();
+     * 
+     * final Model newThis = myOriginService.get(id, this);
+     * become(newThis, atomic);
+     * }
+     */
 
     public void setAllFieldsToDefaultValue() {
 
@@ -437,21 +522,6 @@ public final class RuntimeModel extends RuntimeObject implements Model {
         _Fields.put(fieldName, null);
 
     }
-
-    /*
-     * public void refresh(boolean atomic) {
-     * final URI id = getId();
-     * if (id == null) {
-     * return;
-     * }
-     * 
-     * // Go all the way to the origin to force a re-GET of "self"
-     * final Service myOriginService = getMyOriginService();
-     * 
-     * final Model newThis = myOriginService.get(id, this);
-     * become(newThis, atomic);
-     * }
-     */
 
     public Object setFieldValue(String fieldName, Object newValue) {
         return _Fields.put(fieldName, newValue);
@@ -514,41 +584,31 @@ public final class RuntimeModel extends RuntimeObject implements Model {
         _Fields.putAll(fieldsToExtend);
     }
 
-    private void fireConstraintViolated(final FieldEvent event) {
-        final String fieldName = event.getFieldName();
-        final List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
-        for (final FieldEventListener fieldEventListener : fieldEventListenerList) {
-            if (event.isCancelable() && event.isCancelled()) {
-                break;
-            }
-
-            fieldEventListener.constraintViolated(event);
-        }
+    private void fireFieldConstraintViolated(final FieldEvent event) {
+        fireFieldEvent(FieldEventName.fieldConstraintViolated, event);
     }
 
-    private void fireValueChanged(final FieldEvent event) {
+    private boolean fireFieldEvent(final FieldEventName fieldEventName, final FieldEvent event) {
         final String fieldName = event.getFieldName();
-        final List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
-        for (final FieldEventListener fieldEventListener : fieldEventListenerList) {
-            if (event.isCancelable() && event.isCancelled()) {
-                break;
-            }
+        final EventSource<FieldEventListener> fieldEventSource = _FieldEventSources.get(fieldName);
+        if (fieldEventSource != null) {
 
-            fieldEventListener.valueChanged(event);
+            fieldEventSource.fireEvent(fieldEventName, event);
+
+            if (event instanceof Cancelable) {
+                return !((Cancelable) event).isCancelled();
+            }
         }
 
+        return true;
     }
 
-    private void fireValueInitialized(final FieldEvent event) {
-        final String fieldName = event.getFieldName();
-        final List<FieldEventListener> fieldEventListenerList = _FieldEventListeners.get(fieldName);
-        for (final FieldEventListener fieldEventListener : fieldEventListenerList) {
-            if (event.isCancelable() && event.isCancelled()) {
-                break;
-            }
+    private void fireFieldValueChanged(final FieldEvent event) {
+        fireFieldEvent(FieldEventName.fieldValueChanged, event);
+    }
 
-            fieldEventListener.valueInitialized(event);
-        }
+    private void fireFieldValueInitialized(final FieldEvent event) {
+        fireFieldEvent(FieldEventName.fieldValueInitialized, event);
     }
 
     private Hyperlink getHyperLink(URI rel) {
@@ -565,7 +625,37 @@ public final class RuntimeModel extends RuntimeObject implements Model {
         return getContext().getSystemTransformers().getNativeTypeToClassTransformer().aToB(getNativeType());
     }
 
-    private class FieldMapEventListener implements MapEventListener<String, Object> {
+    private class FieldMapEventListener implements MapEventListener {
+
+        public void omMapRemovingEntry(CancelableMapEvent event) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void onMapCleared(MapEvent event) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void onMapClearing(CancelableMapEvent event) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void onMapEntryRemoved(MapEvent event) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void onMapEntryUpdated(MapEvent event) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void onMapUpdatingEntry(CancelableMapEvent event) {
+            // TODO Auto-generated method stub
+
+        }
 
         // TODO Run constraint validators
 
@@ -574,46 +664,6 @@ public final class RuntimeModel extends RuntimeObject implements Model {
         // TODO Consider the read only status of the schema's field
 
         // TODO Fire field events
-
-        public void cleared(MapEvent<String, Object> event) {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void clearing(MapEvent<String, Object> event) {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void entryInserted(MapEvent<String, Object> event) {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void entryRemoved(MapEvent<String, Object> event) {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void entryUpdated(MapEvent<String, Object> event) {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void insertingEntry(MapEvent<String, Object> event) {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void removingEntry(MapEvent<String, Object> event) {
-            // TODO Auto-generated method stub
-
-        }
-
-        public void updatingEntry(MapEvent<String, Object> event) {
-            // TODO Auto-generated method stub
-
-        }
 
     }
 

@@ -20,7 +20,7 @@ import java.util.Map;
 
 public interface ObservableMap<K, V> extends Map<K, V> {
 
-    void addMapEventListener(MapEventListener<K, V> listener);
+    public boolean addEventListener(MapEventListener listener);
 
-    void removeMapEventListener(MapEventListener<K, V> listener);
+    public boolean removeEventListener(MapEventListener listener);
 }

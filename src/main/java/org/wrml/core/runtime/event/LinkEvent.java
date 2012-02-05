@@ -16,18 +16,19 @@
 
 package org.wrml.core.runtime.event;
 
+import java.util.EventObject;
+
 import org.wrml.core.model.schema.Link;
-import org.wrml.core.util.CancelableEvent;
 
 /**
  * Used to communicate the change in a Link's state.
  */
-public final class LinkEvent extends CancelableEvent {
+public class LinkEvent extends EventObject {
 
-    private static final long serialVersionUID = -3145602918059087982L;
+    private static final long serialVersionUID = 1L;
 
-    public LinkEvent(Link link, boolean cancelable) {
-        super(link, cancelable);
+    public LinkEvent(Link link) {
+        super(link);
     }
 
     public Link getLink() {

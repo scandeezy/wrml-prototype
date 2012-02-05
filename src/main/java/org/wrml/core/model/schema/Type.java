@@ -55,8 +55,7 @@ public enum Type {
 
     /**
      * In Java, maps to: org.wrml.core.util.ObservableMap<K,V>, where "param"
-     * type
-     * is determined by TypeConstraints.
+     * types are determined by TypeConstraints.
      */
     Map,
 

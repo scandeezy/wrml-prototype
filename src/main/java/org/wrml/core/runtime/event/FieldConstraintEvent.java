@@ -24,7 +24,7 @@ import org.wrml.core.enforcer.FieldConstraintEnforcer;
 
 public class FieldConstraintEvent extends EventObject {
 
-    private static final long serialVersionUID = 8426522526071747315L;
+    private static final long serialVersionUID = 1L;
 
     private final FieldConstraintEnforcer _FieldConstraintEnforcer;
     private final EnforcementResult _EnforcementResult;

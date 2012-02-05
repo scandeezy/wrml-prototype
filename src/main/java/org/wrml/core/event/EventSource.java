@@ -16,13 +16,16 @@
 
 package org.wrml.core.event;
 
-import java.util.ArrayList;
 import java.util.EventObject;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EventSource<L extends java.util.EventListener> {
 
     private final transient Class<L> _EventListenerClass;
     private transient EventListenerList<L> _EventListeners;
+    private transient Set<L> _EventListenerSet;
 
     public EventSource(Class<L> eventListenerClass) {
         _EventListenerClass = eventListenerClass;
@@ -30,8 +33,15 @@ public class EventSource<L extends java.util.EventListener> {
 
     public boolean addEventListener(L eventListener) {
         if (_EventListeners == null) {
-            _EventListeners = createEventListenerList();
+            init();
         }
+
+        if (_EventListenerSet.contains(eventListener)) {
+            return false;
+        }
+
+        _EventListenerSet.add(eventListener);
+
         return _EventListeners.add(eventListener);
     }
 
@@ -47,8 +57,44 @@ public class EventSource<L extends java.util.EventListener> {
         _EventListeners.fireEvent(eventName, event);
     }
 
+    public void free() {
+
+        if (_EventListeners != null) {
+            _EventListeners.clear();
+            _EventListeners = null;
+        }
+
+        if (_EventListenerSet != null) {
+            _EventListenerSet.clear();
+            _EventListenerSet = null;
+        }
+
+    }
+
     public Class<L> getEventListenerClass() {
         return _EventListenerClass;
+    }
+
+    public int getEventListenerCount() {
+        return (_EventListenerSet != null) ? _EventListenerSet.size() : 0;
+    }
+
+    public EventListenerList<L> getEventListeners() {
+        if (_EventListeners == null) {
+            init();
+        }
+        return _EventListeners;
+    }
+
+    public Set<L> getEventListenerSet() {
+        if (_EventListenerSet == null) {
+            init();
+        }
+        return _EventListenerSet;
+    }
+
+    public boolean isEventHearable() {
+        return getEventListenerCount() > 0;
     }
 
     public boolean removeEventListener(L eventListener) {
@@ -58,8 +104,9 @@ public class EventSource<L extends java.util.EventListener> {
         return _EventListeners.remove(eventListener);
     }
 
-    private EventListenerList<L> createEventListenerList() {
-        return new DelegatingEventListenerList<L>(getEventListenerClass(), new ArrayList<L>());
+    private void init() {
+        _EventListeners = new DelegatingEventListenerList<L>(getEventListenerClass(), new CopyOnWriteArrayList<L>());
+        _EventListenerSet = new HashSet<L>();
     }
 
 }

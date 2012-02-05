@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.wrml.core.util.Cancelable;
+
 public class EventListenerPrototype<L extends java.util.EventListener> {
 
     public final static String EVENT_METHOD_NAME_PREFIX = "on";
@@ -69,9 +71,18 @@ public class EventListenerPrototype<L extends java.util.EventListener> {
                     + "\"");
         }
 
+        Cancelable cancelable = null;
+        if (event instanceof Cancelable) {
+            cancelable = (Cancelable) event;
+        }
+
         final Object[] args = new Object[] { event };
 
         for (final L listener : listeners) {
+
+            if ((cancelable != null) && cancelable.isCancelled()) {
+                break;
+            }
 
             try {
 

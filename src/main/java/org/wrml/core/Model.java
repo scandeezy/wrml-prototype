@@ -42,6 +42,17 @@ import org.wrml.core.www.MediaType;
 public interface Model extends Serializable {
 
     /**
+     * Absorb all of the fields, links, and listeners from the specified
+     * {@link Model} before freeing it.
+     * 
+     * @param modelToAbsorb
+     *            to be absorbed.
+     * @param additionalModelsToAbsorb
+     *            The optional list of other models to absorb.
+     */
+    public void absorb(Model modelToAbsorb, Model... additionalModelsToAbsorb);
+
+    /**
      * Add a listener for a variety of model events (the classic MVC pattern).
      * 
      * @param listener
@@ -50,7 +61,7 @@ public interface Model extends Serializable {
      * @see Model#addFieldEventListener(String, FieldEventListener)
      * @see Model#addLinkEventListener(URI, LinkEventListener)
      */
-    public void addEventListener(ModelEventListener listener);
+    public boolean addEventListener(ModelEventListener listener);
 
     /**
      * Add a listener for events relating to the named field.
@@ -60,7 +71,7 @@ public interface Model extends Serializable {
      * 
      * @see Model#setFieldValue(String, Object)
      */
-    public void addFieldEventListener(String fieldName, FieldEventListener listener);
+    public boolean addFieldEventListener(String fieldName, FieldEventListener listener);
 
     /**
      * Add a listener for events relating to the identified link relation.
@@ -73,11 +84,11 @@ public interface Model extends Serializable {
      * 
      * @see Model#clickLink(URI, Type, Object, Map)
      */
-    public void addLinkEventListener(URI linkRelationId, LinkEventListener listener);
+    public boolean addLinkEventListener(URI linkRelationId, LinkEventListener listener);
 
     /**
      * Click the {@link Hyperlink} that is identified by the rel field value,
-     * which is a {@link URI} of a {@link LinkRelation}. The click effect is a
+     * which is a {@link URI} of a {@link LinkRelation}. The click's effect is a
      * function of the metadata.
      * 
      * @param rel
@@ -99,15 +110,8 @@ public interface Model extends Serializable {
             Map<String, String> hrefParams);
 
     /**
-     * "Remove" the model from the WRML runtime. The model may or may not still
-     * have an associated (and available) Web resource.
-     */
-    public void die();
-
-    /**
      * Add/override the fields of this {@link Model} with those contained within
-     * the
-     * specified models. This is a form of prototypical extension.
+     * the specified models. This is a form of prototypical extension.
      * 
      * @param modelToExtend
      *            The first model to extend.
@@ -115,6 +119,12 @@ public interface Model extends Serializable {
      *            The optional list of other models to extend.
      */
     public void extend(Model modelToExtend, Model... additionalModelsToExtend);
+
+    /**
+     * Free the model from the WRML runtime. The model may or may not still
+     * have an associated (and available) Web resource.
+     */
+    public void free();
 
     /**
      * Get the {@link Context} associated with this {@link Model}.
@@ -242,7 +252,7 @@ public interface Model extends Serializable {
      * 
      * @see Model#addEventListener(ModelEventListener)
      */
-    public void removeEventListener(ModelEventListener listener);
+    public boolean removeEventListener(ModelEventListener listener);
 
     /**
      * Remove the specified {@link FieldEventListener}.
@@ -255,7 +265,7 @@ public interface Model extends Serializable {
      * 
      * @see Model#addFieldEventListener(String, FieldEventListener)
      */
-    public void removeFieldEventListener(String fieldName, FieldEventListener listener);
+    public boolean removeFieldEventListener(String fieldName, FieldEventListener listener);
 
     /**
      * Remove the specified {@link LinkEventListener}.
@@ -269,7 +279,7 @@ public interface Model extends Serializable {
      * 
      * @see Model#addLinkEventListener(URI, LinkEventListener)
      */
-    public void removeLinkEventListener(URI linkRelationId, LinkEventListener listener);
+    public boolean removeLinkEventListener(URI linkRelationId, LinkEventListener listener);
 
     /**
      * Restore the default value of each field.
@@ -289,7 +299,8 @@ public interface Model extends Serializable {
     public void setFieldToDefaultValue(String fieldName);
 
     /**
-     * Set the value of the named field.
+     * Set the value of the named field. The value can be any of the types
+     * described by {@link org.wrml.core.model.schema.Type}.
      * 
      * @param fieldName
      *            the name of the field to set.
@@ -314,7 +325,7 @@ public interface Model extends Serializable {
      * Maybe create Enum constants behind the Static/Dynamic dimension
      * switching?
      */
-    //public Model getAlternate(AlternateDimensions alternateDimensions);
+    //public Model getAlternateRepresentation(AlternateDimensions alternateDimensions);
 
     //public void refresh(boolean forceSync);
 

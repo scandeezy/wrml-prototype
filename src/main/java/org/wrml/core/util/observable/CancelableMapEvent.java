@@ -16,36 +16,40 @@
 
 package org.wrml.core.util.observable;
 
-import java.util.EventListener;
+import org.wrml.core.util.Cancelable;
 
 /**
- * Listener for the ObservableMap collection's events.
+ * Fired from an ObservableList whenever its contents are altered.
  * 
  * @param <K>
  *            The key type
  * @param <V>
  *            The value type
  */
-public interface MapEventListener extends EventListener {
+public final class CancelableMapEvent extends MapEvent implements Cancelable {
 
-    public void omMapRemovingEntry(CancelableMapEvent event);
+    private static final long serialVersionUID = 1L;
 
-    public void onMapCleared(MapEvent event);
+    private boolean _Cancelled;
 
-    public void onMapClearing(CancelableMapEvent event);
-
-    public void onMapEntryRemoved(MapEvent event);
-
-    public void onMapEntryUpdated(MapEvent event);
-
-    public void onMapUpdatingEntry(CancelableMapEvent event);
-
-    public enum MapEventName {
-        mapCleared,
-        mapClearing,
-        mapEntryRemoved,
-        mapEntryUpdated,
-        mapRemovingEntry,
-        mapUpdatingEntry;
+    public CancelableMapEvent(ObservableMap<?, ?> map) {
+        super(map);
     }
+
+    public CancelableMapEvent(ObservableMap<?, ?> map, Object key) {
+        super(map, key);
+    }
+
+    public CancelableMapEvent(ObservableMap<?, ?> map, Object key, Object newValue, Object oldValue) {
+        super(map, key, newValue, oldValue);
+    }
+
+    public boolean isCancelled() {
+        return _Cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        _Cancelled = cancelled;
+    }
+
 }

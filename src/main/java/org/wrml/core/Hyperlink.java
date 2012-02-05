@@ -41,7 +41,7 @@ public interface Hyperlink {
      *            the LinkEventListener that will receive event-based
      *            notifications.
      */
-    public void addEventListener(LinkEventListener listener);
+    public boolean addEventListener(LinkEventListener listener);
 
     /**
      * Click the link to invoke its underlying "function".
@@ -56,6 +56,11 @@ public interface Hyperlink {
      * @return the result of clicking this Hyperlink.
      */
     public Object click(java.lang.reflect.Type nativeReturnType, Object requestEntity, Map<String, String> hrefParams);
+
+    /**
+     * Disconnects this Hyperlink from the runtime system.
+     */
+    public void free();
 
     /**
      * The fully qualified URI that will be used by
@@ -120,6 +125,6 @@ public interface Hyperlink {
      * @param listener
      *            the quitter.
      */
-    public void removeEventListener(LinkEventListener listener);
+    public boolean removeEventListener(LinkEventListener listener);
 
 }

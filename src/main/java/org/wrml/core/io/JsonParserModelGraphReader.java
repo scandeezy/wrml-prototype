@@ -29,16 +29,16 @@ import org.codehaus.jackson.JsonToken;
 
 import org.wrml.core.Model;
 import org.wrml.core.event.Event;
-import org.wrml.core.io.FieldIterativeModelReader.EventListener.EventNames;
+import org.wrml.core.io.FieldIterativeModelGraphReader.EventListener.EventNames;
 import org.wrml.core.runtime.Context;
 import org.wrml.core.runtime.ModelGraph;
 import org.wrml.core.util.observable.ObservableMap;
 
-public class JsonParserModelReader extends FieldIterativeModelReader {
+public class JsonParserModelGraphReader extends FieldIterativeModelGraphReader {
 
     private JsonParser _JsonParser;
     private String _CurrentName;
-    private Event<JsonParserModelReader> _Event;
+    private Event<JsonParserModelGraphReader> _Event;
 
     public void close() throws Exception {
 
@@ -91,7 +91,7 @@ public class JsonParserModelReader extends FieldIterativeModelReader {
         final JsonFactory jsonFactory = new JsonFactory();
         _JsonParser = jsonFactory.createJsonParser(inputStream);
 
-        _Event = new Event<JsonParserModelReader>(this);
+        _Event = new Event<JsonParserModelGraphReader>(this);
 
         getNextToken();
         _CurrentName = null;

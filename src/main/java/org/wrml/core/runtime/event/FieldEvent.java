@@ -16,24 +16,25 @@
 
 package org.wrml.core.runtime.event;
 
+import java.util.EventObject;
+
 import org.wrml.core.Model;
-import org.wrml.core.util.CancelableEvent;
 import org.wrml.core.util.observable.MapEvent;
 
 /**
  * An event that communicates some activity associated with a specific
  * Model instance's specific field.
  */
-public final class FieldEvent extends CancelableEvent {
+public class FieldEvent extends EventObject {
 
-    private static final long serialVersionUID = -1277427529297982437L;
+    private static final long serialVersionUID = 1L;
 
     private final String _FieldName;
-    private final MapEvent<String, Object> _SourceEvent;
+    private final MapEvent _SourceEvent;
     private FieldConstraintEvent _FieldConstraintEvent;
 
-    public FieldEvent(Model source, boolean cancelable, String fieldName, MapEvent<String, Object> sourceEvent) {
-        super(source, cancelable);
+    public FieldEvent(Model source, String fieldName, MapEvent sourceEvent) {
+        super(source);
         _FieldName = fieldName;
         _SourceEvent = sourceEvent;
     }
@@ -46,7 +47,7 @@ public final class FieldEvent extends CancelableEvent {
         return _FieldName;
     }
 
-    public MapEvent<String, Object> getSourceEvent() {
+    public MapEvent getSourceEvent() {
         return _SourceEvent;
     }
 

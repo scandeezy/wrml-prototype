@@ -92,7 +92,8 @@ public class BootstrapModel<M extends Model> extends RuntimeObject implements Se
             final Map<URI, Hyperlink> linkMap = new HashMap<URI, Hyperlink>();
 
             final ModelGraph modelGraph = getModelGraph();
-            final Model dynamicModel = context.instantiateModel(_StaticInterfaceClass, modelGraph, fieldMap, linkMap);
+            final Model dynamicModel = context.getModelHeap().newModel(_StaticInterfaceClass, modelGraph, fieldMap,
+                    linkMap);
             _StaticInterface = (M) dynamicModel.getStaticInterface();
         }
 

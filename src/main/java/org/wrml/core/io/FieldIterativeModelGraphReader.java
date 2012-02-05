@@ -24,8 +24,8 @@ import java.util.List;
 import org.wrml.core.Model;
 import org.wrml.core.event.Event;
 import org.wrml.core.event.EventSource;
-import org.wrml.core.io.FieldIterativeModelReader.EventListener;
-import org.wrml.core.io.FieldIterativeModelReader.EventListener.EventNames;
+import org.wrml.core.io.FieldIterativeModelGraphReader.EventListener;
+import org.wrml.core.io.FieldIterativeModelGraphReader.EventListener.EventNames;
 import org.wrml.core.model.schema.Link;
 import org.wrml.core.model.schema.Type;
 import org.wrml.core.runtime.Context;
@@ -40,10 +40,10 @@ import org.wrml.core.util.observable.ObservableList;
 import org.wrml.core.util.observable.ObservableMap;
 import org.wrml.core.util.observable.Observables;
 
-public abstract class FieldIterativeModelReader extends EventSource<EventListener> implements ModelReader,
+public abstract class FieldIterativeModelGraphReader extends EventSource<EventListener> implements ModelGraphReader,
         Iterator<String> {
 
-    public FieldIterativeModelReader() {
+    public FieldIterativeModelGraphReader() {
         super(EventListener.class);
     }
 
@@ -51,9 +51,9 @@ public abstract class FieldIterativeModelReader extends EventSource<EventListene
      * Reads the root of a ModelGraph by iterating over a linear sequence/stream
      * of (possibly nested) models with fields.
      */
-    public Model readModel(Context context, java.lang.reflect.Type nativeType) throws Exception {
+    public ModelGraph readModelGraph(Context context, java.lang.reflect.Type nativeType) throws Exception {
 
-        final Event<FieldIterativeModelReader> event = new Event<FieldIterativeModelReader>(this);
+        final Event<FieldIterativeModelGraphReader> event = new Event<FieldIterativeModelGraphReader>(this);
 
         /*
          * Create the ModelGraph that, once initialized, will represent the
@@ -67,19 +67,19 @@ public abstract class FieldIterativeModelReader extends EventSource<EventListene
 
         fireEvent(EventNames.beginReadModelGraph, event);
 
-        final Model model = readModelToGraph(context, nativeType, modelGraph);
+        readModelToGraph(context, nativeType, modelGraph);
 
         removeEventListener(modelGraphScopeEventListener);
 
-        return model;
+        return modelGraph;
     }
 
     public Model readModelToGraph(Context context, java.lang.reflect.Type nativeType, ModelGraph modelGraph)
             throws Exception {
 
-        final Event<FieldIterativeModelReader> event = new Event<FieldIterativeModelReader>(this);
+        final Event<FieldIterativeModelGraphReader> event = new Event<FieldIterativeModelGraphReader>(this);
 
-        final Model model = context.instantiateModel(nativeType, modelGraph);
+        final Model model = context.getModelHeap().newModel(nativeType, modelGraph);
 
         fireEvent(EventNames.beginReadModel, event);
 
@@ -155,6 +155,9 @@ public abstract class FieldIterativeModelReader extends EventSource<EventListene
                  * 
                  * This "filtering" of wire garbage is a security (fail-safe)
                  * feature in some sense.
+                 * 
+                 * TODO: This will need to be changed to support embedded links,
+                 * maybe as a secondary check before freaking out below).
                  * 
                  * TODO: This may need to be made more flexible to handle
                  * versioning in a robust way. Maybe log an error and drop the
@@ -344,34 +347,34 @@ public abstract class FieldIterativeModelReader extends EventSource<EventListene
 
     public static class DefaultEventListener implements EventListener {
 
-        public void onBeginReadModel(Event<FieldIterativeModelReader> event) {
+        public void onBeginReadModel(Event<FieldIterativeModelGraphReader> event) {
         }
 
-        public void onBeginReadModelGraph(Event<FieldIterativeModelReader> event) {
+        public void onBeginReadModelGraph(Event<FieldIterativeModelGraphReader> event) {
         }
 
-        public void onEndReadModel(Event<FieldIterativeModelReader> event) {
+        public void onEndReadModel(Event<FieldIterativeModelGraphReader> event) {
         }
 
-        public void onEndReadModelGraph(Event<FieldIterativeModelReader> event) {
+        public void onEndReadModelGraph(Event<FieldIterativeModelGraphReader> event) {
         }
     }
 
     public static interface EventListener extends java.util.EventListener {
 
-        public void onBeginReadModel(Event<FieldIterativeModelReader> event);
+        public void onBeginReadModel(Event<FieldIterativeModelGraphReader> event);
 
-        public void onBeginReadModelGraph(Event<FieldIterativeModelReader> event);
+        public void onBeginReadModelGraph(Event<FieldIterativeModelGraphReader> event);
 
-        public void onEndReadModel(Event<FieldIterativeModelReader> event);
+        public void onEndReadModel(Event<FieldIterativeModelGraphReader> event);
 
-        public void onEndReadModelGraph(Event<FieldIterativeModelReader> event);
+        public void onEndReadModelGraph(Event<FieldIterativeModelGraphReader> event);
 
         public enum EventNames {
             beginReadModelGraph,
             endReadModelGraph,
             beginReadModel,
-            endReadModel
+            endReadModel;
         }
     }
 
@@ -384,7 +387,7 @@ public abstract class FieldIterativeModelReader extends EventSource<EventListene
         }
 
         @Override
-        public void onEndReadModel(Event<FieldIterativeModelReader> event) {
+        public void onEndReadModel(Event<FieldIterativeModelGraphReader> event) {
             _ModelGraph.popInitCursorBack();
         }
 

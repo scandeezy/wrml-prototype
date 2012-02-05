@@ -16,8 +16,8 @@
 
 package org.wrml.core.util.observable;
 
-import java.util.LinkedList;
-import java.util.List;
+import org.wrml.core.event.EventSource;
+import org.wrml.core.util.observable.MapEventListener.MapEventName;
 
 /**
  * A Map that fires events when entries are inserted, updated, removed, or
@@ -28,98 +28,41 @@ import java.util.List;
  * @param <V>
  *            The value type
  */
-public abstract class AbstractObservableMap<K, V> implements ObservableMap<K, V> {
+public abstract class AbstractObservableMap<K, V> extends EventSource<MapEventListener> implements ObservableMap<K, V> {
 
-    private final List<MapEventListener<K, V>> mapEventListeners = new LinkedList<MapEventListener<K, V>>();
-
-    public void addMapEventListener(MapEventListener<K, V> mapEventListener) {
-        mapEventListeners.add(mapEventListener);
+    public AbstractObservableMap() {
+        this(MapEventListener.class);
     }
 
-    public void removeMapEventListener(MapEventListener<K, V> mapEventListener) {
-        mapEventListeners.remove(mapEventListener);
+    public AbstractObservableMap(Class<MapEventListener> listenerClass) {
+        super(listenerClass);
     }
 
-    protected final void fireClearedEvent(MapEvent<K, V> mapEvent) {
-        fireEvent(mapEvent, new MapEventHandler<K, V>() {
-
-            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
-                mapEventListener.cleared(mapEvent);
-            }
-        });
+    public void fireMapCleared(MapEvent event) {
+        fireEvent(MapEventName.mapCleared, event);
     }
 
-    protected final void fireClearingEvent(MapEvent<K, V> mapEvent) {
-        fireEvent(mapEvent, new MapEventHandler<K, V>() {
-
-            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
-                mapEventListener.clearing(mapEvent);
-            }
-        });
+    public boolean fireMapClearing(CancelableMapEvent event) {
+        fireEvent(MapEventName.mapClearing, event);
+        return !event.isCancelled();
     }
 
-    protected final void fireEntryInsertedEvent(MapEvent<K, V> mapEvent) {
-        fireEvent(mapEvent, new MapEventHandler<K, V>() {
-
-            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
-                mapEventListener.entryInserted(mapEvent);
-            }
-        });
+    public void fireMapEntryRemoved(MapEvent event) {
+        fireEvent(MapEventName.mapEntryRemoved, event);
     }
 
-    protected final void fireEntryRemovedEvent(MapEvent<K, V> mapEvent) {
-        fireEvent(mapEvent, new MapEventHandler<K, V>() {
-
-            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
-                mapEventListener.entryRemoved(mapEvent);
-            }
-        });
+    public void fireMapEntryUpdated(MapEvent event) {
+        fireEvent(MapEventName.mapEntryUpdated, event);
     }
 
-    protected final void fireEntryUpdatedEvent(MapEvent<K, V> mapEvent) {
-        fireEvent(mapEvent, new MapEventHandler<K, V>() {
-
-            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
-                mapEventListener.entryUpdated(mapEvent);
-            }
-        });
+    public boolean fireMapRemovingEntry(CancelableMapEvent event) {
+        fireEvent(MapEventName.mapRemovingEntry, event);
+        return !event.isCancelled();
     }
 
-    protected void fireEvent(MapEvent<K, V> mapEvent, MapEventHandler handler) {
-        for (final MapEventListener<K, V> mapEventListener : mapEventListeners) {
-            handler.handleEvent(mapEvent, mapEventListener);
-        }
+    public boolean fireMapUpdatingEntry(CancelableMapEvent event) {
+        fireEvent(MapEventName.mapUpdatingEntry, event);
+        return !event.isCancelled();
     }
 
-    protected final void fireInsertingEntryEvent(MapEvent<K, V> mapEvent) {
-        fireEvent(mapEvent, new MapEventHandler<K, V>() {
-
-            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
-                mapEventListener.insertingEntry(mapEvent);
-            }
-        });
-    }
-
-    protected final void fireRemovingEntryEvent(MapEvent<K, V> mapEvent) {
-        fireEvent(mapEvent, new MapEventHandler<K, V>() {
-
-            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
-                mapEventListener.removingEntry(mapEvent);
-            }
-        });
-    }
-
-    protected final void fireUpdatingEntryEvent(MapEvent<K, V> mapEvent) {
-        fireEvent(mapEvent, new MapEventHandler<K, V>() {
-
-            public void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener) {
-                mapEventListener.updatingEntry(mapEvent);
-            }
-        });
-    }
-
-    private interface MapEventHandler<K, V> {
-
-        void handleEvent(MapEvent<K, V> mapEvent, MapEventListener<K, V> mapEventListener);
-    }
 }

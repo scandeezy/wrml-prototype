@@ -16,25 +16,26 @@
 
 package org.wrml.core.runtime.event;
 
-import java.util.EventListener;
+import org.wrml.core.Model;
+import org.wrml.core.event.Event;
+import org.wrml.core.runtime.ModelHeapShard;
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
+public class ModelHeapShardEvent extends Event<ModelHeapShard> {
 
-    public void onLinkClicked(LinkEvent event);
+    private static final long serialVersionUID = 1L;
 
-    public void onLinkClicking(CancelableLinkEvent event);
+    private Model _Model;
 
-    public void onLinkEnabledStateChanged(LinkEvent event);
-
-    public void onLinkHrefChanged(LinkEvent event);
-
-    public enum EventName {
-        linkClicked,
-        linkClicking,
-        linkEnabledStateChanged,
-        linkHrefChanged;
+    public ModelHeapShardEvent(ModelHeapShard source) {
+        super(source);
     }
+
+    public Model getModel() {
+        return _Model;
+    }
+
+    public void setModel(Model model) {
+        _Model = model;
+    }
+
 }

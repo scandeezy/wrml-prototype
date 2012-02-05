@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.lang.reflect.Type;
 
 import org.wrml.core.Model;
-import org.wrml.core.io.ModelReader;
+import org.wrml.core.io.ModelGraphReader;
 import org.wrml.core.runtime.Context;
 import org.wrml.core.runtime.system.transformer.SystemTransformers;
 import org.wrml.core.www.MediaType;
@@ -37,11 +37,11 @@ public class DefaultFormatter implements Formatter {
         final InputStream inputStream = body.getInputStream();
         final MediaType mediaType = entity.getHeaders().getContentType();
 
-        final ModelReader reader = context.createModelReader(mediaType, inputStream);
+        final ModelGraphReader reader = context.createModelReader(mediaType, inputStream);
 
         final SystemTransformers systemTransformers = context.getSystemTransformers();
         final Type nativeType = systemTransformers.getMediaTypeToNativeTypeTransformer().aToB(mediaType);
-        final Model responseModel = reader.readModel(context, nativeType);
+        final Model responseModel = reader.readModelGraph(context, nativeType).getRoot();
 
         reader.close();
 

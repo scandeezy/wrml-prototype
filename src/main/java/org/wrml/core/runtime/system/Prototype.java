@@ -563,7 +563,7 @@ public final class Prototype extends RuntimeObject {
 
                 final Context context = getContext();
                 modelGraph.setInitCursorFocusRelationShipName(String.valueOf(modelKey));
-                model = (M) context.instantiateModel(staticInterfaceType, modelGraph).getStaticInterface();
+                model = (M) context.getModelHeap().newModel(staticInterfaceType, modelGraph).getStaticInterface();
                 modelGraph.popInitCursorBack();
                 allModels.put(modelKey, model);
             }

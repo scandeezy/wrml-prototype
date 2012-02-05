@@ -16,25 +16,20 @@
 
 package org.wrml.core.runtime.event;
 
-import java.util.EventListener;
+import java.util.EventObject;
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
+import org.wrml.core.Model;
 
-    public void onLinkClicked(LinkEvent event);
+public class ModelEvent extends EventObject {
 
-    public void onLinkClicking(CancelableLinkEvent event);
+    private static final long serialVersionUID = 1L;
 
-    public void onLinkEnabledStateChanged(LinkEvent event);
-
-    public void onLinkHrefChanged(LinkEvent event);
-
-    public enum EventName {
-        linkClicked,
-        linkClicking,
-        linkEnabledStateChanged,
-        linkHrefChanged;
+    public ModelEvent(Model model) {
+        super(model);
     }
+
+    public Model getModel() {
+        return (Model) getSource();
+    }
+
 }

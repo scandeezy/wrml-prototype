@@ -26,24 +26,33 @@ import java.util.EventListener;
  * @param <V>
  *            The value type
  */
-public interface ListEventListener<T> extends EventListener {
+public interface ListEventListener extends EventListener {
 
-    // TODO: Design API to match the List operations (pre and post)
+    public void onListCleared(ListEvent event);
 
-    public void cleared(ListEvent<T> event);
+    public void onListClearing(CancelableListEvent event);
 
-    public void clearing(ListEvent<T> event);
+    public void onListElementInserted(ListEvent event);
 
-    public void elementInserted(ListEvent<T> event);
+    public void onListElementRemoved(ListEvent event);
 
-    public void elementRemoved(ListEvent<T> event);
+    public void onListElementUpdated(ListEvent event);
 
-    public void elementUpdated(ListEvent<T> event);
+    public void onListInsertingElement(CancelableListEvent event);
 
-    public void insertingElement(ListEvent<T> event);
+    public void onListRemovingElement(CancelableListEvent event);
 
-    public void removingElement(ListEvent<T> event);
+    public void onListUpdatingElement(CancelableListEvent event);
 
-    public void updatingElement(ListEvent<T> event);
+    public enum ListEventName {
+        listCleared,
+        listClearing,
+        listElementInserted,
+        listElementRemoved,
+        listElementUpdated,
+        listInsertingElement,
+        listRemovingElement,
+        listUpdatingElement;
+    }
 
 }

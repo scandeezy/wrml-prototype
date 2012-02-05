@@ -16,25 +16,25 @@
 
 package org.wrml.core.runtime.event;
 
-import java.util.EventListener;
+import org.wrml.core.model.schema.Link;
+import org.wrml.core.util.Cancelable;
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
+public class CancelableLinkEvent extends LinkEvent implements Cancelable {
 
-    public void onLinkClicked(LinkEvent event);
+    private static final long serialVersionUID = 1L;
 
-    public void onLinkClicking(CancelableLinkEvent event);
+    private boolean _Cancelled;
 
-    public void onLinkEnabledStateChanged(LinkEvent event);
-
-    public void onLinkHrefChanged(LinkEvent event);
-
-    public enum EventName {
-        linkClicked,
-        linkClicking,
-        linkEnabledStateChanged,
-        linkHrefChanged;
+    public CancelableLinkEvent(Link link) {
+        super(link);
     }
+
+    public boolean isCancelled() {
+        return _Cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        _Cancelled = cancelled;
+    }
+
 }

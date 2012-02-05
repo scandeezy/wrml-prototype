@@ -24,6 +24,7 @@ import java.util.Date;
  */
 public abstract class Compare {
 
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static int twoComparables(Comparable easy, Comparable peasy) {
 
         if (easy == peasy) {
@@ -49,7 +50,7 @@ public abstract class Compare {
         return Double.compare(me, you);
     }
 
-    public static int twoEnums(Enum me, Enum you) {
+    public static int twoEnums(Enum<?> me, Enum<?> you) {
         return twoComparables(me, you);
     }
 

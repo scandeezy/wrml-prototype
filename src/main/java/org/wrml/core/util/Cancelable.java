@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-package org.wrml.core.io;
+package org.wrml.core.util;
 
-import java.io.InputStream;
-import java.lang.reflect.Type;
+public interface Cancelable {
 
-import org.wrml.core.Model;
-import org.wrml.core.runtime.Context;
+    public boolean isCancelled();
 
-public interface ModelReader {
-
-    public void close() throws Exception;
-
-    public void open(InputStream inputStream) throws Exception;
-
-    public Model readModel(Context context, Type staticInterfaceType) throws Exception;
+    public void setCancelled(boolean cancelled);
 
 }

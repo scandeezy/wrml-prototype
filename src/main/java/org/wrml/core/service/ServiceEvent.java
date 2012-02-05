@@ -22,23 +22,20 @@ import org.wrml.core.Model;
 import org.wrml.core.util.observable.MapEvent;
 import org.wrml.core.util.observable.ObservableMap;
 
-public class ServiceEvent<M extends Model> extends MapEvent<URI, M> {
+public class ServiceEvent<M extends Model> extends MapEvent {
 
-    private static final long serialVersionUID = 6956353992776164917L;
+    private static final long serialVersionUID = 1L;
 
-    public ServiceEvent(ObservableMap<URI, M> map, boolean cancelable) {
-        super(map, cancelable);
-        // TODO Auto-generated constructor stub
+    public ServiceEvent(ObservableMap<URI, M> map) {
+        super(map);
     }
 
-    public ServiceEvent(ObservableMap<URI, M> map, boolean cancelable, URI _Key) {
-        super(map, cancelable, _Key);
-        // TODO Auto-generated constructor stub
+    public ServiceEvent(ObservableMap<URI, M> map, boolean cancelable, URI resourceId, M newValue, M oldValue) {
+        super(map, resourceId, newValue, oldValue);
     }
 
-    public ServiceEvent(ObservableMap<URI, M> map, boolean cancelable, URI key, M newValue, M oldValue) {
-        super(map, cancelable, key, newValue, oldValue);
-        // TODO Auto-generated constructor stub
+    public ServiceEvent(ObservableMap<URI, M> map, URI resourceId) {
+        super(map, resourceId);
     }
 
 }

@@ -47,7 +47,7 @@ public class BootstrapDocument<D extends Document> extends BootstrapModel<D> {
     }
 
     public final void delete() {
-        getStaticInterface().die();
+        getStaticInterface().free();
     }
 
     public final String getEtag() {

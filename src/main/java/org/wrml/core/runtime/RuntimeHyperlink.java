@@ -21,6 +21,7 @@ import java.util.Map;
 
 import org.wrml.core.Hyperlink;
 import org.wrml.core.Model;
+import org.wrml.core.event.EventSource;
 import org.wrml.core.model.api.LinkTemplate;
 import org.wrml.core.model.schema.Link;
 import org.wrml.core.model.schema.LinkRelation;
@@ -42,6 +43,7 @@ public final class RuntimeHyperlink extends RuntimeObject implements Hyperlink {
     private final URI _Rel;
     private URI _Href;
     private boolean _Enabled;
+    private transient EventSource<LinkEventListener> _LinkEventSource;
 
     public RuntimeHyperlink(Model referrer, URI rel) {
         super(referrer.getContext());
@@ -49,8 +51,11 @@ public final class RuntimeHyperlink extends RuntimeObject implements Hyperlink {
         _Rel = rel;
     }
 
-    public void addEventListener(LinkEventListener listener) {
-        // TODO Add an event listener
+    public boolean addEventListener(LinkEventListener listener) {
+        if (_LinkEventSource == null) {
+            _LinkEventSource = new EventSource<LinkEventListener>(LinkEventListener.class);
+        }
+        return _LinkEventSource.addEventListener(listener);
     }
 
     public Object click(java.lang.reflect.Type nativeReturnType, Object requestEntity, Map<String, String> hrefParams) {
@@ -298,6 +303,11 @@ public final class RuntimeHyperlink extends RuntimeObject implements Hyperlink {
 
     }
 
+    public void free() {
+        // TODO Auto-generated method stub
+
+    }
+
     public URI getHref() {
         return _Href;
     }
@@ -362,9 +372,13 @@ public final class RuntimeHyperlink extends RuntimeObject implements Hyperlink {
         return _Enabled;
     }
 
-    public void removeEventListener(LinkEventListener listener) {
-        // TODO Auto-generated method stub
+    public boolean removeEventListener(LinkEventListener listener) {
 
+        if (_LinkEventSource == null) {
+            return false;
+        }
+
+        return _LinkEventSource.removeEventListener(listener);
     }
 
     /**

@@ -16,13 +16,31 @@
 
 package org.wrml.core.runtime.event;
 
-public interface ModelEventListener {
+import java.util.EventListener;
 
-    public void fieldConstraintViolated(FieldEvent event);
+public interface ModelEventListener extends EventListener {
 
-    public void fieldValueChanged(FieldEvent event);
+    public void onFieldConstraintViolated(FieldEvent event);
 
-    public void fieldValueInitialized(FieldEvent event);
+    public void onFieldValueChanged(FieldEvent event);
 
-    public void linkEnabledStateChanged(LinkEvent event);
+    public void onFieldValueInitialized(FieldEvent event);
+
+    public void onLinkClicked(LinkEvent event);
+
+    public void onLinkEnabledStateChanged(LinkEvent event);
+
+    public void onLinkHrefChanged(LinkEvent event);
+
+    public void onModelFreed(LinkEvent event);
+
+    public enum ModelEventName {
+        fieldConstraintViolated,
+        fieldValueChanged,
+        fieldValueInitialized,
+        linkClicked,
+        linkEnabledStateChanged,
+        linkHrefChanged,
+        modelFreed;
+    }
 }

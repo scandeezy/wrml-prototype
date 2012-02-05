@@ -16,11 +16,9 @@
 
 package org.wrml.core.service;
 
-import java.net.URI;
-
 import org.wrml.core.Model;
 import org.wrml.core.util.observable.MapEventListener;
 
-public interface ServiceEventListener<M extends Model> extends MapEventListener<URI, M> {
+public interface ServiceEventListener<M extends Model> extends MapEventListener {
 
 }

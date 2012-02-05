@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package org.wrml.core.runtime.event;
+package org.wrml.core.io;
 
-import java.util.EventListener;
+import java.io.InputStream;
+import java.lang.reflect.Type;
 
-/**
- * An event listener that can watch Links to follow their availability status.
- */
-public interface LinkEventListener extends EventListener {
+import org.wrml.core.runtime.Context;
+import org.wrml.core.runtime.ModelGraph;
 
-    public void onLinkClicked(LinkEvent event);
+public interface ModelGraphReader {
 
-    public void onLinkClicking(CancelableLinkEvent event);
+    public void close() throws Exception;
 
-    public void onLinkEnabledStateChanged(LinkEvent event);
+    public void open(InputStream inputStream) throws Exception;
 
-    public void onLinkHrefChanged(LinkEvent event);
+    public ModelGraph readModelGraph(Context context, Type staticInterfaceType) throws Exception;
 
-    public enum EventName {
-        linkClicked,
-        linkClicking,
-        linkEnabledStateChanged,
-        linkHrefChanged;
-    }
 }

@@ -14,24 +14,34 @@
  * limitations under the License.
  */
 
-package org.wrml.core.util;
+package org.wrml.core.util.observable;
 
-import java.util.EventObject;
+import org.wrml.core.util.Cancelable;
 
-public class CancelableEvent extends EventObject {
+/**
+ * Fired from an ObservableList whenever its contents are altered.
+ * 
+ * @param <K>
+ *            The key type
+ * @param <V>
+ *            The value type
+ */
+public final class CancelableListEvent extends ListEvent implements Cancelable {
 
-    private static final long serialVersionUID = -8701444086930982155L;
+    private static final long serialVersionUID = 1L;
 
-    private final boolean _Cancelable;
     private boolean _Cancelled;
 
-    public CancelableEvent(Object source, boolean cancelable) {
-        super(source);
-        _Cancelable = cancelable;
+    public CancelableListEvent(ObservableList<?> list) {
+        super(list);
     }
 
-    public boolean isCancelable() {
-        return _Cancelable;
+    public CancelableListEvent(ObservableList<?> list, Object insertionElement, Object removalElement) {
+        super(list, insertionElement, removalElement);
+    }
+
+    public CancelableListEvent(ObservableList<?> list, Object insertionElement, Object removalElement, int index) {
+        super(list, insertionElement, removalElement, index);
     }
 
     public boolean isCancelled() {
@@ -41,4 +51,5 @@ public class CancelableEvent extends EventObject {
     public void setCancelled(boolean cancelled) {
         _Cancelled = cancelled;
     }
+
 }

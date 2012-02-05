@@ -16,53 +16,47 @@
 
 package org.wrml.core.util.observable;
 
-import org.wrml.core.util.CancelableEvent;
+import java.util.EventObject;
 
 /**
  * Fired from an ObservableMap whenever its contents are altered.
- * 
- * @param <K>
- *            The key type
- * @param <V>
- *            The value type
  */
-public class MapEvent<K, V> extends CancelableEvent {
+public class MapEvent extends EventObject {
 
-    private static final long serialVersionUID = -4697339990791750523L;
+    private static final long serialVersionUID = 1L;
 
-    private final K _Key;
-    private final V _NewValue;
-    private final V _OldValue;
+    private final Object _Key;
+    private final Object _NewValue;
+    private final Object _OldValue;
 
-    public MapEvent(ObservableMap<K, V> map, boolean cancelable) {
-        this(map, cancelable, null, null, null);
+    public MapEvent(ObservableMap<?, ?> map) {
+        this(map, null, null, null);
     }
 
-    public MapEvent(ObservableMap<K, V> map, boolean cancelable, K _Key) {
-        this(map, cancelable, _Key, null, null);
+    public MapEvent(ObservableMap<?, ?> map, Object key) {
+        this(map, key, null, null);
     }
 
-    public MapEvent(ObservableMap<K, V> map, boolean cancelable, K key, V newValue, V oldValue) {
-        super(map, cancelable);
+    public MapEvent(ObservableMap<?, ?> map, Object key, Object newValue, Object oldValue) {
+        super(map);
         _Key = key;
         _NewValue = newValue;
         _OldValue = oldValue;
     }
 
-    public K getKey() {
+    public Object getKey() {
         return _Key;
     }
 
-    @SuppressWarnings("unchecked")
-    public ObservableMap<K, V> getMap() {
-        return (ObservableMap<K, V>) getSource();
+    public ObservableMap<?, ?> getMap() {
+        return (ObservableMap<?, ?>) getSource();
     }
 
-    public V getNewValue() {
+    public Object getNewValue() {
         return _NewValue;
     }
 
-    public V getOldValue() {
+    public Object getOldValue() {
         return _OldValue;
     }
 
