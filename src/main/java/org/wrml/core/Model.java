@@ -74,19 +74,6 @@ public interface Model extends Serializable {
     public boolean addFieldEventListener(String fieldName, FieldEventListener listener);
 
     /**
-     * Add a listener for events relating to the identified link relation.
-     * 
-     * @param linkRelationId
-     *            The id of the link relation, which in turn uniquely identifies
-     *            a link within the {@link Model}.
-     * @param listener
-     *            The {@link LinkEventListener} to add.
-     * 
-     * @see Model#clickLink(URI, Type, Object, Map)
-     */
-    public boolean addLinkEventListener(URI linkRelationId, LinkEventListener listener);
-
-    /**
      * Click the {@link Hyperlink} that is identified by the rel field value,
      * which is a {@link URI} of a {@link LinkRelation}. The click's effect is a
      * function of the metadata.
@@ -266,20 +253,6 @@ public interface Model extends Serializable {
      * @see Model#addFieldEventListener(String, FieldEventListener)
      */
     public boolean removeFieldEventListener(String fieldName, FieldEventListener listener);
-
-    /**
-     * Remove the specified {@link LinkEventListener}.
-     * 
-     * @param linkRelationId
-     *            the id of the {@link LinkRelation} that is no longer
-     *            interesting.
-     * @param listener
-     *            the {@link LinkEventListener} that is no longer interested in
-     *            receiving events from this Model about the identified link.
-     * 
-     * @see Model#addLinkEventListener(URI, LinkEventListener)
-     */
-    public boolean removeLinkEventListener(URI linkRelationId, LinkEventListener listener);
 
     /**
      * Restore the default value of each field.

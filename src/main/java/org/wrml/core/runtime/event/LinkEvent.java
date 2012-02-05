@@ -16,23 +16,24 @@
 
 package org.wrml.core.runtime.event;
 
-import java.util.EventObject;
-
-import org.wrml.core.model.schema.Link;
+import org.wrml.core.Hyperlink;
 
 /**
  * Used to communicate the change in a Link's state.
  */
-public class LinkEvent extends EventObject {
+public class LinkEvent extends ModelEvent {
 
     private static final long serialVersionUID = 1L;
 
-    public LinkEvent(Link link) {
-        super(link);
+    private final Hyperlink _Hyperlink;
+
+    public LinkEvent(Hyperlink link) {
+        super(link.getReferrer());
+        _Hyperlink = link;
     }
 
-    public Link getLink() {
-        return (Link) getSource();
+    public Hyperlink getHyperlink() {
+        return _Hyperlink;
     }
 
 }

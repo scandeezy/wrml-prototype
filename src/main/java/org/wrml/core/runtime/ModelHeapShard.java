@@ -25,9 +25,11 @@ import org.wrml.core.event.EventSource;
 import org.wrml.core.runtime.bootstrap.FieldNames;
 import org.wrml.core.runtime.event.FieldEvent;
 import org.wrml.core.runtime.event.LinkEvent;
+import org.wrml.core.runtime.event.ModelEvent;
 import org.wrml.core.runtime.event.ModelEventListener;
 import org.wrml.core.runtime.event.ModelHeapShardEvent;
 import org.wrml.core.runtime.event.ModelHeapShardEventListener;
+import org.wrml.core.runtime.event.ModelHeapShardEventListener.ModelHeapShardEventName;
 import org.wrml.core.service.CachingService;
 import org.wrml.core.service.Service;
 import org.wrml.core.util.observable.ObservableMap;
@@ -39,7 +41,7 @@ public class ModelHeapShard extends EventSource<ModelHeapShardEventListener> imp
     private final Type _Type;
     private final ModelEventListener _HeapModelEventListener;
 
-    private ObservableMap<URI, Object> _IdMap;
+    private ObservableMap<URI, Object> _HeapIdMap;
     private ObservableMap<Integer, Model> _HashCodeMap;
 
     public ModelHeapShard(Context context, Type type) {
@@ -60,7 +62,7 @@ public class ModelHeapShard extends EventSource<ModelHeapShardEventListener> imp
 
         final ModelHeapShardEvent event = new ModelHeapShardEvent(this);
         event.setModel(model);
-        fireEvent(ModelHeapShardEventListener.ModelHeapShardEventName.modelAdded, event);
+        fireEvent(ModelHeapShardEventName.modelAdded, event);
 
         // Check to see if the model has an id set on it already
         final URI heapId = model.getHeapId();
@@ -82,23 +84,19 @@ public class ModelHeapShard extends EventSource<ModelHeapShardEventListener> imp
             return null;
         }
 
-        // TODO: Listen to models being freed so that they can be removed from the heap shard via callback
         model.free();
-
         return model;
     }
 
-    public Model free(final URI resourceId) {
+    public Model free(final URI heapId) {
 
-        final Model model = get(resourceId);
+        final Model model = get(heapId);
 
         if (model == null) {
             return null;
         }
 
-        // TODO: Listen to models being freed so that they can be removed from the heap shard via callback
         model.free();
-
         return model;
     }
 
@@ -106,8 +104,8 @@ public class ModelHeapShard extends EventSource<ModelHeapShardEventListener> imp
         return getHashCodeMap().get(hashCode);
     }
 
-    public Model get(final URI resourceId) {
-        return (Model) getIdMap().get(resourceId);
+    public Model get(final URI heapId) {
+        return (Model) getHeapIdMap().get(heapId);
     }
 
     public Context getContext() {
@@ -119,7 +117,8 @@ public class ModelHeapShard extends EventSource<ModelHeapShardEventListener> imp
     }
 
     public CachingService newModelCachingService(final Service originService) {
-        final CachingService cachingService = new CachingService(originService.getContext(), originService, getIdMap());
+        final CachingService cachingService = new CachingService(originService.getContext(), originService,
+                getHeapIdMap());
 
         // TODO: Wire up to the origin to help deal with model cache timeouts?
 
@@ -133,16 +132,16 @@ public class ModelHeapShard extends EventSource<ModelHeapShardEventListener> imp
         return _HashCodeMap;
     }
 
-    private ObservableMap<URI, Object> getIdMap() {
-        if (_IdMap == null) {
-            _IdMap = Observables.observableMap(new HashMap<URI, Object>());
+    private ObservableMap<URI, Object> getHeapIdMap() {
+        if (_HeapIdMap == null) {
+            _HeapIdMap = Observables.observableMap(new HashMap<URI, Object>());
         }
-        return _IdMap;
+        return _HeapIdMap;
     };
 
     private Model modelIdentified(Model model, final URI id, final ModelHeapShardEvent event) {
 
-        fireEvent(ModelHeapShardEventListener.ModelHeapShardEventName.modelIdentified, event);
+        fireEvent(ModelHeapShardEventName.modelIdentified, event);
 
         // Check to see if the cache already contains the model with the same id.
         final Model cachedModel = get(id);
@@ -157,7 +156,7 @@ public class ModelHeapShard extends EventSource<ModelHeapShardEventListener> imp
             model = cachedModel;
         }
         else {
-            getIdMap().put(id, model);
+            getHeapIdMap().put(id, model);
         }
 
         return model;
@@ -165,15 +164,10 @@ public class ModelHeapShard extends EventSource<ModelHeapShardEventListener> imp
 
     private final class HeapModelEventListener implements ModelEventListener {
 
-        public void onFieldConstraintViolated(FieldEvent event) {
-            // TODO Auto-generated method stub
-
-        }
-
         public void onFieldValueChanged(FieldEvent fieldEvent) {
             final String idFieldName = FieldNames.Document.id.name();
             if (idFieldName.equals(fieldEvent.getFieldName())) {
-                final RuntimeModel model = (RuntimeModel) fieldEvent.getSourceModel().getDynamicInterface();
+                final RuntimeModel model = (RuntimeModel) fieldEvent.getModel().getDynamicInterface();
                 final URI heapId = model.getHeapId();
                 if (heapId != null) {
                     final ModelHeapShardEvent modelHeapShardEvent = new ModelHeapShardEvent(ModelHeapShard.this);
@@ -183,27 +177,37 @@ public class ModelHeapShard extends EventSource<ModelHeapShardEventListener> imp
             }
         }
 
-        public void onFieldValueInitialized(FieldEvent event) {
+        public void onModelFieldConstraintViolated(FieldEvent event) {
             // TODO Auto-generated method stub
 
         }
 
-        public void onLinkClicked(LinkEvent event) {
+        public void onModelFieldValueChanged(FieldEvent event) {
             // TODO Auto-generated method stub
 
         }
 
-        public void onLinkEnabledStateChanged(LinkEvent event) {
+        public void onModelFieldValueInitialized(FieldEvent event) {
             // TODO Auto-generated method stub
 
         }
 
-        public void onLinkHrefChanged(LinkEvent event) {
+        public void onModelFreed(ModelEvent event) {
             // TODO Auto-generated method stub
 
         }
 
-        public void onModelFreed(LinkEvent event) {
+        public void onModelLinkClicked(LinkEvent event) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void onModelLinkEnabledStateChanged(LinkEvent event) {
+            // TODO Auto-generated method stub
+
+        }
+
+        public void onModelLinkHrefChanged(LinkEvent event) {
             // TODO Auto-generated method stub
 
         }

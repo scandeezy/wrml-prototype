@@ -20,27 +20,27 @@ import java.util.EventListener;
 
 public interface ModelEventListener extends EventListener {
 
-    public void onFieldConstraintViolated(FieldEvent event);
+    public void onModelFieldConstraintViolated(FieldEvent event);
 
-    public void onFieldValueChanged(FieldEvent event);
+    public void onModelFieldValueChanged(FieldEvent event);
 
-    public void onFieldValueInitialized(FieldEvent event);
+    public void onModelFieldValueInitialized(FieldEvent event);
 
-    public void onLinkClicked(LinkEvent event);
+    public void onModelFreed(ModelEvent event);
 
-    public void onLinkEnabledStateChanged(LinkEvent event);
+    public void onModelLinkClicked(LinkEvent event);
 
-    public void onLinkHrefChanged(LinkEvent event);
+    public void onModelLinkEnabledStateChanged(LinkEvent event);
 
-    public void onModelFreed(LinkEvent event);
+    public void onModelLinkHrefChanged(LinkEvent event);
 
     public enum ModelEventName {
-        fieldConstraintViolated,
-        fieldValueChanged,
-        fieldValueInitialized,
-        linkClicked,
-        linkEnabledStateChanged,
-        linkHrefChanged,
-        modelFreed;
+        modelFieldConstraintViolated,
+        modelFieldValueChanged,
+        modelFieldValueInitialized,
+        modelFreed,
+        modelLinkClicked,
+        modelLinkEnabledStateChanged,
+        modelLinkHrefChanged;
     }
 }

@@ -16,7 +16,7 @@
 
 package org.wrml.core.runtime.event;
 
-import org.wrml.core.model.schema.Link;
+import org.wrml.core.Hyperlink;
 import org.wrml.core.util.Cancelable;
 
 public class CancelableLinkEvent extends LinkEvent implements Cancelable {
@@ -25,7 +25,7 @@ public class CancelableLinkEvent extends LinkEvent implements Cancelable {
 
     private boolean _Cancelled;
 
-    public CancelableLinkEvent(Link link) {
+    public CancelableLinkEvent(Hyperlink link) {
         super(link);
     }
 

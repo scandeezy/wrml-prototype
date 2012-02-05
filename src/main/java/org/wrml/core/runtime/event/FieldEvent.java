@@ -16,8 +16,6 @@
 
 package org.wrml.core.runtime.event;
 
-import java.util.EventObject;
-
 import org.wrml.core.Model;
 import org.wrml.core.util.observable.MapEvent;
 
@@ -25,7 +23,7 @@ import org.wrml.core.util.observable.MapEvent;
  * An event that communicates some activity associated with a specific
  * Model instance's specific field.
  */
-public class FieldEvent extends EventObject {
+public class FieldEvent extends ModelEvent {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,8 +31,8 @@ public class FieldEvent extends EventObject {
     private final MapEvent _SourceEvent;
     private FieldConstraintEvent _FieldConstraintEvent;
 
-    public FieldEvent(Model source, String fieldName, MapEvent sourceEvent) {
-        super(source);
+    public FieldEvent(Model sourceModel, String fieldName, MapEvent sourceEvent) {
+        super(sourceModel);
         _FieldName = fieldName;
         _SourceEvent = sourceEvent;
     }
@@ -49,10 +47,6 @@ public class FieldEvent extends EventObject {
 
     public MapEvent getSourceEvent() {
         return _SourceEvent;
-    }
-
-    public Model getSourceModel() {
-        return (Model) getSource();
     }
 
     public void setConstraintEvent(FieldConstraintEvent fieldConstraintEvent) {

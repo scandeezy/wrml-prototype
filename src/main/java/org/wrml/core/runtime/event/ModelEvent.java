@@ -24,8 +24,8 @@ public class ModelEvent extends EventObject {
 
     private static final long serialVersionUID = 1L;
 
-    public ModelEvent(Model model) {
-        super(model);
+    public ModelEvent(Model sourceModel) {
+        super(sourceModel);
     }
 
     public Model getModel() {

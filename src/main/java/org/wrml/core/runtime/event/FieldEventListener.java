@@ -25,21 +25,21 @@ import java.util.EventListener;
  */
 public interface FieldEventListener extends EventListener {
 
+    public void onFieldChangingValue(CancelableFieldEvent event);
+
     public void onFieldConstraintViolated(FieldEvent event);
+
+    public void onFieldInitializingValue(CancelableFieldEvent event);
 
     public void onFieldValueChanged(FieldEvent event);
 
-    public void onFieldValueChanging(CancelableFieldEvent event);
-
     public void onFieldValueInitialized(FieldEvent event);
 
-    public void onFieldValueInitializing(CancelableFieldEvent event);
-
     public enum FieldEventName {
+        fieldChangingValue,
         fieldConstraintViolated,
+        fieldInitializingValue,
         fieldValueChanged,
-        fieldValueChanging,
-        fieldValueInitialized,
-        fieldValueInitializing;
+        fieldValueInitialized;
     }
 }
