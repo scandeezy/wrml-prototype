@@ -317,7 +317,9 @@ public abstract class FieldIterativeModelGraphReader extends EventSource<EventLi
             break;
 
         case Choice:
-            value = readChoiceValue(context, nativeType);
+            // temp var needed to avoid compile error due to implicit typing edge case
+            Enum temp = readChoiceValue(context, nativeType);
+            value = temp;
             break;
 
         case DateTime:
