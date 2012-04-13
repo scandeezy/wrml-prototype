@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.wrml.core.runtime.Context;
-import org.wrml.core.runtime.bootstrap.BootstrapConfig;
 import org.wrml.core.service.ServiceConfigurator;
 import org.wrml.core.service.ServiceMap;
 

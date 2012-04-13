@@ -11,7 +11,6 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.wrml.core.runtime.bootstrap.BootstrapConfig;
 import org.wrml.core.runtime.bootstrap.ServiceConfig;
 import org.wrml.core.service.handler.RequestHandler;
 
