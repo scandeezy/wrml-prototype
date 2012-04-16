@@ -87,10 +87,10 @@
         <url>https://wrmlorg.jira.com/browse/PROTO</url>
     </issueManagement>
 
-    <ciManagement>
+    <!-- <ciManagement>
         <system>TeamCity</system>
         <url>http://dev.fanclout.com/teamcity/project.html?projectId=project5</url>
-    </ciManagement>
+    </ciManagement> -->
 
     <scm>
         <url>https://github.com/wrml/wrml-prototype</url>
@@ -300,7 +300,7 @@
             <url>gitsite:git@github.com/wrml/wrml-prototype.git</url>
         </site>
 
-        <!-- This is temporarily set to use the FanClout Nexus instance until we get a Sonatype OSS Hosted Repository -->
+        <!-- This is temporarily set to use the FanClout Nexus instance until we get a Sonatype OSS Hosted Repository 
         <repository>
             <id>fanclout.releases</id>
             <url>http://dev.fanclout.com/nexus/content/repositories/releases/</url>
@@ -308,11 +308,11 @@
         <snapshotRepository>
             <id>fanclout.snapshots</id>
             <url>http://dev.fanclout.com/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
+        </snapshotRepository> -->
     </distributionManagement>
 
 
-    <!-- The following is here temporarily during initial development. -->
+    <!-- The following is here temporarily during initial development. 
     <profiles>
         <profile>
             <id>fanclout-repo</id>
@@ -332,5 +332,5 @@
                 </pluginRepository>
             </pluginRepositories>
         </profile>
-    </profiles>
+    </profiles> -->
 </project>
