@@ -204,8 +204,9 @@
                         <exclude>.gitignore</exclude>
                         <exclude>LICENSE.txt</exclude>
                         <exclude>simple.json</exclude>
-                        <exclude>web.xml</exclude>
+                        <exclude>**/src/main/webapp/WEB-INF/web.xml</exclude>
                     </excludes>
+                    <useDefaultExcludes>true</useDefaultExcludes>
                     <strictCheck>true</strictCheck>
                     <mapping>
                         <md>XML_STYLE</md>
