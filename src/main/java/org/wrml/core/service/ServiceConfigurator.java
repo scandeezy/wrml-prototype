@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
 
@@ -23,6 +24,8 @@ public class ServiceConfigurator
 	public static final String WRMLCONFIGLOCATIONDEFAULT = "/etc/wrml/config";
 	
 	private static ServiceConfigurator INSTANCE = null;
+	
+	private Logger log = Logger.getLogger(this.getClass().getName());
 	
 	private ServiceMap serviceMap;
 	
@@ -54,12 +57,18 @@ public class ServiceConfigurator
 		
 		if(location != null)
 			configFile = new File(location);
+		else
+			log.info("config file location is null");
 		
 		if(configFile == null || !configFile.exists())
 		{
 			location = System.getProperty(WRMLCONFIGLOCATIONTAG);
 			if(location != null)
 				configFile = new File(location);
+		}
+		else
+		{
+			log.info("config file does not exist");
 		}
 		
 		if(configFile == null || !configFile.exists())
@@ -102,41 +111,43 @@ public class ServiceConfigurator
 			serviceMap = null;
 
 			pullInConfig(configFile);
-//			
-//			//load up
-//			ObjectMapper mapper = new ObjectMapper();
-//			try
-//			{
-//				JsonNode rootNode = mapper.readValue(configFile,JsonNode.class);
-//				Iterator<Entry<String, JsonNode>> iter = rootNode.getFields();
-//				RequestHandler.TEST = "configed: ";
-//				while(iter.hasNext())
-//				{
-//					Entry<String, JsonNode> entry = iter.next();
-//					RequestHandler.TEST = RequestHandler.TEST + entry.getKey() + ", " + entry.getValue().getTextValue() + " ";
-//				}
-//				
-//				JsonNode apis = rootNode.get(APIKEY);
-//				loadAPIs(apis);
-//			} 
-//			catch (JsonParseException e)
-//			{
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//				RequestHandler.TEST = "fail1 " + e.toString();
-//			}
-//			catch (JsonMappingException e)
-//			{
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//				RequestHandler.TEST = "fail2";
-//			}
-//			catch (IOException e)
-//			{
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//				RequestHandler.TEST = "fail3";
-//			}
+			
+			/*
+ 			//load up
+			ObjectMapper mapper = new ObjectMapper();
+			try
+			{
+				JsonNode rootNode = mapper.readValue(configFile,JsonNode.class);
+				Iterator<Entry<String, JsonNode>> iter = rootNode.getFields();
+				RequestHandler.TEST = "configed: ";
+				while(iter.hasNext())
+				{
+					Entry<String, JsonNode> entry = iter.next();
+					RequestHandler.TEST = RequestHandler.TEST + entry.getKey() + ", " + entry.getValue().getTextValue() + " ";
+				}
+				
+				JsonNode apis = rootNode.get(APIKEY);
+				loadAPIs(apis);
+			} 
+			catch (JsonParseException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				RequestHandler.TEST = "fail1 " + e.toString();
+			}
+			catch (JsonMappingException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				RequestHandler.TEST = "fail2";
+			}
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				RequestHandler.TEST = "fail3";
+			}
+			*/
 		}
 		else
 		{

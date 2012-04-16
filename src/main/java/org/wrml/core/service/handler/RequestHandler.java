@@ -2,6 +2,8 @@ package org.wrml.core.service.handler;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URI;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -20,6 +22,8 @@ public class RequestHandler extends HttpServlet
 	
 	private ServiceMap serviceMap = null;
 	private ObjectMapper mapper;
+	
+	private Logger log = Logger.getLogger(this.getClass().getName());
 	
 	public void init(ServletConfig config) throws ServletException {
 	    super.init(config);
@@ -50,26 +54,34 @@ public class RequestHandler extends HttpServlet
 		
 		TEST = TEST + " Meow";
 		
-//		if(serviceMap != null)
-//		{
-//			TEST = "Service Map Created!";
-//		}
-//		else
-//		{
-//			TEST = "No Service Map";
-//		}
-		
-		
-		// Boo hahahahahaha
 		// We do what we want
 		resp.setStatus(HttpServletResponse.SC_OK);
-		//resp.setContentType("text/plain");
-		resp.setContentType("application/json");
-		
+		resp.setContentType("text/html");
+//		resp.setContentType("application/json");
+
 		try
 		{
 			PrintWriter out = resp.getWriter();
-			mapper.writeValue(out, TEST);
+
+			if (serviceMap == null || serviceMap.keySet().isEmpty())
+			{
+//				mapper.writeValue(out, "serviceMap has an empty keyset");
+				out.println("serviceMap has an empty keyset<br/>");
+				log.info(serviceMap==null?"serviceMap is null":"serviceMap is empty");
+			}
+			else
+			{
+				for (URI key : serviceMap.keySet())
+
+				{
+//					mapper.writeValue(out, key + " : " + serviceMap.get(key));
+					out.println(key + " : " + serviceMap.get(key) + "<br/>");
+				}
+			}
+
+			//mapper.writeValue(out, TEST);
+			out.println(TEST);
+			log.info("JCLIFFE: " + TEST);
 			
 		}
 		catch (IOException e) {
