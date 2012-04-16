@@ -203,6 +203,7 @@
                              http://code.google.com/p/maven-license-plugin/issues/detail?id=88 -->
                         <exclude>.gitignore</exclude>
                         <exclude>LICENSE.txt</exclude>
+                        <exclude>simple.json</exclude>
                     </excludes>
                     <strictCheck>true</strictCheck>
                     <mapping>
