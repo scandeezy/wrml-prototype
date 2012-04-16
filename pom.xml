@@ -204,6 +204,7 @@
                         <exclude>.gitignore</exclude>
                         <exclude>LICENSE.txt</exclude>
                         <exclude>simple.json</exclude>
+                        <exclude>web.xml</exclude>
                     </excludes>
                     <strictCheck>true</strictCheck>
                     <mapping>
