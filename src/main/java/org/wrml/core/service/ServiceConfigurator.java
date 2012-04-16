@@ -18,6 +18,7 @@ package org.wrml.core.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -35,43 +36,44 @@ import org.wrml.core.service.handler.RequestHandler;
 public class ServiceConfigurator 
 {
 	private Logger log = Logger.getLogger(this.getClass().getName());
-	
+
 	public static final String APIKEY = "apis";
-	
+
+	private static final String sep = File.separator;
 	public static final String WRMLCONFIGLOCATIONTAG = "wrml.configuration.location";
 	public static final String WRMLCONFIGFILE = "wrml.config";
-	public static final String WRMLCONFIGLOCATIONDEFAULT = "/etc/wrml/" + WRMLCONFIGFILE;
-	
+	public static final String WRMLCONFIGLOCATIONDEFAULT = sep + "etc" + sep+ "wrml" + sep + WRMLCONFIGFILE;
+
 	private static ServiceConfigurator INSTANCE = null;
-	
+
 	private ServiceMap serviceMap;
-	
+
 	private ServiceConfigurator()
 	{
-		
+
 	}
-	
+
 	public static ServiceConfigurator getInstance()
 	{
 		if(INSTANCE == null)
 		{
 			INSTANCE = new ServiceConfigurator();
 		}
-		
+
 		return INSTANCE;
 	}
-	
+
 	public ServiceMap getServiceMap()
 	{
 		return serviceMap;
 	}
-	
+
 	private File locateConfig(ServletConfig config)
 	{
 		// Check if we were given a location to look at from the xml
 		String location = config.getInitParameter(WRMLCONFIGLOCATIONTAG);
 		File configFile = null;
-		
+
 		if(location != null)
 		{
 			configFile = new File(location);
@@ -87,31 +89,46 @@ public class ServiceConfigurator
 				log.info("Setting config location to WRMLCONFIGLOCATIONTAG: " + WRMLCONFIGLOCATIONTAG);
 			}
 		}
-		
+
 		if(configFile == null || !configFile.exists())
 		{
-			URL resource = Thread.currentThread().getContextClassLoader().getResource(WRMLCONFIGFILE);
+			URL resource = null;
+			try
+			{
+				resource = config.getServletContext().getResource("/WEB-INF/" + WRMLCONFIGFILE);
+				if (resource == null)
+				{
+					resource = config.getServletContext().getResource(WRMLCONFIGFILE);
+				}
+			} catch (MalformedURLException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
 			if(resource != null)
 			{
+				log.info("JCLIFFE: " + resource.getPath());
+
 				configFile = new File(resource.getFile());
-						
+
 				log.info("Setting config location to WRMLCONFIGLOCSTIONCLASSPATH: " + WRMLCONFIGFILE);
 			}
 		}
-			
+
 		if(configFile == null || !configFile.exists())
 		{
 			configFile = new File(WRMLCONFIGLOCATIONDEFAULT);
 			log.info("Setting config location to WRMLCONFIGLOCATIONDEFAULT: " + WRMLCONFIGLOCATIONDEFAULT);
 		}
-		
+
 		return configFile;
 	}
-	
+
 	private void pullInConfig(File configFile)
 	{
 		ObjectMapper mapper = new ObjectMapper();
-		
+
 		try 
 		{
 			ServiceConfig config = mapper.readValue(configFile, ServiceConfig.class);
@@ -126,7 +143,7 @@ public class ServiceConfigurator
 		catch (JsonMappingException e) 
 		{
 			log.warning("Unable to read in base service config:" + e);
-			
+
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			RequestHandler.TEST = "fail2 " + e.toString();
@@ -139,18 +156,18 @@ public class ServiceConfigurator
 			RequestHandler.TEST = "fail3 " + e.toString();
 		}
 	}
-	
+
 	public void init(ServletConfig config)
 	{
 		// Check if we were given a location to look at from the xml
 		File configFile = locateConfig(config);
-		
+
 		if(configFile.exists())
 		{
 			serviceMap = null;
 
 			pullInConfig(configFile);
-			
+
 			/*
  			//load up
 			ObjectMapper mapper = new ObjectMapper();
@@ -164,7 +181,7 @@ public class ServiceConfigurator
 					Entry<String, JsonNode> entry = iter.next();
 					RequestHandler.TEST = RequestHandler.TEST + entry.getKey() + ", " + entry.getValue().getTextValue() + " ";
 				}
-				
+
 				JsonNode apis = rootNode.get(APIKEY);
 				loadAPIs(apis);
 			} 
@@ -186,7 +203,7 @@ public class ServiceConfigurator
 				e.printStackTrace();
 				RequestHandler.TEST = "fail3";
 			}
-			*/
+			 */
 		}
 		else
 		{
@@ -194,17 +211,17 @@ public class ServiceConfigurator
 			RequestHandler.TEST = "fail4";
 		}
 	}
-	
+
 	private void loadAPIs(JsonNode apis)
 	{
 		Iterator<Entry<String,JsonNode>> apiIterator = apis.getFields();
-		
+
 		// Pull out each config and construct the corresponding API
 		while(apiIterator.hasNext())
 		{
 			Entry<String, JsonNode> apiEntry = apiIterator.next();
 			RequestHandler.TEST += apiEntry.getKey() + " : " + apiEntry.getValue().asText() + " ";
-			
+
 		}
 	}
 }
