@@ -2,8 +2,10 @@ package org.wrml.core.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
 
@@ -16,11 +18,13 @@ import org.wrml.core.service.handler.RequestHandler;
 
 public class ServiceConfigurator 
 {
+	private Logger log = Logger.getLogger(this.getClass().getName());
+	
 	public static final String APIKEY = "apis";
 	
 	public static final String WRMLCONFIGLOCATIONTAG = "wrml.configuration.location";
-	public static final String WRMLCONFIGLOCSTIONCLASSPATH = "classpath://wrml.config";
-	public static final String WRMLCONFIGLOCATIONDEFAULT = "/etc/wrml/config";
+	public static final String WRMLCONFIGFILE = "wrml.config";
+	public static final String WRMLCONFIGLOCATIONDEFAULT = "/etc/wrml/" + WRMLCONFIGFILE;
 	
 	private static ServiceConfigurator INSTANCE = null;
 	
@@ -53,20 +57,37 @@ public class ServiceConfigurator
 		File configFile = null;
 		
 		if(location != null)
+		{
 			configFile = new File(location);
-		
+			log.info("Setting config location to WRMLCONFIGLOCATION: " + WRMLCONFIGLOCATIONTAG);
+		}
+			
 		if(configFile == null || !configFile.exists())
 		{
 			location = System.getProperty(WRMLCONFIGLOCATIONTAG);
 			if(location != null)
+			{
 				configFile = new File(location);
+				log.info("Setting config location to WRMLCONFIGLOCATIONTAG: " + WRMLCONFIGLOCATIONTAG);
+			}
 		}
 		
 		if(configFile == null || !configFile.exists())
-			configFile = new File(WRMLCONFIGLOCSTIONCLASSPATH);
+		{
+			URL resource = Thread.currentThread().getContextClassLoader().getResource(WRMLCONFIGFILE);
+			if(resource != null)
+			{
+				configFile = new File(resource.getFile());
+						
+				log.info("Setting config location to WRMLCONFIGLOCSTIONCLASSPATH: " + WRMLCONFIGFILE);
+			}
+		}
 			
-		if(!configFile.exists())
+		if(configFile == null || !configFile.exists())
+		{
 			configFile = new File(WRMLCONFIGLOCATIONDEFAULT);
+			log.info("Setting config location to WRMLCONFIGLOCATIONDEFAULT: " + WRMLCONFIGLOCATIONDEFAULT);
+		}
 		
 		return configFile;
 	}
@@ -75,17 +96,28 @@ public class ServiceConfigurator
 	{
 		ObjectMapper mapper = new ObjectMapper();
 		
-		try {
+		try 
+		{
 			ServiceConfig config = mapper.readValue(configFile, ServiceConfig.class);
-		} catch (JsonParseException e) {
+		} 
+		catch (JsonParseException e) 
+		{
+			log.warning("Unable to read in base service config:" + e);
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			RequestHandler.TEST = "fail1 " + e.toString();
-		} catch (JsonMappingException e) {
+		} 
+		catch (JsonMappingException e) 
+		{
+			log.warning("Unable to read in base service config:" + e);
+			
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			RequestHandler.TEST = "fail2 " + e.toString();
-		} catch (IOException e) {
+		} 
+		catch (IOException e) 
+		{
+			log.warning("Unable to read in base service config:" + e);
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			RequestHandler.TEST = "fail3 " + e.toString();
