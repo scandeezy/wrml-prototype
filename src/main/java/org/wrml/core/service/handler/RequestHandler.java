@@ -48,7 +48,14 @@ public class RequestHandler extends HttpServlet
 	    
 	    // Build the special context
 	    ServiceConfigurator sc = ServiceConfigurator.getInstance();
-	    sc.init(config);
+	    try
+        {
+	        sc.init(config);
+        } catch (IOException e)
+        {
+	        // TODO Auto-generated catch block
+	        e.printStackTrace();
+        }
 	    
 	    serviceMap = sc.getServiceMap();
 	    

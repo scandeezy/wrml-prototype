@@ -16,8 +16,10 @@
 
 package org.wrml.core.service;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Iterator;
@@ -68,7 +70,30 @@ public class ServiceConfigurator
 		return serviceMap;
 	}
 
-	private File locateConfig(ServletConfig config)
+	/*private URL locateConfigURL(ServletConfig servletConfig)
+	{
+		// Check if we were given a location to look at from the xml
+		String location = servletConfig.getInitParameter(WRMLCONFIGLOCATIONTAG);
+		URL config = null;
+		
+		if (null != location)
+		{
+//			config = new URL(location);
+			log.info("Setting config location to WRMLCONFIGLOCATION: " + WRMLCONFIGLOCATIONTAG);
+
+		}
+		
+		
+		URL resource = servletConfig.getServletContext().getResource("/WEB-INF/wrml.config");
+		java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(resource.openStream()));
+
+		ObjectMapper mapper = new ObjectMapper();
+		ServiceConfig svcConfig = mapper.readValue(in, ServiceConfig.class);
+		System.out.println(mapper.writeValueAsString(svcConfig));
+		
+	}*/
+	
+	private URL locateConfig(ServletConfig config) throws MalformedURLException
 	{
 		// Check if we were given a location to look at from the xml
 		String location = config.getInitParameter(WRMLCONFIGLOCATIONTAG);
@@ -108,11 +133,13 @@ public class ServiceConfigurator
 
 			if(resource != null)
 			{
-				log.info("JCLIFFE: " + resource.getPath());
+//				log.info("JCLIFFE: " + resource.getPath());
 
-				configFile = new File(resource.getFile());
+				// configFile = new File(resource.getFile());
 
 				log.info("Setting config location to WRMLCONFIGLOCSTIONCLASSPATH: " + WRMLCONFIGFILE);
+				
+				return resource;
 			}
 		}
 
@@ -122,7 +149,7 @@ public class ServiceConfigurator
 			log.info("Setting config location to WRMLCONFIGLOCATIONDEFAULT: " + WRMLCONFIGLOCATIONDEFAULT);
 		}
 
-		return configFile;
+		return configFile.toURI().toURL();
 	}
 
 	private void pullInConfig(File configFile)
@@ -132,6 +159,7 @@ public class ServiceConfigurator
 		try 
 		{
 			ServiceConfig config = mapper.readValue(configFile, ServiceConfig.class);
+			log.info("CONFIG VALUES: " + mapper.writeValueAsString(config));
 		} 
 		catch (JsonParseException e) 
 		{
@@ -157,59 +185,60 @@ public class ServiceConfigurator
 		}
 	}
 
-	public void init(ServletConfig config)
+	private void pullInConfig(URL config) throws IOException
+	{
+		ObjectMapper mapper = new ObjectMapper();
+		
+		//BufferedReader in = new BufferedReader(new InputStreamReader(config.openStream()));
+
+		try 
+		{
+			ServiceConfig svcConfig = mapper.readValue(config, ServiceConfig.class);
+			log.info("CONFIG VALUES: " + mapper.writeValueAsString(svcConfig));
+		} 
+		catch (JsonParseException e) 
+		{
+			log.warning("Unable to read in base service config:" + e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			RequestHandler.TEST = "fail1 " + e.toString();
+		} 
+		catch (JsonMappingException e) 
+		{
+			log.warning("Unable to read in base service config:" + e);
+
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			RequestHandler.TEST = "fail2 " + e.toString();
+		} 
+		catch (IOException e) 
+		{
+			log.warning("Unable to read in base service config:" + e);
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			RequestHandler.TEST = "fail3 " + e.toString();
+		}
+	}
+	
+	public void init(ServletConfig config) throws IOException
 	{
 		// Check if we were given a location to look at from the xml
-		File configFile = locateConfig(config);
+		URL configFile = locateConfig(config);
 
-		if(configFile.exists())
+		pullInConfig(configFile);
+		
+/*		if(configFile.exists())
 		{
 			serviceMap = null;
 
 			pullInConfig(configFile);
 
-			/*
- 			//load up
-			ObjectMapper mapper = new ObjectMapper();
-			try
-			{
-				JsonNode rootNode = mapper.readValue(configFile,JsonNode.class);
-				Iterator<Entry<String, JsonNode>> iter = rootNode.getFields();
-				RequestHandler.TEST = "configed: ";
-				while(iter.hasNext())
-				{
-					Entry<String, JsonNode> entry = iter.next();
-					RequestHandler.TEST = RequestHandler.TEST + entry.getKey() + ", " + entry.getValue().getTextValue() + " ";
-				}
-
-				JsonNode apis = rootNode.get(APIKEY);
-				loadAPIs(apis);
-			} 
-			catch (JsonParseException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				RequestHandler.TEST = "fail1 " + e.toString();
-			}
-			catch (JsonMappingException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				RequestHandler.TEST = "fail2";
-			}
-			catch (IOException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				RequestHandler.TEST = "fail3";
-			}
-			 */
 		}
 		else
 		{
 			//boo?
 			RequestHandler.TEST = "fail4";
-		}
+		}*/
 	}
 
 	private void loadAPIs(JsonNode apis)
