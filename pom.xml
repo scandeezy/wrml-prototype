@@ -20,7 +20,7 @@
     <groupId>org.wrml</groupId>
     <artifactId>wrml-prototype</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
 
     <name>wrml-prototype</name>
     <description>A prototype for the Web Resource Modeling Language (WRML).</description>
@@ -87,10 +87,10 @@
         <url>https://wrmlorg.jira.com/browse/PROTO</url>
     </issueManagement>
 
-    <ciManagement>
+    <!-- <ciManagement>
         <system>TeamCity</system>
         <url>http://dev.fanclout.com/teamcity/project.html?projectId=project5</url>
-    </ciManagement>
+    </ciManagement> -->
 
     <scm>
         <url>https://github.com/wrml/wrml-prototype</url>
@@ -219,7 +219,10 @@
                              http://code.google.com/p/maven-license-plugin/issues/detail?id=88 -->
                         <exclude>.gitignore</exclude>
                         <exclude>LICENSE.txt</exclude>
+                        <exclude>simple.json</exclude>
+                        <exclude>**/src/main/webapp/WEB-INF/web.xml</exclude>
                     </excludes>
+                    <useDefaultExcludes>true</useDefaultExcludes>
                     <strictCheck>true</strictCheck>
                     <mapping>
                         <md>XML_STYLE</md>
@@ -268,11 +271,32 @@
                     <webResources>
                         <resource>
                             <!-- this is relative to the pom.xml directory -->
-                            <directory>resource-ext</directory>
+                            <directory>src/main/webapp</directory>
                         </resource>
                     </webResources>
                 </configuration>
             </plugin>
+            <plugin>
+            	<groupId>org.apache.maven.plugins</groupId>
+            	<artifactId>maven-dependency-plugin</artifactId>
+        	    <version>2.3</version>
+    	        <executions>
+	                <execution>
+                    	<phase>package</phase>
+                	    <goals><goal>copy</goal></goals>
+            	        <configuration>
+        	                <artifactItems>
+    	                        <artifactItem>
+	                                <groupId>org.mortbay.jetty</groupId>
+                                	<artifactId>jetty-runner</artifactId>
+                            	    <version>7.5.4.v20111024</version>
+                        	        <destFileName>jetty-runner.jar</destFileName>
+                    	        </artifactItem>
+                	        </artifactItems>
+            	        </configuration>
+        	        </execution>
+    	        </executions>
+	        </plugin>
         </plugins>
     </build>
 
@@ -292,7 +316,7 @@
             <url>gitsite:git@github.com/wrml/wrml-prototype.git</url>
         </site>
 
-        <!-- This is temporarily set to use the FanClout Nexus instance until we get a Sonatype OSS Hosted Repository -->
+        <!-- This is temporarily set to use the FanClout Nexus instance until we get a Sonatype OSS Hosted Repository 
         <repository>
             <id>fanclout.releases</id>
             <url>http://dev.fanclout.com/nexus/content/repositories/releases/</url>
@@ -300,11 +324,11 @@
         <snapshotRepository>
             <id>fanclout.snapshots</id>
             <url>http://dev.fanclout.com/nexus/content/repositories/snapshots/</url>
-        </snapshotRepository>
+        </snapshotRepository> -->
     </distributionManagement>
 
 
-    <!-- The following is here temporarily during initial development. -->
+    <!-- The following is here temporarily during initial development. 
     <profiles>
         <profile>
             <id>fanclout-repo</id>
@@ -324,5 +348,5 @@
                 </pluginRepository>
             </pluginRepositories>
         </profile>
-    </profiles>
+    </profiles> -->
 </project>
