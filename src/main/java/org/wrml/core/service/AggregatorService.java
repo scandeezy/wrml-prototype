@@ -16,17 +16,49 @@
 
 package org.wrml.core.service;
 
+import java.net.URI;
 import java.util.List;
 
+import org.wrml.core.Model;
 import org.wrml.core.runtime.Context;
+import org.wrml.core.transformer.Transformer;
+import org.wrml.core.www.MediaType;
 
 /*
  * TODO: Create A base Model AggregatorService (http://en.wikipedia.org/wiki/Aggregator)
  */
-public abstract class AggregatorService extends MultiProxyService {
+public class AggregatorService extends MultiProxyService {
 
     public AggregatorService(Context context, List<Service> services) {
         super(context, services);
     }
+
+	public Object create(URI collectionId, Object requestEntity,
+			MediaType responseType, Model referrer) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Object get(URI resourceId, Object cachedEntity,
+			MediaType responseType, Model referrer) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Transformer<URI, ?> getIdTransformer() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Object put(URI resourceId, Object requestEntity,
+			MediaType responseType, Model referrer) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public Object remove(URI resourceId, MediaType responseType, Model referrer) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

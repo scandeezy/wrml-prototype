@@ -2,10 +2,10 @@ package org.wrml.core.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
-import java.util.Iterator;
-import java.util.Map.Entry;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletConfig;
 
@@ -13,12 +13,15 @@ import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.JsonParseException;
 import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.wrml.core.runtime.Context;
 import org.wrml.core.runtime.bootstrap.ServiceConfig;
-import org.wrml.core.service.handler.RequestHandler;
+//import org.wrml.core.service.handler.RequestHandler;
 
 public class ServiceConfigurator 
 {
-	private Logger log = Logger.getLogger(this.getClass().getName());
+	private Logger log = LoggerFactory.getLogger(ServiceConfigurator.class);
 	
 	public static final String APIKEY = "apis";
 	
@@ -28,7 +31,7 @@ public class ServiceConfigurator
 	
 	private static ServiceConfigurator INSTANCE = null;
 	
-	private ServiceMap serviceMap;
+	private Context context;
 	
 	private ServiceConfigurator()
 	{
@@ -43,11 +46,6 @@ public class ServiceConfigurator
 		}
 		
 		return INSTANCE;
-	}
-	
-	public ServiceMap getServiceMap()
-	{
-		return serviceMap;
 	}
 	
 	private File locateConfig(ServletConfig config)
@@ -92,36 +90,63 @@ public class ServiceConfigurator
 		return configFile;
 	}
 	
-	private void pullInConfig(File configFile)
+	private List<Service> pullInConfig(File configFile)
 	{
+		List<Service> services = new ArrayList<Service>();
 		ObjectMapper mapper = new ObjectMapper();
 		
 		try 
 		{
 			ServiceConfig config = mapper.readValue(configFile, ServiceConfig.class);
+			
+			for(URI api : config.getApiSpecifications())
+			{
+				log.info("Loading api from " + api);
+				
+				// Check if this is a file on disk
+				File apiFile = new File(api.toString());
+				if(apiFile.exists())
+				{
+					log.info("Pulling in api config from local disk...");
+					JsonNode apiConfig = mapper.readValue(apiFile, JsonNode.class);
+					// Do Magic with this thing until we figure out what it needs to be
+//					services.add(arg0);
+				}
+				else // Grab the reference to something probably over the 'net
+				{
+					URL url = api.toURL();
+					// Do Magic with this thing until we figure out what it needs to be
+					JsonNode apiConfig = mapper.readValue(url, JsonNode.class);
+//					services.add(arg0);
+				}
+			}
 		} 
 		catch (JsonParseException e) 
 		{
-			log.warning("Unable to read in base service config:" + e);
+			log.error("Unable to read in base service config", e);
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			RequestHandler.TEST = "fail1 " + e.toString();
 		} 
 		catch (JsonMappingException e) 
 		{
-			log.warning("Unable to read in base service config:" + e);
+			log.error("Unable to read in base service config", e);
 			
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			RequestHandler.TEST = "fail2 " + e.toString();
 		} 
 		catch (IOException e) 
 		{
-			log.warning("Unable to read in base service config:" + e);
+			log.error("Unable to read in base service config", e);
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-			RequestHandler.TEST = "fail3 " + e.toString();
 		}
+		
+		return services;
+	}
+	
+	public Context getContext()
+	{
+		return this.context;
 	}
 	
 	public void init(ServletConfig config)
@@ -131,62 +156,14 @@ public class ServiceConfigurator
 		
 		if(configFile.exists())
 		{
-			serviceMap = null;
-
-			pullInConfig(configFile);
-//			
-//			//load up
-//			ObjectMapper mapper = new ObjectMapper();
-//			try
-//			{
-//				JsonNode rootNode = mapper.readValue(configFile,JsonNode.class);
-//				Iterator<Entry<String, JsonNode>> iter = rootNode.getFields();
-//				RequestHandler.TEST = "configed: ";
-//				while(iter.hasNext())
-//				{
-//					Entry<String, JsonNode> entry = iter.next();
-//					RequestHandler.TEST = RequestHandler.TEST + entry.getKey() + ", " + entry.getValue().getTextValue() + " ";
-//				}
-//				
-//				JsonNode apis = rootNode.get(APIKEY);
-//				loadAPIs(apis);
-//			} 
-//			catch (JsonParseException e)
-//			{
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//				RequestHandler.TEST = "fail1 " + e.toString();
-//			}
-//			catch (JsonMappingException e)
-//			{
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//				RequestHandler.TEST = "fail2";
-//			}
-//			catch (IOException e)
-//			{
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//				RequestHandler.TEST = "fail3";
-//			}
+			List<Service> services = pullInConfig(configFile);
+			this.context = new Context(null);
+			log.info("Context initialized");
 		}
 		else
 		{
 			//boo?
-			RequestHandler.TEST = "fail4";
-		}
-	}
-	
-	private void loadAPIs(JsonNode apis)
-	{
-		Iterator<Entry<String,JsonNode>> apiIterator = apis.getFields();
-		
-		// Pull out each config and construct the corresponding API
-		while(apiIterator.hasNext())
-		{
-			Entry<String, JsonNode> apiEntry = apiIterator.next();
-			RequestHandler.TEST += apiEntry.getKey() + " : " + apiEntry.getValue().asText() + " ";
-			
+			log.error("Unexpected case met, config file does not exist");
 		}
 	}
 }
