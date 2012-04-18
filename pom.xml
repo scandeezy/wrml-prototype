@@ -221,6 +221,7 @@
                         <exclude>LICENSE.txt</exclude>
                         <exclude>simple.json</exclude>
                         <exclude>**/src/main/webapp/WEB-INF/web.xml</exclude>
+                        <exclude>**/src/main/webapp/WEB-INF/classes/log4j.properties</exclude>
                     </excludes>
                     <useDefaultExcludes>true</useDefaultExcludes>
                     <strictCheck>true</strictCheck>
