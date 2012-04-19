@@ -18,8 +18,9 @@ package org.wrml.core.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
+import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -36,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wrml.core.runtime.Context;
 import org.wrml.core.runtime.bootstrap.ServiceConfig;
-//import org.wrml.core.service.handler.RequestHandler;
 
 public class ServiceConfigurator 
 {
@@ -122,57 +122,56 @@ public class ServiceConfigurator
 		return configFile.toURI().toURL();
 	}
 
-	private List<Service> pullInConfig(URL config) throws IOException
+	private List<Service> pullInConfig(ServletConfig servletConfig, URL wrmlConfig)
 	{
 		List<Service> services = new ArrayList<Service>();
 		ObjectMapper mapper = new ObjectMapper();
-		
+
 		//BufferedReader in = new BufferedReader(new InputStreamReader(config.openStream()));
+
+		ServiceConfig svcConfig;
 
 		try 
 		{
-			ServiceConfig svcConfig = mapper.readValue(config, ServiceConfig.class);
-			
-			for(URI api : svcConfig.getApiSpecifications())
-			{
-				log.info("Loading api from " + api);
-				
-				// Check if this is a file on disk
-				File apiFile = new File(api.toString());
-				if(apiFile.exists())
-				{
-					log.info("Pulling in api config from local disk...");
-					JsonNode apiConfig = mapper.readValue(apiFile, JsonNode.class);
-					// Do Magic with this thing until we figure out what it needs to be
-//					services.add(arg0);
-				}
-				else // Grab the reference to something probably over the 'net
-				{
-					URL url = api.toURL();
-					// Do Magic with this thing until we figure out what it needs to be
-					JsonNode apiConfig = mapper.readValue(url, JsonNode.class);
-//					services.add(arg0);
-				}
-			}
-			log.info("CONFIG VALUES: " + mapper.writeValueAsString(svcConfig));
-		} 
-		catch (JsonParseException e) 
-		{
-			log.error("Unable to read in base service config:" + e);
-		} 
-		catch (JsonMappingException e) 
-		{
-			log.error("Unable to read in base service config:" + e);
-		} 
-		catch (IOException e) 
-		{
-			log.error("Unable to read in base service config", e);
+			svcConfig = mapper.readValue(wrmlConfig, ServiceConfig.class);
 		}
-		
+		catch (IOException e)
+		{
+			log.error("Unable to read in base service config:" + e);
+			e.printStackTrace();
+
+			return null;
+		}
+
+		for(URL api : svcConfig.getRemoteSpecifications())
+		{
+			log.info("Loading api from " + api);
+
+			try
+			{
+				JsonNode apiConfig = mapper.readValue(api.openStream(), JsonNode.class);
+				log.info("loaded remote API specification: " + mapper.writeValueAsString(apiConfig));
+				// TODO something
+			} catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+		try
+		{
+			log.info("CONFIG VALUES: " + mapper.writeValueAsString(svcConfig));
+		} catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		// TODO: Change this mofo
 		// Do something to init context
 		this.context = new Context(null);
-		
+
 		return services;
 	}
 	
@@ -186,7 +185,7 @@ public class ServiceConfigurator
 		// Check if we were given a location to look at from the xml
 		URL configFile = locateConfig(config);
 
-		pullInConfig(configFile);
+		pullInConfig(config, configFile);
 	}
 
 	private void loadAPIs(JsonNode apis)

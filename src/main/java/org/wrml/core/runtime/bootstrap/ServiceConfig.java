@@ -16,32 +16,50 @@
 
 package org.wrml.core.runtime.bootstrap;
 
-import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.codehaus.jackson.JsonNode;
+
 public class ServiceConfig 
-{
-	private List<URI> apiSpecifications;
+{	
+	private List<JsonNode> apiSpecifications;
+	private List<URL> remoteSpecifications;
 	
 	public ServiceConfig()
 	{
-		apiSpecifications = new ArrayList<URI>();
+		apiSpecifications = new ArrayList<JsonNode>();
 	}
 	
-	public void setApiSpecifications(List<URI> apiSpecifications)
+	public List<JsonNode> getApiSpecifications()
+	{
+		return apiSpecifications;
+	}
+	
+	public void setApiSpecifications(List<JsonNode> apiSpecifications)
 	{
 		this.apiSpecifications = apiSpecifications;
 	}
 	
-	public void addApiSpecification(URI spec)
+	public void addApiSpecification(JsonNode value)
 	{
-		this.apiSpecifications.add(spec);
+		apiSpecifications.add(value);
 	}
+
+	public List<URL> getRemoteSpecifications()
+    {
+	    return remoteSpecifications;
+    }
 	
-	public List<URI> getApiSpecifications()
+	public void addRemoteSpecification(URL spec)
 	{
-		return this.apiSpecifications;
+		remoteSpecifications.add(spec);
 	}
+
+	public void setRemoteSpecifications(List<URL> remoteSpecifications)
+    {
+	    this.remoteSpecifications = remoteSpecifications;
+    }
 
 }
