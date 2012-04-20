@@ -20,7 +20,10 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletConfig;
@@ -33,6 +36,9 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wrml.core.runtime.Context;
+import org.wrml.core.runtime.bootstrap.ServiceConfig;
+import org.wrml.core.service.API;
+import org.wrml.core.service.AggregatorService;
 import org.wrml.core.service.Service;
 import org.wrml.core.service.ServiceConfigurator;
 import org.wrml.core.service.ServiceMap;
@@ -44,9 +50,11 @@ public class RequestHandler extends HttpServlet
 	public static String TEST = "it worked!!!!";
 	
 	private ObjectMapper mapper;
+	private AggregatorService serviceMap;
 	private Context context;
 	
-	public void init(ServletConfig config) throws ServletException {
+	public void init(ServletConfig config) throws ServletException
+	{
 	    super.init(config);
 	    
 	    log.info("Initializing RequestHandler");
@@ -54,19 +62,25 @@ public class RequestHandler extends HttpServlet
 	    mapper = new ObjectMapper();
 	    
 	    // Build the special context
+	    // Temp to spit out example config
+	    
 	    ServiceConfigurator sc = ServiceConfigurator.getInstance();
 	    try
         {
 	        sc.init(config);
-        } catch (IOException e)
+        } 
+	    catch (IOException e)
         {
-	        // TODO Auto-generated catch block
-	        e.printStackTrace();
+	        log.error("Unable to initialize the Service Configurator", e);
         }
 	    
 	    this.context = sc.getContext();
+	    
+	    
 	    if(this.context == null)
-	    	log.info("Context is null");
+	    	log.error("Context is null");
+	    
+//	    serviceMap = new AggregatorService(context);
 	}
 	
 	public Map<String,String> parseMediaType(String mediaType)
@@ -119,12 +133,12 @@ public class RequestHandler extends HttpServlet
 			{
 				schema = new URI(mediaTypes.get("schema"));
 				Service service = context.getService(schema);
+				PrintWriter out = resp.getWriter();
+				out.println("Found service by schema to map to");
 			} 
 			catch (URISyntaxException e) 
 			{
-				
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				log.error("Uri syntax for a map request is incorrect", e);
 			}
 //			Object obj = null;
 //			switch (method) 
@@ -132,10 +146,25 @@ public class RequestHandler extends HttpServlet
 //				case "GET" : obj = service.get(uri); break;
 //				default : break;
 //			}
+			catch (IOException e)
+			{
+				log.error("IO exception while mapping request", e);
+			}
 		}
 		else // Map to the uri default handler
 		{
 			Service service = context.getService(uri);
+			PrintWriter out;
+			
+			try 
+			{
+				out = resp.getWriter();
+				out.println("Found service by URI to map to");
+			} 
+			catch (IOException e) 
+			{
+				log.error("IO exception while mapping request", e);
+			}
 		}
 	}
 	
@@ -157,7 +186,46 @@ public class RequestHandler extends HttpServlet
 		resp.setStatus(HttpServletResponse.SC_OK);
 		resp.setContentType("text/html");
 //		resp.setContentType("application/json");
-
+		
+		/*
+		ServiceConfig conf = new ServiceConfig();
+		List<API> apiSpecifications = new ArrayList<API>();
+		API example = new API();
+		example.setName("Boris");
+		try {
+			URI mooseSchema = new URI("http://www.wrml.org/examples/moose");
+			URI squirrelSchema = new URI("http://www.wrml.org/examples/squirrel");
+			String service1 = "org.wrml.example.exampleService1";
+			String service2 = "org.wrml.example.exampleService2";
+			
+			example.addPathSchema(new URI("/"), mooseSchema);
+			example.addPathSchema(new URI("/squirrel"), squirrelSchema);
+			
+			example.setSchemaService(mooseSchema, service1);
+			example.setSchemaService(squirrelSchema, service2);
+			
+			URI jarLocation = new URI("http://www.wrml.org/dependencies/service.jar");
+			List<URI> jarLocations = new ArrayList<URI>();
+			jarLocations.add(jarLocation);
+			
+			example.setService(service1, jarLocations);
+			example.setService(service2, jarLocations);
+		} catch (URISyntaxException e) {
+			log.error("Unable to do my URI thing", e);
+		}
+		apiSpecifications.add(example);
+		conf.setApiSpecifications(apiSpecifications);
+		
+		PrintWriter out;
+		try {
+			out = resp.getWriter();
+			
+			mapper.writeValue(out, conf);
+		} catch (IOException e) {
+			log.error("Damnit", e);
+		}
+		*/
+		
 //		try
 //		{
 //			PrintWriter out = resp.getWriter();

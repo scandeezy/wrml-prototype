@@ -16,75 +16,33 @@
 
 package org.wrml.core.runtime.bootstrap;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.codehaus.jackson.JsonNode;
+import org.wrml.core.service.API;
 
-public class ServiceConfig 
-{	
-	private List<JsonNode> apiSpecifications;
-	private List<URL> remoteSpecifications;
-	private Map<String, String> configValues;
-		
+public class ServiceConfig
+{
+	private List<API> apiSpecifications;
+	
 	public ServiceConfig()
 	{
-		apiSpecifications = new ArrayList<JsonNode>();
+		apiSpecifications = new ArrayList<API>();
 	}
 	
-	
-	public List<JsonNode> getApiSpecifications()
-	{
-		return apiSpecifications;
-	}
-	
-	public void setApiSpecifications(List<JsonNode> apiSpecifications)
+	public void setApiSpecifications(List<API> apiSpecifications)
 	{
 		this.apiSpecifications = apiSpecifications;
 	}
 	
-	public void addApiSpecification(JsonNode value)
+	public void addApiSpecification(API spec)
 	{
-		apiSpecifications.add(value);
-	}
-
-	
-	public List<URL> getRemoteSpecifications()
-    {
-	    return remoteSpecifications;
-    }
-	
-	public void setRemoteSpecifications(List<URL> remoteSpecifications)
-    {
-	    this.remoteSpecifications = remoteSpecifications;
-    }
-	
-	public void addRemoteSpecification(URL spec)
-	{
-		remoteSpecifications.add(spec);
-	}
-
-	
-	public Map<String, String> getConfigValues()
-    {
-	    return configValues;
-    }
-
-	public void setConfigValues(Map<String, String> configStore)
-    {
-	    this.configValues = configStore;
-    }
-	
-	public String getConfigValue(String key)
-	{
-		return configValues.get(key);
+		this.apiSpecifications.add(spec);
 	}
 	
-	public void addConfigValue(String key, String value)
+	public List<API> getApiSpecifications()
 	{
-		configValues.put(key, value);
+		return this.apiSpecifications;
 	}
 
 }

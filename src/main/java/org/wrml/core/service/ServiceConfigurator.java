@@ -18,13 +18,13 @@ package org.wrml.core.service;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.ServletConfig;
@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wrml.core.runtime.Context;
 import org.wrml.core.runtime.bootstrap.ServiceConfig;
+//import org.wrml.core.service.handler.RequestHandler;
 
 public class ServiceConfigurator 
 {
@@ -52,6 +53,7 @@ public class ServiceConfigurator
 	private static ServiceConfigurator INSTANCE = null;
 	
 	private Context context;
+	private AggregatorService aggregator;
 	
 	private ServiceConfigurator()
 	{
@@ -122,56 +124,59 @@ public class ServiceConfigurator
 		return configFile.toURI().toURL();
 	}
 
-	private List<Service> pullInConfig(ServletConfig servletConfig, URL wrmlConfig)
+	private List<Service> pullInConfig(URL config) throws IOException
 	{
 		List<Service> services = new ArrayList<Service>();
 		ObjectMapper mapper = new ObjectMapper();
-
+		
 		//BufferedReader in = new BufferedReader(new InputStreamReader(config.openStream()));
-
-		ServiceConfig svcConfig;
 
 		try 
 		{
-			svcConfig = mapper.readValue(wrmlConfig, ServiceConfig.class);
-		}
-		catch (IOException e)
+			ServiceConfig svcConfig = mapper.readValue(config, ServiceConfig.class);
+			
+			// TODO Unhack this (serviceconfig instead of config)
+			this.context = new Context(svcConfig);
+//			aggregator = new AggregatorService(context);
+			
+			for(API api : svcConfig.getApiSpecifications())
+			{
+				log.info("Loading api : " + api.getName());
+				
+				Map<URI, List<URI>> pathMap = api.getPathMap();
+				log.info("loading paths");
+				for(URI path : pathMap.keySet())
+				{
+					log.info("Configuring path : " + path );
+				}
+				
+				log.info("loading schemas");
+				for(URI schema : api.getSchemaMap().keySet())
+				{
+					log.info("loading schema : " + schema);
+				}
+				
+				log.info("loading services");
+				for(String service : api.getServiceJars().keySet())
+				{
+					log.info("loading service : " + service);
+				}
+			}
+			log.info("CONFIG VALUES: " + mapper.writeValueAsString(svcConfig));
+		} 
+		catch (JsonParseException e) 
 		{
 			log.error("Unable to read in base service config:" + e);
-			e.printStackTrace();
-
-			return null;
-		}
-
-		for(URL api : svcConfig.getRemoteSpecifications())
+		} 
+		catch (JsonMappingException e) 
 		{
-			log.info("Loading api from " + api);
-
-			try
-			{
-				JsonNode apiConfig = mapper.readValue(api.openStream(), JsonNode.class);
-				log.info("loaded remote API specification: " + mapper.writeValueAsString(apiConfig));
-				// TODO something
-			} catch (IOException e)
-			{
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-
-		}
-		try
+			log.error("Unable to read in base service config:" + e);
+		} 
+		catch (IOException e) 
 		{
-			log.info("CONFIG VALUES: " + mapper.writeValueAsString(svcConfig));
-		} catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.error("Unable to read in base service config", e);
 		}
-
-		// TODO: Change this mofo
-		// Do something to init context
-		this.context = new Context(null);
-
+		
 		return services;
 	}
 	
@@ -185,7 +190,7 @@ public class ServiceConfigurator
 		// Check if we were given a location to look at from the xml
 		URL configFile = locateConfig(config);
 
-		pullInConfig(config, configFile);
+		pullInConfig(configFile);
 	}
 
 	private void loadAPIs(JsonNode apis)

@@ -21,6 +21,8 @@ import java.util.List;
 import org.wrml.core.runtime.Context;
 import org.wrml.core.util.observable.DelegatingObservableList;
 
+import java.util.Collections;
+
 /**
  * TODO: Make this a useful base class for various types of multiproxies (load
  * balancers, aggregators, and other cluster-oriented operators).
@@ -29,9 +31,11 @@ public abstract class MultiProxyService extends ServiceMap implements Delegating
 
     private final DelegatingObservableList<Service> _Services;
 
-    public MultiProxyService(Context context, List<Service> services) {
+    public MultiProxyService(Context context) {
         super(context);
-        _Services = new DelegatingObservableList<Service>(services);
+        List<Service> tempServices = Collections.<Service>emptyList();
+        tempServices.addAll(context.getServices().values());
+        _Services = new DelegatingObservableList<Service>(tempServices);
     }
 
     public List<Service> getDelegate() {
