@@ -16,30 +16,31 @@
 
 package org.wrml.core.runtime.bootstrap;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ServiceConfig 
+import org.wrml.core.service.API;
+
+public class ServiceConfig
 {
-	private List<URI> apiSpecifications;
+	private List<API> apiSpecifications;
 	
 	public ServiceConfig()
 	{
-		apiSpecifications = new ArrayList<URI>();
+		apiSpecifications = new ArrayList<API>();
 	}
 	
-	public void setApiSpecifications(List<URI> apiSpecifications)
+	public void setApiSpecifications(List<API> apiSpecifications)
 	{
 		this.apiSpecifications = apiSpecifications;
 	}
 	
-	public void addApiSpecification(URI spec)
+	public void addApiSpecification(API spec)
 	{
 		this.apiSpecifications.add(spec);
 	}
 	
-	public List<URI> getApiSpecifications()
+	public List<API> getApiSpecifications()
 	{
 		return this.apiSpecifications;
 	}

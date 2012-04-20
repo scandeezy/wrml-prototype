@@ -37,8 +37,9 @@ public class App {
 
         final Config config = createConfig(args);
 
-        final Context context = new Context(config);
+//        final Context context = new Context(config);
 
+        final Context context = new Context(null);
         /*
          * The above code exercised the "bootstrap" meta schema, which is
          * handled internally by the core framework implementation, without

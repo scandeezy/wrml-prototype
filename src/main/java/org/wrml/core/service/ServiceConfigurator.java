@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.servlet.ServletConfig;
@@ -52,6 +53,7 @@ public class ServiceConfigurator
 	private static ServiceConfigurator INSTANCE = null;
 	
 	private Context context;
+	private AggregatorService aggregator;
 	
 	private ServiceConfigurator()
 	{
@@ -133,25 +135,31 @@ public class ServiceConfigurator
 		{
 			ServiceConfig svcConfig = mapper.readValue(config, ServiceConfig.class);
 			
-			for(URI api : svcConfig.getApiSpecifications())
+			// TODO Unhack this (serviceconfig instead of config)
+			this.context = new Context(svcConfig);
+//			aggregator = new AggregatorService(context);
+			
+			for(API api : svcConfig.getApiSpecifications())
 			{
-				log.info("Loading api from " + api);
+				log.info("Loading api : " + api.getName());
 				
-				// Check if this is a file on disk
-				File apiFile = new File(api.toString());
-				if(apiFile.exists())
+				Map<URI, List<URI>> pathMap = api.getPathMap();
+				log.info("loading paths");
+				for(URI path : pathMap.keySet())
 				{
-					log.info("Pulling in api config from local disk...");
-					JsonNode apiConfig = mapper.readValue(apiFile, JsonNode.class);
-					// Do Magic with this thing until we figure out what it needs to be
-//					services.add(arg0);
+					log.info("Configuring path : " + path );
 				}
-				else // Grab the reference to something probably over the 'net
+				
+				log.info("loading schemas");
+				for(URI schema : api.getSchemaMap().keySet())
 				{
-					URL url = api.toURL();
-					// Do Magic with this thing until we figure out what it needs to be
-					JsonNode apiConfig = mapper.readValue(url, JsonNode.class);
-//					services.add(arg0);
+					log.info("loading schema : " + schema);
+				}
+				
+				log.info("loading services");
+				for(String service : api.getServiceJars().keySet())
+				{
+					log.info("loading service : " + service);
 				}
 			}
 			log.info("CONFIG VALUES: " + mapper.writeValueAsString(svcConfig));
@@ -168,10 +176,6 @@ public class ServiceConfigurator
 		{
 			log.error("Unable to read in base service config", e);
 		}
-		
-		// TODO: Change this mofo
-		// Do something to init context
-		this.context = new Context(null);
 		
 		return services;
 	}

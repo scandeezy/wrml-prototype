@@ -29,8 +29,8 @@ import org.wrml.core.www.MediaType;
  */
 public class AggregatorService extends MultiProxyService {
 
-    public AggregatorService(Context context, List<Service> services) {
-        super(context, services);
+    public AggregatorService(Context context) {
+        super(context);
     }
 
 	public Object create(URI collectionId, Object requestEntity,
