@@ -19,6 +19,7 @@ package org.wrml.core.runtime.bootstrap;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.codehaus.jackson.JsonNode;
 
@@ -26,11 +27,13 @@ public class ServiceConfig
 {	
 	private List<JsonNode> apiSpecifications;
 	private List<URL> remoteSpecifications;
-	
+	private Map<String, String> configValues;
+		
 	public ServiceConfig()
 	{
 		apiSpecifications = new ArrayList<JsonNode>();
 	}
+	
 	
 	public List<JsonNode> getApiSpecifications()
 	{
@@ -47,9 +50,15 @@ public class ServiceConfig
 		apiSpecifications.add(value);
 	}
 
+	
 	public List<URL> getRemoteSpecifications()
     {
 	    return remoteSpecifications;
+    }
+	
+	public void setRemoteSpecifications(List<URL> remoteSpecifications)
+    {
+	    this.remoteSpecifications = remoteSpecifications;
     }
 	
 	public void addRemoteSpecification(URL spec)
@@ -57,9 +66,25 @@ public class ServiceConfig
 		remoteSpecifications.add(spec);
 	}
 
-	public void setRemoteSpecifications(List<URL> remoteSpecifications)
+	
+	public Map<String, String> getConfigValues()
     {
-	    this.remoteSpecifications = remoteSpecifications;
+	    return configValues;
     }
+
+	public void setConfigValues(Map<String, String> configStore)
+    {
+	    this.configValues = configStore;
+    }
+	
+	public String getConfigValue(String key)
+	{
+		return configValues.get(key);
+	}
+	
+	public void addConfigValue(String key, String value)
+	{
+		configValues.put(key, value);
+	}
 
 }

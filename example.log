@@ -1,0 +1,54 @@
+1    [qtp1728468445-12 - /wrml-prototype/moose/] INFO  org.wrml.core.service.handler.RequestHandler  - Initializing RequestHandler
+206  [qtp1728468445-12 - /wrml-prototype/moose/] INFO  org.wrml.core.service.ServiceConfigurator  - Setting config location to WRMLCONFIGLOCSTIONCLASSPATH: wrml.config
+273  [qtp1728468445-12 - /wrml-prototype/moose/] INFO  org.wrml.core.service.ServiceConfigurator  - Loading api from /etc/wrml/example.api
+1    [qtp1357862146-18 - /moose] INFO  org.wrml.core.service.handler.RequestHandler  - Initializing RequestHandler
+188  [qtp1357862146-18 - /moose] INFO  org.wrml.core.service.ServiceConfigurator  - Setting config location to WRMLCONFIGLOCSTIONCLASSPATH: wrml.config
+243  [qtp1357862146-18 - /moose] INFO  org.wrml.core.service.ServiceConfigurator  - Loading api from /etc/wrml/example.api
+0    [qtp280371153-15 - /wrml-prototype/] INFO  org.wrml.core.service.handler.RequestHandler  - Initializing RequestHandler
+195  [qtp280371153-15 - /wrml-prototype/] INFO  org.wrml.core.service.ServiceConfigurator  - Setting config location to WRMLCONFIGLOCSTIONCLASSPATH: wrml.config
+256  [qtp280371153-15 - /wrml-prototype/] ERROR org.wrml.core.service.ServiceConfigurator  - Unable to read in base service config:org.codehaus.jackson.JsonParseException: Unrecognized character escape 'g' (code 103)
+ at [Source: file:/C:/git/scandeezy/target/wrml-prototype-1.0-SNAPSHOT/WEB-INF/wrml.config; line: 4, column: 14]
+466  [qtp280371153-15 - /wrml-prototype/] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+466  [qtp280371153-15 - /wrml-prototype/] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+3519 [qtp280371153-17 - /] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+3520 [qtp280371153-17 - /] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+0    [qtp1728468445-13 - /] INFO  org.wrml.core.service.handler.RequestHandler  - Initializing RequestHandler
+220  [qtp1728468445-13 - /] INFO  org.wrml.core.service.ServiceConfigurator  - Setting config location to WRMLCONFIGLOCSTIONCLASSPATH: wrml.config
+296  [qtp1728468445-13 - /] INFO  org.wrml.core.service.ServiceConfigurator  - Loading api from file:///c:/git/scandeezy/example.api
+328  [qtp1728468445-13 - /] INFO  org.wrml.core.service.ServiceConfigurator  - CONFIG VALUES: {"apiSpecifications":["file:///c:/git/scandeezy/example.api"]}
+511  [qtp1728468445-13 - /] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+511  [qtp1728468445-13 - /] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+29108 [qtp1728468445-15 - /asdf] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+29108 [qtp1728468445-15 - /asdf] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+34044 [qtp1728468445-11 - /asdf] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+34044 [qtp1728468445-11 - /asdf] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+36740 [qtp1728468445-15 - /asdf] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+36740 [qtp1728468445-15 - /asdf] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+37793 [qtp1728468445-13 - /asdf] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+37793 [qtp1728468445-13 - /asdf] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+39671 [qtp1728468445-13 - /asdf] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+39671 [qtp1728468445-13 - /asdf] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+42243 [qtp1728468445-16 - /moose] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+42243 [qtp1728468445-16 - /moose] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+43548 [qtp1728468445-15 - /moose] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+43548 [qtp1728468445-15 - /moose] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+44335 [qtp1728468445-16 - /moose] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+44335 [qtp1728468445-16 - /moose] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+45423 [qtp1728468445-11 - /moose] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+45423 [qtp1728468445-11 - /moose] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+70711 [qtp1728468445-13 - /squirrel] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+70711 [qtp1728468445-13 - /squirrel] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+0    [qtp280371153-17 - /squirrel] INFO  org.wrml.core.service.handler.RequestHandler  - Initializing RequestHandler
+195  [qtp280371153-17 - /squirrel] INFO  org.wrml.core.service.ServiceConfigurator  - Setting config location to WRMLCONFIGLOCSTIONCLASSPATH: wrml.config
+269  [qtp280371153-17 - /squirrel] INFO  org.wrml.core.service.ServiceConfigurator  - Loading api from file:/c:/git/scandeezy/example.api
+287  [qtp280371153-17 - /squirrel] INFO  org.wrml.core.service.ServiceConfigurator  - loaded remote API specification: {"name":"example","endpoints":{"/moose":["moose.service"],"/squirrel":["squirrel.service"]},"services":{"moose.service":"http://download.this.jar","squirrel.service":"http://download.this.jar.too"}}
+287  [qtp280371153-17 - /squirrel] INFO  org.wrml.core.service.ServiceConfigurator  - Loading api from http://someurl.com/apis
+14891 [qtp280371153-17 - /squirrel] INFO  org.wrml.core.service.ServiceConfigurator  - CONFIG VALUES: {"apiSpecifications":[{"name":"example","endpoints":{"/moose":["moose.service"],"/squirrel":["squirrel.service"]},"services":{"moose.service":"http://download.this.jar","squirrel.service":"http://download.this.jar.too"}}],"remoteSpecifications":["file:/c:/git/scandeezy/example.api","http://someurl.com/apis"]}
+15067 [qtp280371153-17 - /squirrel] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+15068 [qtp280371153-17 - /squirrel] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+20366 [qtp280371153-14 - /squirrel] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+20366 [qtp280371153-14 - /squirrel] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+23508 [qtp280371153-15 - /squirrel/wtf] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+23508 [qtp280371153-15 - /squirrel/wtf] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
+48659 [qtp280371153-15 - /moose/] DEBUG org.wrml.core.service.handler.RequestHandler  - Servicing new request
+48660 [qtp280371153-15 - /moose/] DEBUG org.wrml.core.service.handler.RequestHandler  - Mapping new Request with method
