@@ -31,7 +31,7 @@ import org.wrml.core.model.Document;
 import org.wrml.core.model.config.Config;
 import org.wrml.core.model.schema.Field;
 import org.wrml.core.model.schema.Schema;
-import org.wrml.core.runtime.bootstrap.ServiceConfig;
+import org.wrml.core.runtime.bootstrap.DomainConfig;
 import org.wrml.core.runtime.system.Prototype;
 import org.wrml.core.runtime.system.SystemSchemaService;
 import org.wrml.core.runtime.system.transformer.SystemTransformers;
@@ -124,7 +124,7 @@ import org.wrml.core.www.WebClient;
  */
 public class Context extends ClassLoader {
 
-    private final ServiceConfig _Config;
+    private final DomainConfig _Config;
 
     private final ModelHeap _ModelHeap;
 
@@ -147,11 +147,11 @@ public class Context extends ClassLoader {
 
     private final Service _WWW;
 
-    public Context(final ServiceConfig config) {
+    public Context(final DomainConfig config) {
         this(config, getSystemClassLoader());
     }
 
-    public Context(final ServiceConfig config, final ClassLoader parent) {
+    public Context(final DomainConfig config, final ClassLoader parent) {
         super(parent);
 
         _Config = config;
@@ -212,7 +212,7 @@ public class Context extends ClassLoader {
 
     }
 
-    public ServiceConfig getConfig() {
+    public DomainConfig getConfig() {
         return _Config;
     }
 

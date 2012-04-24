@@ -1,0 +1,15 @@
+{
+   "name" : "example",
+   "endpoints" : {
+       "/moose" : [
+           "moose.service"
+       ],
+       "/squirrel" : [
+           "squirrel.service"
+       ]
+   },
+   "services" : {
+       "moose.service" : "http://download.this.jar",
+       "squirrel.service" : "http://download.this.jar.too"
+   }
+}
