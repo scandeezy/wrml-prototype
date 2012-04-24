@@ -36,7 +36,8 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.wrml.core.runtime.Context;
-import org.wrml.core.runtime.bootstrap.ServiceConfig;
+import org.wrml.core.runtime.bootstrap.DomainConfig;
+import org.wrml.core.runtime.bootstrap.WRMLConfig;
 //import org.wrml.core.service.handler.RequestHandler;
 
 public class ServiceConfigurator 
@@ -126,43 +127,44 @@ public class ServiceConfigurator
 
 	private List<Service> pullInConfig(URL config) throws IOException
 	{
-		List<Service> services = new ArrayList<Service>();
+		List<Service> configuredServices = new ArrayList<Service>();
 		ObjectMapper mapper = new ObjectMapper();
 		
 		//BufferedReader in = new BufferedReader(new InputStreamReader(config.openStream()));
 
 		try 
 		{
-			ServiceConfig svcConfig = mapper.readValue(config, ServiceConfig.class);
+//			DomainConfig domainConfig = mapper.readValue(config, DomainConfig.class);
+			WRMLConfig wrmlConfig = mapper.readValue(config, WRMLConfig.class);
 			
-			// TODO Unhack this (serviceconfig instead of config)
-			this.context = new Context(svcConfig);
-//			aggregator = new AggregatorService(context);
-			
-			for(API api : svcConfig.getApiSpecifications())
+			for (String domain : wrmlConfig.getDomains().keySet())
 			{
-				log.info("Loading api : " + api.getName());
-				
-				Map<URI, List<URI>> pathMap = api.getPathMap();
-				log.info("loading paths");
-				for(URI path : pathMap.keySet())
+				DomainConfig domainConfig = wrmlConfig.getDomains().get(domain);
+				// TODO Unhack this (serviceconfig instead of config)
+				this.context = new Context(domainConfig);
+				//			aggregator = new AggregatorService(context);
+
+				for(APISpecification api : domainConfig.getApiSpecifications())
 				{
-					log.info("Configuring path : " + path );
-				}
-				
-				log.info("loading schemas");
-				for(URI schema : api.getSchemaMap().keySet())
-				{
-					log.info("loading schema : " + schema);
-				}
-				
-				log.info("loading services");
-				for(String service : api.getServiceJars().keySet())
-				{
-					log.info("loading service : " + service);
+					log.info("Loading api : " + api.getName());
+
+//					Map<URI, List<URI>> pathMap = api.getPathMap();
+					Map<String, List<Endpoint>> endpoints = api.getEndpoints();
+					log.info("loading path endpoints");
+					for(String path : endpoints.keySet())
+					{
+						log.info("Configuring path : " + path );
+					}
+
+					Map<String, URL> services = api.getServices();
+					log.info("loading services");
+					for(String service : services.keySet())
+					{
+						log.info("loading service : " + service);
+					}
 				}
 			}
-			log.info("CONFIG VALUES: " + mapper.writeValueAsString(svcConfig));
+			log.info("CONFIG VALUES: " + mapper.writeValueAsString(wrmlConfig));
 		} 
 		catch (JsonParseException e) 
 		{
@@ -177,7 +179,7 @@ public class ServiceConfigurator
 			log.error("Unable to read in base service config", e);
 		}
 		
-		return services;
+		return configuredServices;
 	}
 	
 	public Context getContext()

@@ -17,32 +17,52 @@
 package org.wrml.core.runtime.bootstrap;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.wrml.core.service.API;
+import org.wrml.core.service.APISpecification;
 
-public class ServiceConfig
+public class DomainConfig
 {
-	private List<API> apiSpecifications;
+	private List<APISpecification> apiSpecifications;
+	private Map<String, String> domainConfig;
 	
-	public ServiceConfig()
+	public DomainConfig()
 	{
-		apiSpecifications = new ArrayList<API>();
+		apiSpecifications = new ArrayList<APISpecification>();
+		domainConfig = new HashMap<String, String>();
 	}
 	
-	public void setApiSpecifications(List<API> apiSpecifications)
+	public void setApiSpecifications(List<APISpecification> apiSpecifications)
 	{
 		this.apiSpecifications = apiSpecifications;
 	}
 	
-	public void addApiSpecification(API spec)
+	public void addApiSpecification(APISpecification spec)
 	{
 		this.apiSpecifications.add(spec);
 	}
 	
-	public List<API> getApiSpecifications()
+	public List<APISpecification> getApiSpecifications()
 	{
 		return this.apiSpecifications;
 	}
+
+	/**
+     * @return the domainConfig
+     */
+    public Map<String, String> getDomainConfig()
+    {
+	    return domainConfig;
+    }
+
+	/**
+     * @param domainConfig the domainConfig to set
+     */
+    public void setDomainConfig(Map<String, String> domainConfig)
+    {
+	    this.domainConfig = domainConfig;
+    }
 
 }
