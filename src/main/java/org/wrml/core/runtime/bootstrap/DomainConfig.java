@@ -21,53 +21,30 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-<<<<<<< HEAD:src/main/java/org/wrml/core/runtime/bootstrap/ServiceConfig.java
-import org.wrml.core.service.API;
-
-public class ServiceConfig
-{
-	private List<API> apiSpecifications;
-=======
 import org.wrml.core.service.APISpecification;
 
 public class DomainConfig
 {
 	private List<APISpecification> apiSpecifications;
 	private Map<String, String> domainConfig;
->>>>>>> 89bcc1bf65e21f02c087ba32f4277dbd9bbc3126:src/main/java/org/wrml/core/runtime/bootstrap/DomainConfig.java
 	
 	public DomainConfig()
 	{
-<<<<<<< HEAD:src/main/java/org/wrml/core/runtime/bootstrap/ServiceConfig.java
-		apiSpecifications = new ArrayList<API>();
-	}
-	
-	public void setApiSpecifications(List<API> apiSpecifications)
-=======
 		apiSpecifications = new ArrayList<APISpecification>();
 		domainConfig = new HashMap<String, String>();
 	}
 	
 	public void setApiSpecifications(List<APISpecification> apiSpecifications)
->>>>>>> 89bcc1bf65e21f02c087ba32f4277dbd9bbc3126:src/main/java/org/wrml/core/runtime/bootstrap/DomainConfig.java
 	{
 		this.apiSpecifications = apiSpecifications;
 	}
 	
-<<<<<<< HEAD:src/main/java/org/wrml/core/runtime/bootstrap/ServiceConfig.java
-	public void addApiSpecification(API spec)
-=======
 	public void addApiSpecification(APISpecification spec)
->>>>>>> 89bcc1bf65e21f02c087ba32f4277dbd9bbc3126:src/main/java/org/wrml/core/runtime/bootstrap/DomainConfig.java
 	{
 		this.apiSpecifications.add(spec);
 	}
 	
-<<<<<<< HEAD:src/main/java/org/wrml/core/runtime/bootstrap/ServiceConfig.java
-	public List<API> getApiSpecifications()
-=======
 	public List<APISpecification> getApiSpecifications()
->>>>>>> 89bcc1bf65e21f02c087ba32f4277dbd9bbc3126:src/main/java/org/wrml/core/runtime/bootstrap/DomainConfig.java
 	{
 		return this.apiSpecifications;
 	}
